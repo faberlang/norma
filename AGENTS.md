@@ -12,8 +12,8 @@ development.
   codegen-template, `ad`, or explicit `mori` deferral based.
 - Do not reintroduce public `norma:hal/*` imports. Use flat modules such as
   `norma:solum`, `norma:json`, and nested modules such as `norma:solum/path`.
-- `crates/norma` in Radix is not this repo and must not be treated as the
-  canonical source library.
+- Do not treat any historical Radix `crates/norma` path as the source library —
+  that crate is removed; this repo is canonical.
 
 ## Validation
 

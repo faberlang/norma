@@ -3,7 +3,7 @@
 # Etymology: "TOML" — Tom's Obvious Minimal Language (universal, kept as-is).
 #
 # Wire floor only: solve (text → valor), pange (valor → text), tempta
-# (lenient parse), all Rust-backed via crates/norma/toml.rs. Shared valor-tree
+# (lenient parse). Faber-native Norma source (no residual Rust norma crate). Shared valor-tree
 # navigation (cape/carpe/inveni/exige/*ne) lives in norma:valor.
 #
 # TOML's predicate semantics are emergent, not implemented here: TOML never

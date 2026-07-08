@@ -380,7 +380,7 @@ functio amputabit(textus via) → vacuum {
 # These proxy the path operations so the solum public surface is preserved
 # for the kernel manifest, MIR stepper dispatch, and existing callers. The
 # canonical Faber definitions live in norma:solum/path; both surfaces route
-# to the same solum:* handlers in crates/norma/solum.rs. New code should
+# to the same solum:* ad route handlers. New code should
 # prefer the norma:solum/path import; these remain for surface compatibility.
 
 # Join path segments

@@ -9,7 +9,7 @@
 # namespace. Path manipulation is logically distinct from file I/O — you
 # should not need to reach for the file device just to join two path
 # segments or read an extension. The Rust handlers live in
-# crates/norma/solum.rs (which uses std::path::Path); the ad routes
+# Pathname helpers are Faber-native; host path behavior is via ad routes (std::path on the host). The ad routes
 # stay under the solum:* namespace because that is where the handlers are
 # registered.
 #

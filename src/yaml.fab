@@ -4,7 +4,7 @@
 #
 # Wire floor only: solve (text → valor), pange (valor → text), tempta
 # (lenient parse), necto (multi-doc bind), collige (multi-doc gather), all
-# Rust-backed via crates/norma/yaml.rs. Shared valor-tree navigation
+# Faber-native Norma source (no residual Rust norma crate). Shared valor-tree navigation
 # (cape/carpe/inveni/exige/*ne) lives in norma:valor.
 
 

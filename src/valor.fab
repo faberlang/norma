@@ -20,7 +20,7 @@ importa ex "norma:chorda" privata chorda
 # SHAPE PREDICATES (est variant checks — all 8 Valor variants)
 # =========================================================================
 # Each predicate is a one-line variant tag check via `est`, lowering to
-# matches!(v, Valor::Variant(_)). See crates/faber/src/valor.rs for the
+# matches!(v, Valor::Variant(_)). See sibling faber-runtime/src/valor.rs for the
 # enum whose variants these check.
 
 functio nihilne(valor v) → bivalens {
