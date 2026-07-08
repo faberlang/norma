@@ -1,0 +1,122 @@
+# thesaurus.fab - Cache and Pub/Sub Device
+#
+# Etymology: "thesaurus" - treasury, storehouse. A cache of values.
+#
+# Part of the host effect surface (gateway-dispatched `thesaurus:*` routes).
+#
+# Design notes:
+# - Verb conjugation encodes sync/async:
+# - Future (-et, -abit, -ent): async operations
+# - Imperative: sync operations
+# - Key-value cache with TTL
+# - Pub/sub messaging with pattern subscriptions
+# - In-memory for dev/single-node, Redis for production
+
+# =========================================================================
+# KEY-VALUE CACHE
+# =========================================================================
+
+# Get value by key (returns nihil if not found)
+@ futura
+functio capiet(textus clavis) → textus ∪ nihil {
+    mori "norma:thesaurus.capiet is deferred pending Stage 2 dispatch"
+}
+
+# Set value with optional TTL in seconds
+@ futura
+functio ponet(textus clavis, textus valor, numerus ttl) → vacuum {
+    mori "norma:thesaurus.ponet is deferred pending Stage 2 dispatch"
+}
+
+# Set value only if key doesn't exist
+@ futura
+functio condet(textus clavis, textus valor) → bivalens {
+    mori "norma:thesaurus.condet is deferred pending Stage 2 dispatch"
+}
+
+# Delete key(s)
+@ futura
+functio delet(lista<textus> claves) → numerus {
+    mori "norma:thesaurus.delet is deferred pending Stage 2 dispatch"
+}
+
+# Check if key exists
+@ futura
+functio exstabit(textus clavis) → bivalens {
+    mori "norma:thesaurus.exstabit is deferred pending Stage 2 dispatch"
+}
+
+# Get remaining TTL in seconds (-1 = no expiry, -2 = not found)
+@ futura
+functio ttl(textus clavis) → numerus {
+    mori "norma:thesaurus.ttl is deferred pending Stage 2 dispatch"
+}
+
+# Set expiry on existing key
+@ futura
+functio expirabit(textus clavis, numerus secundae) → bivalens {
+    mori "norma:thesaurus.expirabit is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# NUMERIC OPERATIONS
+# =========================================================================
+
+# Increment by amount (default 1)
+@ futura
+functio augebit(textus clavis, numerus quantum) → numerus {
+    mori "norma:thesaurus.augebit is deferred pending Stage 2 dispatch"
+}
+
+# Decrement by 1
+@ futura
+functio minuet(textus clavis) → numerus {
+    mori "norma:thesaurus.minuet is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# KEY QUERIES
+# =========================================================================
+
+# Find keys matching glob pattern
+@ futura
+functio quaeret(textus exemplar) → lista<textus> {
+    mori "norma:thesaurus.quaeret is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# PUB/SUB
+# =========================================================================
+
+# Publish message to topic, returns subscriber count
+@ futura
+functio publicabit(textus thema, textus nuntius) → numerus {
+    mori "norma:thesaurus.publicabit is deferred pending Stage 2 dispatch"
+}
+
+# Subscribe to topic patterns
+# Pattern: * matches one segment, ** matches multiple
+@ futura
+functio auscultabit(lista<textus> exemplaria) → Subscriptio {
+    mori "norma:thesaurus.auscultabit is deferred pending Stage 2 dispatch"
+}
+
+# Pub/Sub subscription
+implendum Subscriptio {
+    # Iterate over incoming messages (async generator)
+    @ futura
+    @ cursor
+    functio nuntiabunt() → cursor<Nuntius>
+
+    # Unsubscribe and cleanup
+    functio claude() → vacuum
+}
+
+# Pub/Sub message
+implendum Nuntius {
+    functio thema() → textus
+
+    functio corpus() → textus
+
+    functio tempus() → numerus
+}

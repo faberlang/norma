@@ -1,0 +1,119 @@
+# json/lexica.fab — shared lexical floor for the JSON wire library
+#
+# Internal to norma:json. Imported by solve.fab (parser) and pange.fab (serializer).
+# No Rust backing: pure Faber character classification and escape tables.
+#
+# Faber has no char type — a single character is a length-1 textus. Classifiers
+# therefore compare length-1 slices using lexicographic ordering (the chorda
+# retenta interval pattern) rather than calling an is_digit intrinsic.
+
+# =========================================================================
+# WHITESPACE
+# =========================================================================
+
+functio _est_sponte(textus c) → bivalens {
+    redde c ≡ " " aut c ≡ "\t" aut c ≡ "\n" aut c ≡ "\r"
+}
+
+# Advance over whitespace; returns the next non-whitespace index.
+functio _salta_sponte(textus s, numerus i) → numerus {
+    varia numerus pos ← i
+    dum pos < s.longitudo() {
+        si _est_sponte(s.sectio(pos, pos + 1)) {
+            pos ← pos + 1
+        }
+        secus {
+            redde pos
+        }
+    }
+    redde pos
+}
+
+# =========================================================================
+# DIGITS / NUMBER TERMINATORS
+# =========================================================================
+# Faber has no char ordering (textus < is rejected as non-numeric), so digit
+# classification uses membership against a literal digit string.
+
+functio _est_digita(textus c) → bivalens {
+    redde "0123456789".continet(c)
+}
+
+# A value terminator: the chars that legally end a scanned token.
+functio _est_finitura(textus c) → bivalens {
+    redde c ≡ "," aut c ≡ "}" aut c ≡ "]" aut _est_sponte(c)
+}
+
+# =========================================================================
+# SERIALIZER ESCAPE TABLES
+# =========================================================================
+# _transeant_liber maps a single literal char to its backslash escape.
+# Returns nihil when the char needs no escaping (caller emits it raw).
+
+functio _transeant_liber(textus c) → textus ∪ nihil {
+    si c ≡ "\"" ergo redde "\\\""
+    si c ≡ "\\" ergo redde "\\\\"
+    si c ≡ "\n" ergo redde "\\n"
+    si c ≡ "\r" ergo redde "\\r"
+    si c ≡ "\t" ergo redde "\\t"
+    si c ≡ "\u{08}" ergo redde "\\b"
+    si c ≡ "\u{0C}" ergo redde "\\f"
+    redde nihil
+}
+
+# Does this char require backslash-escaping? The structural " and \ always
+# do; other control chars (< space) are caught via _transeant_liber, which
+# knows the named escapes (\n \r \t \b \f). LIMITATION: Faber has no ord
+# intrinsic, so unnamed control chars (0x00-0x1F outside the named five)
+# are not escaped — real JSON rarely carries them, but full RFC 8259
+# compliance would require a \u00XX path and a codepoint intrinsic.
+functio _postulat_transeum(textus c) → bivalens {
+    si c ≡ "\"" aut c ≡ "\\" ergo redde verum
+    si _transeant_liber(c) non est nihil ergo redde verum
+    redde falsum
+}
+
+# =========================================================================
+# PARSER ESCAPE TABLE
+# =========================================================================
+# _destruat_liber maps a single escape letter (the char following \) back
+# to the literal it represents. Returns nihil for unknown letters (caller
+# signals a syntax error) and treats "u" as a sentinel for \uXXXX handling.
+
+functio _destruat_liber(textus s) → textus ∪ nihil {
+    si s ≡ "\"" ergo redde "\""
+    si s ≡ "\\" ergo redde "\\"
+    si s ≡ "/" ergo redde "/"
+    si s ≡ "n" ergo redde "\n"
+    si s ≡ "r" ergo redde "\r"
+    si s ≡ "t" ergo redde "\t"
+    si s ≡ "b" ergo redde "\u{08}"
+    si s ≡ "f" ergo redde "\u{0C}"
+    redde nihil
+}
+
+# =========================================================================
+# HEX DIGIT VALUE (for \uXXXX escapes)
+# =========================================================================
+# Single-hex-digit → numeric value. Returns nihil for non-hex chars.
+# Plain lookup table: Faber has no ord intrinsic, so we enumerate.
+
+functio _valor_hexadecimalis(textus c) → numerus ∪ nihil {
+    si c ≡ "0" ergo redde 0
+    si c ≡ "1" ergo redde 1
+    si c ≡ "2" ergo redde 2
+    si c ≡ "3" ergo redde 3
+    si c ≡ "4" ergo redde 4
+    si c ≡ "5" ergo redde 5
+    si c ≡ "6" ergo redde 6
+    si c ≡ "7" ergo redde 7
+    si c ≡ "8" ergo redde 8
+    si c ≡ "9" ergo redde 9
+    si c ≡ "a" aut c ≡ "A" ergo redde 10
+    si c ≡ "b" aut c ≡ "B" ergo redde 11
+    si c ≡ "c" aut c ≡ "C" ergo redde 12
+    si c ≡ "d" aut c ≡ "D" ergo redde 13
+    si c ≡ "e" aut c ≡ "E" ergo redde 14
+    si c ≡ "f" aut c ≡ "F" ergo redde 15
+    redde nihil
+}

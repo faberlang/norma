@@ -1,0 +1,148 @@
+# valor.fab — codec-agnostic valor tree navigation
+#
+# Shared surface for the tree-shaped codecs under the flat codec modules (json, toml, yaml).
+# Each codec owns its wire floor; this module owns the operations on the
+# valor tree shape they all produce. CSV is excluded — it produces a flat
+# lista<lista<textus>>, not a valor tree.
+#
+# No Rust backing. Variant discrimination uses `est` (tag check without
+# extraction, per docs/factory/est-variant-check) and typed read uses `↦`
+# (extraction). The conversio-cascade pattern that previously lived in
+# json.fab and toml.fab is retired here in favor of the flat est dispatch.
+#
+# Same-file calls use bare helpers. `cape` is a reserved keyword (the fac/cape
+# error-catch clause), so internal callers use the private `_cape` helper while
+# the public `cape` export preserves the external namespace surface.
+
+importa ex "norma:chorda" privata chorda
+
+# =========================================================================
+# SHAPE PREDICATES (est variant checks — all 8 Valor variants)
+# =========================================================================
+# Each predicate is a one-line variant tag check via `est`, lowering to
+# matches!(v, Valor::Variant(_)). See crates/faber/src/valor.rs for the
+# enum whose variants these check.
+
+functio nihilne(valor v) → bivalens {
+    redde v est nihil
+}
+
+functio bivalensne(valor v) → bivalens {
+    redde v est bivalens
+}
+
+functio textusne(valor v) → bivalens {
+    redde v est textus
+}
+
+functio numerusne(valor v) → bivalens {
+    redde v est numerus
+}
+
+functio fractusne(valor v) → bivalens {
+    redde v est fractus
+}
+
+functio listane(valor v) → bivalens {
+    redde v est lista<valor>
+}
+
+functio tabulane(valor v) → bivalens {
+    redde v est tabula<textus, valor>
+}
+
+# Instans is the RFC3339 datetime wire form (Valor::Instans). Available to
+# all tree codecs — previously toml-only, now shared.
+functio instansne(valor v) → bivalens {
+    redde v est instans
+}
+
+# =========================================================================
+# VALUE ACCESS
+# =========================================================================
+# All accessors return nihil for missing keys, out-of-bounds indices, and
+# non-collection variants. Callers distinguish "absent" from "wrong shape"
+# via the predicates above if they care.
+
+# Get value by key from a tabula (returns nihil if missing or non-tabula).
+@ privata
+functio _cape(valor v, textus clavis) → valor {
+    si v est nihil ergo redde nihil
+    si v non est tabula<textus, valor> ergo redde nihil
+    fixum tabula<textus, valor> tab ← v ↦ tabula<textus, valor>
+    fixum valor got ← tab.accipe(clavis)
+    redde got
+}
+
+functio cape(valor v, textus clavis) → valor {
+    redde _cape(v, clavis)
+}
+
+# Pluck value by index from a lista (returns nihil if out of bounds or
+# non-lista).
+functio carpe(valor v, numerus index) → valor {
+    si v est nihil ergo redde nihil
+    si v non est lista<valor> ergo redde nihil
+    fixum lista<valor> items ← v ↦ lista<valor>
+    fixum valor got ← items.accipe(index)
+    redde got
+}
+
+# Find value by dotted path (e.g. "user.address.city"). Walks tabulae by
+# key; numeric segments index listae. Returns nihil if any segment misses.
+functio inveni(valor v, textus via) → valor {
+    # chorda.discissa limited split: at most via.longitudo()+1 segments,
+    # which is more than any dotted path can produce.
+    fixum lista<textus> partes ← chorda.discissa(via, ".", via.longitudo() + 1) ↦ lista<textus>
+    varia valor current ← v
+    itera ex partes fixum pars {
+        current ← inveni_partem(current, pars)
+        si current est nihil ergo redde nihil
+    }
+    redde current
+}
+
+# Walk one path segment. Tabula-keyed first; numeric segments fall through
+# to lista indexing. Non-collection variants return nihil.
+functio inveni_partem(valor current, textus part) → valor {
+    si current est nihil ergo redde nihil
+    si current est tabula<textus, valor> {
+        fixum tabula<textus, valor> tab ← current ↦ tabula<textus, valor>
+        fixum valor got ← tab.accipe(part)
+        si got est nihil ergo redde nihil
+        redde got
+    }
+    si current est lista<valor> {
+        fac {
+            fixum numerus idx ← part ↦ numerus
+            redde carpe(current, idx)
+        }
+        cape err {
+            redde nihil
+        }
+    }
+    redde nihil
+}
+
+# =========================================================================
+# STRICT EXTRACTION
+# =========================================================================
+
+# Require a textus child at clavis; throw on missing or non-textus.
+functio exige(valor v, textus clavis) → textus ⇥ textus {
+    fixum valor child ← _cape(v, clavis)
+    si child est nihil ergo iace "missing key: §"(clavis)
+    si child non est textus ergo iace "key not textus: §"(clavis)
+    redde child ↦ textus
+}
+
+# Require multiple textus children; throws on the first missing or
+# non-textus key. Used by codec callers that validate a schema shape.
+functio exige_claves(valor v, lista<textus> claves) → vacuum ⇥ textus {
+    itera ex claves fixum clavis {
+        fixum valor child ← _cape(v, clavis)
+        si child est nihil ergo iace "missing key: §"(clavis)
+        si child non est textus ergo iace "key not textus: §"(clavis)
+    }
+    redde
+}

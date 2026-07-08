@@ -1,0 +1,468 @@
+# solum.fab - File System Device
+#
+# Etymology: "solum" - ground, floor, base. Local/ground I/O (vs caelum/sky/network).
+#
+# All verbs are native Faber bodies over stream `ad` (Latin `solum:*` routes).
+# Path operations are proxied here for surface compatibility; their canonical
+# home is norma:solum/path.
+#
+# Design principles:
+# - Every verb blocks on its `ad` frame response. Async is host-side plumbing:
+# the gateway decides how long to hold a request; Faber's posture is uniform.
+# There is no `@ futura` — sync/async is a route-naming distinction, not a
+# Faber-side marker. The host may dispatch `leget` to an async handler while
+# `lege` runs on a blocking thread; Faber sees the same `ad` shape either way.
+# - Verb conjugation names the route, not the posture:
+# - Imperative (-a, -e, -i) and Future (-et, -ebit) verbs name distinct
+# `solum:*` routes so the host can dispatch them differently if it chooses.
+# - Different verbs for different data types (text vs bytes vs lines)
+# - No "Latin as paint" - verbs chosen for semantic fit, not translation
+
+
+# =============================================================================
+# TYPES
+# =============================================================================
+
+# Full file status returned by describe/describet
+# Maps to: stat(), lstat()
+genus SolumStatus {
+    numerus modus
+    # permission bits (e.g., 0o755)
+    numerus nexus
+    # hard link count
+    numerus possessor
+    # owner uid
+    numerus grex
+    # group gid
+    numerus mensura
+    # size in bytes
+    numerus modificatum
+    # mtime (ms since epoch)
+    bivalens directoriumne
+    bivalens vinculumne
+}
+
+# =========================================================================
+# READING - Text
+# =========================================================================
+# Verb: lege/leget from "legere" (to read, gather)
+# Why: The primary Latin verb for reading. Text is the "readable" format.
+# Maps to: fs.readFileSync(path, 'utf8') / fs.readFile(path, 'utf8')
+
+# Read entire file as text (sync)
+@ radix typus T in textus lista<textus> octeti
+functio lege<T>(textus via) → T {
+    redde ad 'solum:lege' (via) ↦ T
+}
+
+# Read entire file as text (async route; Faber blocks on the frame)
+functio leget(textus via) → textus {
+    redde ad 'solum:leget' (via) ↦ textus
+}
+
+# =========================================================================
+# READING - Bytes
+# =========================================================================
+# Verb: hauri/hauriet from "haurire" (to draw up, draw water)
+# Why: Drawing bytes from a file like drawing water from a well.
+# Distinct from "reading" text - this is raw extraction.
+# Maps to: fs.readFileSync(path) / fs.readFile(path) returning Buffer
+
+# Draw entire file as bytes (sync)
+functio hauri(textus via) → octeti {
+    redde ad 'solum:hauri' (via) ↦ octeti
+}
+
+# Draw entire file as bytes (async route; Faber blocks on the frame)
+functio hauriet(textus via) → octeti {
+    redde ad 'solum:hauriet' (via) ↦ octeti
+}
+
+# =========================================================================
+# READING - Lines
+# =========================================================================
+# Verb: carpe/carpiet from "carpere" (to pluck, pick, harvest)
+# Why: Plucking lines one by one, like picking fruit from a tree.
+# Different from bulk reading - implies iteration/selection.
+# Maps to: readline interface or line-by-line file reading
+
+# Pluck lines from file (sync)
+functio carpe(textus via) → lista<textus> {
+    redde ad 'solum:carpe' (via) ↦ lista<textus>
+}
+
+# Pluck lines from file (async route; Faber blocks on the frame)
+functio carpiet(textus via) → lista<textus> {
+    redde ad 'solum:carpiet' (via) ↦ lista<textus>
+}
+
+# =========================================================================
+# WRITING - Text
+# =========================================================================
+# Verb: scribe/scribet from "scribere" (to write)
+# Why: The primary Latin verb for writing. Natural fit for text output.
+# Also handles writing lines (text with newlines).
+# Maps to: fs.writeFileSync(path, data, 'utf8') / fs.writeFile(...)
+
+# Write text to file, overwrites existing (sync)
+functio scribe(textus via, textus data) → vacuum {
+    redde ad 'solum:scribe' ([via, data]) ↦ vacuum
+}
+
+# Write text to file, overwrites existing (async route; Faber blocks)
+functio scribet(textus via, textus data) → vacuum {
+    redde ad 'solum:scribet' ([via, data]) ↦ vacuum
+}
+
+# =========================================================================
+# WRITING - Bytes
+# =========================================================================
+# Verb: funde/fundet from "fundere" (to pour, pour out)
+# Why: Pouring bytes into a file like pouring liquid into a vessel.
+# Counterpart to "hauri" (drawing out) - funde pours in.
+# Maps to: fs.writeFileSync(path, buffer) / fs.writeFile(path, buffer)
+
+# Pour bytes to file, overwrites existing (sync)
+functio funde(textus via, octeti data) → vacuum {
+    fixum lista<valor> args ← [via ↦ valor, data ↦ valor]
+    redde ad 'solum:funde' (args) ↦ vacuum
+}
+
+# Pour bytes to file, overwrites existing (async route; Faber blocks)
+@ futura
+functio fundet(textus via, octeti data) → vacuum {
+    mori "norma:solum.fundet is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# WRITING - Append
+# =========================================================================
+# Verb: appone/apponet from "apponere" (to place near, add to)
+# Why: Adding content to the end of existing content.
+# Not overwriting - placing alongside what's already there.
+# Maps to: fs.appendFileSync(path, data) / fs.appendFile(path, data)
+
+# Append text to file (sync)
+functio appone(textus via, textus data) → vacuum {
+    redde ad 'solum:appone' ([via, data]) ↦ vacuum
+}
+
+# Append text to file (async route; Faber blocks)
+functio apponet(textus via, textus data) → vacuum {
+    redde ad 'solum:apponet' ([via, data]) ↦ vacuum
+}
+
+# =========================================================================
+# FILE INFO - Existence
+# =========================================================================
+# Verb: exstat/exstabit from "exstare" (to stand out, exist, be visible)
+# Why: Asking if something exists/stands in the filesystem.
+# Maps to: fs.existsSync(path) / fs.access(path)
+
+# Check if path exists (sync)
+functio exstat(textus via) → bivalens {
+    redde ad 'solum:exstat' (via) ↦ bivalens
+}
+
+# Check if path exists (async route; Faber blocks)
+functio exstabit(textus via) → bivalens {
+    redde ad 'solum:exstabit' (via) ↦ bivalens
+}
+
+# True when path metadata says directory.
+functio directoriumne(textus via) → bivalens {
+    redde ad 'solum:directoriumne' (via) ↦ bivalens
+}
+
+# True when path metadata says regular file.
+functio regularene(textus via) → bivalens {
+    redde ad 'solum:regularene' (via) ↦ bivalens
+}
+
+# True when path itself is a symbolic link.
+functio vinculumne(textus via) → bivalens {
+    redde ad 'solum:vinculumne' (via) ↦ bivalens
+}
+
+# File size in bytes.
+functio mensura(textus via) → numerus {
+    redde ad 'solum:mensura' (via) ↦ numerus
+}
+
+# Permission/mode bits as a numeric value.
+functio modus(textus via) → numerus {
+    redde ad 'solum:modus' (via) ↦ numerus
+}
+
+# =========================================================================
+# FILE INFO - Details
+# =========================================================================
+# Verb: describe/describet from "describere" (to write down, delineate, describe)
+# Why: Asking the filesystem to describe/detail the file's properties.
+# Returns full metadata struct, not just existence.
+# Maps to: fs.statSync(path) / fs.stat(path) - uses lstat to not follow symlinks
+
+# Get file details (sync)
+# WHY: deferred because the `ad` materializer does not support
+# arbitrary genera like SolumStatus — only vacuum, valor, scalars, octeti,
+# instans, and lista<T> (empirically confirmed July 2026). Migrating to
+# `ad` requires extending the materializer's conversio-valor genus table
+# to lower SolumStatus as a Tabula walk. The host gateway work is the
+# right moment to land that.
+functio describe(textus via) → SolumStatus {
+    mori "norma:solum.describe is deferred pending Stage 2 dispatch"
+}
+
+# Get file details (async — same materializer blocker as describe)
+functio describet(textus via) → SolumStatus {
+    mori "norma:solum.describet is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# FILE INFO - Symlinks
+# =========================================================================
+# Verb: sequere/sequetur from "sequi" (to follow)
+# Why: Following a symbolic link to discover its target.
+# Like following a trail or path to its destination.
+# Maps to: fs.readlinkSync(path) / fs.readlink(path)
+
+# Follow symlink to get target path (sync)
+functio sequere(textus via) → textus {
+    redde ad 'solum:sequere' (via) ↦ textus
+}
+
+# Follow symlink to get target path (async route; Faber blocks)
+functio sequetur(textus via) → textus {
+    redde ad 'solum:sequetur' (via) ↦ textus
+}
+
+# Create a symbolic link pointing from destinatio to fons.
+functio vincula(textus fons, textus destinatio) → vacuum {
+    redde ad 'solum:vincula' ([fons, destinatio]) ↦ vacuum
+}
+
+# =========================================================================
+# FILE OPERATIONS - Delete
+# =========================================================================
+# Verb: dele/delet from "delere" (to destroy, delete, erase)
+# Why: Direct Latin root of English "delete". Unambiguous.
+# Files only - use amputa/amputabit for directories.
+# Maps to: fs.unlinkSync(path) / fs.unlink(path)
+
+# Delete file (sync)
+functio dele(textus via) → vacuum {
+    redde ad 'solum:dele' (via) ↦ vacuum
+}
+
+# Delete file (async route; Faber blocks)
+functio delet(textus via) → vacuum {
+    redde ad 'solum:delet' (via) ↦ vacuum
+}
+
+# =========================================================================
+# FILE OPERATIONS - Copy
+# =========================================================================
+# Verb: exscribe/exscribet from "exscribere" (to copy out, transcribe)
+# Why: Writing out a copy of something. More precise than generic "copy".
+# The "ex-" prefix implies extracting/copying from source.
+# Maps to: fs.copyFileSync(src, dest) / fs.copyFile(src, dest)
+
+# Copy file (sync)
+functio exscribe(textus fons, textus destinatio) → vacuum {
+    redde ad 'solum:exscribe' ([fons, destinatio]) ↦ vacuum
+}
+
+# Copy file (async route; Faber blocks)
+functio exscribet(textus fons, textus destinatio) → vacuum {
+    redde ad 'solum:exscribet' ([fons, destinatio]) ↦ vacuum
+}
+
+# =========================================================================
+# FILE OPERATIONS - Rename/Move
+# =========================================================================
+# Verb: renomina/renominabit from "renominare" (to rename)
+# Why: Connects to "nomen" terminology used throughout Faber.
+# Handles both rename and move (same underlying syscall).
+# Maps to: fs.renameSync(src, dest) / fs.rename(src, dest)
+
+# Rename or move file (sync)
+functio renomina(textus fons, textus destinatio) → vacuum {
+    redde ad 'solum:renomina' ([fons, destinatio]) ↦ vacuum
+}
+
+# Rename or move file (async route; Faber blocks)
+functio renominabit(textus fons, textus destinatio) → vacuum {
+    redde ad 'solum:renominabit' ([fons, destinatio]) ↦ vacuum
+}
+
+# =========================================================================
+# FILE OPERATIONS - Touch
+# =========================================================================
+# Verb: tange/tanget from "tangere" (to touch)
+# Why: Direct Latin root of English "touch". Creates if missing,
+# updates mtime if exists. Light contact with the file.
+# Maps to: touch behavior (utimes or create empty file)
+
+# Touch file - create or update mtime (sync)
+functio tange(textus via) → vacuum {
+    redde ad 'solum:tange' (via) ↦ vacuum
+}
+
+# Touch file - create or update mtime (async route; Faber blocks)
+functio tanget(textus via) → vacuum {
+    redde ad 'solum:tanget' (via) ↦ vacuum
+}
+
+# Set permission/mode bits.
+functio modum(textus via, numerus modus) → vacuum {
+    fixum lista<valor> args ← [via ↦ valor, modus ↦ valor]
+    redde ad 'solum:modum' (args) ↦ vacuum
+}
+
+# =========================================================================
+# DIRECTORY OPERATIONS - Create
+# =========================================================================
+# Verb: crea/creabit from "creare" (to create, bring forth)
+# Why: Creating something new. In this context, always a directory.
+# Recursive by default (creates parent dirs as needed).
+# Maps to: fs.mkdirSync(path, {recursive: true}) / fs.mkdir(...)
+
+# Create directory (sync)
+functio crea(textus via) → vacuum {
+    redde ad 'solum:crea' (via) ↦ vacuum
+}
+
+# Create directory (async route; Faber blocks)
+functio creabit(textus via) → vacuum {
+    redde ad 'solum:creabit' (via) ↦ vacuum
+}
+
+# =========================================================================
+# DIRECTORY OPERATIONS - List
+# =========================================================================
+# Verb: enumera/enumerabit from "enumerare" (to count out, enumerate)
+# Why: Listing/counting the contents of a directory.
+# More precise than "list" - implies systematic enumeration.
+# Maps to: fs.readdirSync(path) / fs.readdir(path)
+
+# List directory contents (sync)
+functio enumera(textus via) → lista<textus> {
+    redde ad 'solum:enumera' (via) ↦ lista<textus>
+}
+
+# List directory contents (async route; Faber blocks)
+functio enumerabit(textus via) → lista<textus> {
+    redde ad 'solum:enumerabit' (via) ↦ lista<textus>
+}
+
+# =========================================================================
+# DIRECTORY OPERATIONS - Prune/Remove
+# =========================================================================
+# Verb: amputa/amputabit from "amputare" (to cut off, prune)
+# Why: Pruning a branch from a tree (directory tree).
+# Recursive deletion - removes directory and all contents.
+# Avoids "puto" which also means "to think".
+# Maps to: fs.rmSync(path, {recursive: true}) / fs.rm(...)
+
+# Prune directory tree (sync)
+functio amputa(textus via) → vacuum {
+    redde ad 'solum:amputa' (via) ↦ vacuum
+}
+
+# Prune directory tree (async route; Faber blocks)
+functio amputabit(textus via) → vacuum {
+    redde ad 'solum:amputabit' (via) ↦ vacuum
+}
+
+# =========================================================================
+# PATH UTILITIES (proxies — canonical definitions live in norma:solum/path)
+# =========================================================================
+# These proxy the path operations so the solum public surface is preserved
+# for the kernel manifest, MIR stepper dispatch, and existing callers. The
+# canonical Faber definitions live in norma:solum/path; both surfaces route
+# to the same solum:* handlers in crates/norma/solum.rs. New code should
+# prefer the norma:solum/path import; these remain for surface compatibility.
+
+# Join path segments
+functio iunge(lista<textus> partes) → textus {
+    redde ad 'solum:iunge' (partes) ↦ textus
+}
+
+# Parent path segment (directory part)
+functio parens(textus via) → textus {
+    redde ad 'solum:parens' (via) ↦ textus
+}
+
+# Final path segment (filename)
+functio nomen(textus via) → textus {
+    redde ad 'solum:nomen' (via) ↦ textus
+}
+
+# File extension (includes dot)
+functio suffixum(textus via) → textus {
+    redde ad 'solum:suffixum' (via) ↦ textus
+}
+
+# Resolve to absolute path
+functio absolve(textus via) → textus {
+    redde ad 'solum:absolve' (via) ↦ textus
+}
+
+# Get user's home directory
+functio domus() → textus {
+    redde ad 'solum:domus' ↦ textus
+}
+
+# Get system temp directory
+functio temporarium() → textus {
+    redde ad 'solum:temporarium' ↦ textus
+}
+
+@ privata
+functio _iunge_duo(textus base, textus segmentum) → textus {
+    si base.finis("/") {
+        redde base + segmentum
+    }
+    redde (base + "/") + segmentum
+}
+
+# =========================================================================
+# SHALLOW GLOB (native composition — v1 single-segment star)
+# =========================================================================
+#
+# Contract: explora(radix, exemplar) → lista<textus> ⇥ textus
+# v1: * matches exactly one path segment (e.g. "*/SKILL.md").
+#
+functio explora(textus radix, textus exemplar) → lista<textus> ⇥ textus {
+    fixum lista<textus> segmenta ← exemplar.divide("/")
+    varia lista<textus> candidatos ← [radix]
+    varia numerus index ← 0
+    dum index < segmenta.longitudo() {
+        fixum textus segmentum ← segmenta.accipe(index) vel ""
+        si segmentum ≡ "" {
+            iace "empty path segment in solum.explora exemplar"
+        }
+
+        varia lista<textus> proximos ← vacua
+        si segmentum ≡ "*" {
+            itera ex candidatos fixum base {
+                fixum lista<textus> nomina ← enumera(base)
+                itera ex nomina fixum nomen {
+                    proximos.appende(_iunge_duo(base, nomen))
+                }
+            }
+        }
+        secus {
+            itera ex candidatos fixum base {
+                fixum textus via ← _iunge_duo(base, segmentum)
+                si exstat(via) {
+                    proximos.appende(via)
+                }
+            }
+        }
+
+        candidatos ← proximos
+        index ← index + 1
+    }
+    redde candidatos
+}

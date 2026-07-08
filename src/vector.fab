@@ -1,0 +1,31 @@
+# vector.fab — compiler-owned vector register intrinsics
+#
+# Public import: importa ex "norma:vector" privata vector
+
+functio addita<elem, magnitudo N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
+    redde a.addita(b)
+}
+
+functio subtrahe<elem, magnitudo N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
+    redde a.subtrahe(b)
+}
+
+functio multiplica<elem, magnitudo N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
+    redde a.multiplica(b)
+}
+
+functio divida<elem, magnitudo N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
+    redde a.divida(b)
+}
+
+functio dot<elem, magnitudo N>(vector<elem, N> a, vector<elem, N> b) → elem {
+    redde a.dot(b)
+}
+
+functio cross<elem>(vector<elem, 3> a, vector<elem, 3> b) → vector<elem, 3> {
+    redde a.cross(b)
+}
+
+functio swizzle<elem, magnitudo N>(vector<elem, N> v, textus exemplar) → vector<elem, N> {
+    redde v.swizzle(exemplar)
+}

@@ -1,0 +1,30 @@
+# caelum/auscultator.fab — TCP listener
+#
+# Public import: importa ex "norma:caelum/auscultator" privata auscultator
+# Depends on: norma:caelum/connexus (for Connexus type in accipe())
+
+importa ex "norma:caelum/connexus" privata connexus
+
+genus Auscultator {
+    numerus id = 0
+
+    # Accept next incoming connection
+    functio accipe() → connexus.Connexus {
+        mori "norma:caelum/auscultator.accipe is deferred pending Stage 2 dispatch"
+    }
+
+    @ futura
+    functio accipiet() → connexus.Connexus {
+        mori "norma:caelum/auscultator.accipiet is deferred pending Stage 2 dispatch"
+    }
+
+    # Stop listening
+    functio claude() → vacuum {
+        mori "norma:caelum/auscultator.claude is deferred pending Stage 2 dispatch"
+    }
+
+    # Local port
+    functio portus() → numerus {
+        mori "norma:caelum/auscultator.portus is deferred pending Stage 2 dispatch"
+    }
+}

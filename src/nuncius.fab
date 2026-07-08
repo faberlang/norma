@@ -1,0 +1,126 @@
+# nuncius.fab - Inter-Process Communication Device
+#
+# Etymology: "nuncius" - messenger, envoy. Communication between processes.
+#
+# Part of the host effect surface (gateway-dispatched `nuncius:*` routes).
+# Maps to IPCDevice from monk-os-kernel.
+#
+# Design notes:
+# - Verb conjugation encodes sync/async:
+# - Imperative (-a, -e, -i): synchronous
+# - Future indicative (-et, -ebit): asynchronous
+# - Shared memory for fast data exchange
+# - Mutex/semaphore/condvar for synchronization
+# - Message ports for structured communication
+
+# =========================================================================
+# SHARED MEMORY
+# =========================================================================
+
+# Allocate shared memory buffer
+functio alloca(numerus mensura) → octeti {
+    mori "norma:nuncius.alloca is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# MESSAGE PORTS
+# =========================================================================
+# Verb: aperi from "aperire" (to open, uncover)
+# Why: Opening a communication channel between endpoints.
+
+# Open a connected message port pair
+functio aperi() → ParPortarum {
+    mori "norma:nuncius.aperi is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# SYNCHRONIZATION PRIMITIVES
+# =========================================================================
+# Verb: restringe from "restringere" (to restrict, bind back)
+# Why: A mutex restricts access to a resource.
+#
+# Verb: numera from "numerare" (to count, reckon)
+# Why: A semaphore counts available permits.
+#
+# Verb: vigila from "vigilare" (to watch, keep watch)
+# Why: Threads keep watch at a condition variable.
+
+# Restrict access via mutex backed by shared memory
+functio restringe(octeti memoria, numerus offset) → Mutex {
+    mori "norma:nuncius.restringe is deferred pending Stage 2 dispatch"
+}
+
+# Count permits via semaphore backed by shared memory
+functio numera(octeti memoria, numerus offset, numerus valor) → Semaphorum {
+    mori "norma:nuncius.numera is deferred pending Stage 2 dispatch"
+}
+
+# Keep watch via condition variable backed by shared memory
+functio vigila(octeti memoria, numerus offset) → Conditio {
+    mori "norma:nuncius.vigila is deferred pending Stage 2 dispatch"
+}
+
+# Message port pair
+implendum ParPortarum {
+    functio a() → Porta
+
+    functio b() → Porta
+}
+
+# Message port (one end of a channel)
+implendum Porta {
+    # Send message
+    functio mitte(valor nuntius) → vacuum
+
+    # Receive message (async, blocks until available)
+    @ futura
+    functio recipiet() → valor
+
+    # Check if message available
+    functio paratum() → bivalens
+
+    # Close port
+    functio claude() → vacuum
+}
+
+# Mutual exclusion lock
+implendum Mutex {
+    # Acquire lock (blocks until available)
+    functio obstringe() → vacuum
+
+    # Try to acquire without blocking
+    functio tempta() → bivalens
+
+    # Release lock
+    functio solve() → vacuum
+}
+
+# Counting semaphore
+implendum Semaphorum {
+    # Wait (decrement, blocks if zero)
+    functio exspecta() → vacuum
+
+    # Try to decrement without blocking
+    functio tempta() → bivalens
+
+    # Post (increment, wakes one waiter)
+    functio signa() → vacuum
+
+    # Read current value
+    functio lege() → numerus
+}
+
+# Condition variable
+implendum Conditio {
+    # Wait for signal (must hold mutex)
+    functio exspecta(Mutex mutex) → vacuum
+
+    # Wait with timeout, returns false if timed out
+    functio morare(Mutex mutex, numerus ms) → bivalens
+
+    # Wake one waiting thread
+    functio signa() → vacuum
+
+    # Wake all waiting threads
+    functio diffunde() → vacuum
+}

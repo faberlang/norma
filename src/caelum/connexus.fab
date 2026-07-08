@@ -1,0 +1,45 @@
+# caelum/connexus.fab — TCP socket (connected byte stream)
+#
+# Public import: importa ex "norma:caelum/connexus" privata connexus
+# Depends on: norma:caelum/terminus (for Terminus type in remotus()/localis())
+
+importa ex "norma:caelum/terminus" privata terminus
+
+genus Connexus {
+    numerus id = 0
+
+    # Draw bytes (up to n if provided, otherwise whatever is available)
+    functio hauri(numerus n sponte) → octeti {
+        mori "norma:caelum/connexus.hauri is deferred pending Stage 2 dispatch"
+    }
+
+    @ futura
+    functio hauriet(numerus n sponte) → octeti {
+        mori "norma:caelum/connexus.hauriet is deferred pending Stage 2 dispatch"
+    }
+
+    # Pour bytes
+    functio funde(octeti data) → vacuum {
+        mori "norma:caelum/connexus.funde is deferred pending Stage 2 dispatch"
+    }
+
+    @ futura
+    functio fundet(octeti data) → vacuum {
+        mori "norma:caelum/connexus.fundet is deferred pending Stage 2 dispatch"
+    }
+
+    # Close connection
+    functio claude() → vacuum {
+        mori "norma:caelum/connexus.claude is deferred pending Stage 2 dispatch"
+    }
+
+    # Remote endpoint
+    functio remotus() → terminus.Terminus {
+        mori "norma:caelum/connexus.remotus is deferred pending Stage 2 dispatch"
+    }
+
+    # Local endpoint
+    functio localis() → terminus.Terminus {
+        mori "norma:caelum/connexus.localis is deferred pending Stage 2 dispatch"
+    }
+}

@@ -1,0 +1,411 @@
+# chorda.fab — public Faber text library (cord operations + mechanical verbs)
+#
+# Public import: importa ex "norma:chorda" privata chorda
+# Method ledger: docs/stdlib/chorda-methods.md
+# Mechanical v1: pange/solve/tempta = UTF-8 textus ↔ octeti only (one functio per verb)
+#
+# Naming rule: chorda owns cord-level transformations that sit above compiler
+# intrinsics such as textus.longitudo() and textus.sectio(). Verb names are
+# Latin stems chosen for motion and result shape, not English API categories.
+
+
+# =========================================================================
+# CORD OPERATIONS
+# =========================================================================
+
+# Name: retorta from retorquere, "to twist back."
+# Morphologia: Perfectum result adjective; the returned cord is the completed
+# reversed form, and the input is not mutated.
+# Why: Provide a cord-level reverse operation without making textus itself
+# carry every derived helper.
+# Edge: v1 walks the compiler-owned sectio index space.
+functio retorta(textus s) → textus {
+    varia numerus i ← s.longitudo()
+    varia textus out ← ""
+
+    # Walk backward through scalar positions and copy each segment into the
+    # output cord.
+    dum i > 0 {
+        i ← i - 1
+        out ← out + s.sectio(i, i + 1)
+    }
+
+    redde out
+}
+
+# Name: nexa from nectere, "to bind" or "to tie."
+# Morphologia: Perfectum result adjective; the segments have been bound by
+# the supplied vinculum.
+# Why: Join cord segments with an arbitrary bond string, avoiding separate
+# join helpers for every naming convention.
+# Edge: An empty partes list returns the empty cord.
+functio nexa(lista<textus> partes, textus vinculum) → textus {
+    varia textus out ← ""
+    varia numerus index ← 0
+
+    # The first segment is copied directly; later segments receive the bond
+    # before their content.
+    itera ex partes fixum pars {
+        si index > 0 {
+            out ← out + vinculum
+        }
+
+        index ← index + 1
+        out ← out + pars
+    }
+
+    redde out
+}
+
+# Name: reputat from reputare, "to reckon" or "to count."
+# Morphologia: Praesens active verb; this observes the cord and reports a
+# count rather than returning a transformed cord.
+# Why: Count non-overlapping occurrences of quaesitum in s.
+# Edge: Empty quaesitum is defined as zero matches, not every boundary.
+functio reputat(textus s, textus quaesitum) → numerus {
+    varia numerus pos ← 0
+    varia numerus count ← 0
+    fixum numerus quaesiti_longitudo ← quaesitum.longitudo()
+
+    si quaesiti_longitudo ≡ 0 ergo redde 0
+
+    # Advance by the query length on a match so overlapping occurrences are
+    # intentionally not counted.
+    dum pos + quaesiti_longitudo ≤ s.longitudo() {
+        si s.sectio(pos, pos + quaesiti_longitudo) ≡ quaesitum {
+            count ← count + 1
+            pos ← pos + quaesiti_longitudo
+        }
+        secus {
+            pos ← pos + 1
+        }
+    }
+
+    redde count
+}
+
+# Name: reciprocus from reciprocus, "running back the same way."
+# Morphologia: Adjectival predicate shape; the result tells whether the cord
+# has reciprocal forward/backward reading.
+# Why: Public palindrome test built on retorta rather than duplicating the
+# reverse walk.
+functio reciprocus(textus s) → bivalens {
+    redde s ≡ retorta(s)
+}
+
+# =========================================================================
+# CORD FILTERING (scalar retention — filter ≠ numeric clamp)
+# =========================================================================
+
+# Name: scala from scala, "ladder."
+# Morphologia: Nominal decomposition; a cord becomes a ladder of scalar
+# segments rather than a newly inflected cord.
+# Why: Expose the scalar walk as data for callers that need explicit pieces.
+# Edge: v1 follows the same sectio index model used by textus intrinsics.
+functio scala(textus s) → lista<textus> {
+    varia lista<textus> out ← vacua
+    varia numerus i ← 0
+
+    # Each rung is represented as a one-scalar textus value.
+    dum i < s.longitudo() {
+        out.appende(s.sectio(i, i + 1))
+        i ← i + 1
+    }
+
+    redde out
+}
+
+# Name: retenta_iudicio from retinere + iudicium, "judgment."
+# Morphologia: Perfectum result adjective; the returned cord contains the
+# scalars that have been retained.
+# Why: Predicate form for caller-defined retention logic.
+# Edge: The predicate receives one scalar textus segment at a time.
+functio retenta_iudicio(textus s, (textus) → bivalens pred) → textus {
+    varia lista<textus> kept ← vacua
+    varia numerus i ← 0
+
+    # Retain only the scalar segments accepted by the predicate, then rejoin
+    # without introducing separators.
+    dum i < s.longitudo() {
+        fixum textus c ← s.sectio(i, i + 1)
+        si pred(c) {
+            kept.appende(c)
+        }
+
+        i ← i + 1
+    }
+
+    redde nexa(kept, "")
+}
+
+# Name: retenta from retinere, "to keep back."
+# Morphologia: Perfectum result adjective; interval bounds select what is
+# retained in the returned cord.
+# Why: Inclusive scalar-order filtering.
+# Edge: sponte bounds are open ends; nihil infimum means no lower bound,
+# nihil supremum means no upper bound.
+functio retenta(textus s, textus infimum sponte, textus supremum sponte) → textus {
+    varia lista<textus> kept ← vacua
+    varia numerus i ← 0
+
+    # Start optimistic for each scalar and rule it out only when a present
+    # bound excludes it.
+    dum i < s.longitudo() {
+        fixum textus c ← s.sectio(i, i + 1)
+        varia bivalens keep ← verum
+
+        si infimum non est nihil et c < infimum {
+            keep ← falsum
+        }
+        si supremum non est nihil et c > supremum {
+            keep ← falsum
+        }
+        si keep {
+            kept.appende(c)
+        }
+
+        i ← i + 1
+    }
+
+    redde nexa(kept, "")
+}
+
+# Name: expurgata_iudicio from expurgare + iudicium, "judgment."
+# Morphologia: Perfectum result adjective; the returned cord has had the
+# rejected scalars purged from it.
+# Why: Predicate form for caller-defined removal logic.
+# Edge: pred(c) = verum means c is removed, not retained.
+functio expurgata_iudicio(textus s, (textus) → bivalens pred) → textus {
+    varia lista<textus> kept ← vacua
+    varia numerus i ← 0
+
+    # Preserve only scalars that the predicate does not mark for removal.
+    dum i < s.longitudo() {
+        fixum textus c ← s.sectio(i, i + 1)
+        si pred(c) ≡ falsum {
+            kept.appende(c)
+        }
+
+        i ← i + 1
+    }
+
+    redde nexa(kept, "")
+}
+
+# Name: expurgata from expurgare, "to purge."
+# Morphologia: Perfectum result adjective; interval bounds describe the
+# scalar region purged from the returned cord.
+# Why: Remove scalars inside inclusive bounds and keep scalars outside them.
+# Edge: sponte bounds are open ends; with both bounds absent, every scalar is
+# inside the open interval and is therefore purged.
+functio expurgata(textus s, textus infimum sponte, textus supremum sponte) → textus {
+    varia lista<textus> kept ← vacua
+    varia numerus i ← 0
+
+    # Start with each scalar inside the purged interval; present bounds can
+    # prove it lies outside and should be kept.
+    dum i < s.longitudo() {
+        fixum textus c ← s.sectio(i, i + 1)
+        varia bivalens drop ← verum
+
+        si infimum non est nihil et c < infimum {
+            drop ← falsum
+        }
+        si supremum non est nihil et c > supremum {
+            drop ← falsum
+        }
+        si drop ≡ falsum {
+            kept.appende(c)
+        }
+
+        i ← i + 1
+    }
+
+    redde nexa(kept, "")
+}
+
+# Name: residuum from residuum, "what remains."
+# Morphologia: Nominal result; this names the remainder rather than an
+# action performed on the cord.
+# Why: Return the suffix of s from initium through the end.
+# Edge: sectio owns out-of-range clamping behavior for initium.
+functio residuum(textus s, numerus initium) → textus {
+    redde s.sectio(initium, s.longitudo())
+}
+
+# =========================================================================
+# DOCUMENT SPLIT (delimiter-leading front block)
+# =========================================================================
+
+# Name: _newline is private helper vocabulary, not a public Latin verb.
+# Morphologia: Private support noun; this isolates the line delimiter used
+# by diducta helpers.
+# Why: Keep newline spelling in one place for fence-line detection.
+@ privata
+functio _newline() → textus {
+    redde "\n"
+}
+
+# Name: _finis_delimitris means the delimiter boundary found while scanning.
+# Morphologia: Private nominal helper; it returns a position, not a cord.
+# Why: Find the newline before a line whose full content is the delimiter.
+# Edge: A delimiter at document end is accepted as the closing fence.
+@ privata
+functio _finis_delimitris(textus documentum, textus delimiter, numerus search_from) → numerus {
+    fixum numerus delim_len ← delimiter.longitudo()
+    fixum textus newline ← _newline()
+    varia numerus pos ← search_from
+
+    # Scan for a newline that begins a possible delimiter line.
+    dum pos < documentum.longitudo() {
+        si documentum.sectio(pos, pos + 1) ≡ newline {
+            fixum numerus line_start ← pos + 1
+
+            # A candidate delimiter line must contain the whole delimiter
+            # before it can be accepted as the closing fence.
+            si line_start + delim_len ≤ documentum.longitudo() {
+                si documentum.sectio(line_start, line_start + delim_len) ≡ delimiter {
+                    fixum numerus line_end ← line_start + delim_len
+
+                    si line_end ≡ documentum.longitudo() ergo redde pos
+                    si documentum.sectio(line_end, line_end + 1) ≡ newline ergo redde pos
+                }
+            }
+        }
+
+        pos ← pos + 1
+    }
+
+    redde -1
+}
+
+# Name: _amputa_postremam_newline from amputare, "to cut off."
+# Morphologia: Private perfective helper; it trims the completed extracted
+# wire segment before diducta returns it.
+# Why: Drop trailing newline(s) from an extracted metadata wire blob.
+# Edge: Multiple trailing newlines are removed because frontmatter payloads
+# are line records, not significant terminal blank lines.
+@ privata
+functio _amputa_postremam_newline(textus s) → textus {
+    varia numerus len ← s.longitudo()
+    fixum textus newline ← _newline()
+
+    dum len > 0 et s.sectio(len - 1, len) ≡ newline {
+        len ← len - 1
+    }
+
+    redde s.sectio(0, len)
+}
+
+# Name: diducta from deducere, "to lead apart."
+# Morphologia: Perfectum result adjective; the document has been led apart
+# into metadata and corpus wires.
+# Why: Split delimiter-leading documents into opaque [metadataWire, corpusWire].
+# Maps to: `+++` frontmatter convention (EBNF file frontmatter); metadata is
+# not parsed here — callers run `toml.tempta` / other parsers on the wire.
+# Edge: Missing or empty fences throw textus errors through the alternate
+# exit channel instead of returning partial data.
+functio diducta(textus documentum, textus delimiter) → lista<textus> ⇥ textus {
+    fixum numerus delim_len ← delimiter.longitudo()
+
+    # Opening-fence validation is one cohesive guard paragraph. After this
+    # block, delimiter slicing is safe and semantically meaningful.
+    si delim_len ≡ 0 ergo iace "empty delimiter"
+    si documentum.longitudo() < delim_len ergo iace "missing opening delimiter"
+    si documentum.sectio(0, delim_len) ≠ delimiter ergo iace "missing opening delimiter"
+
+    varia numerus meta_start ← delim_len
+    fixum textus newline ← _newline()
+
+    # Metadata begins after the optional newline that follows the opening
+    # delimiter line.
+    si meta_start < documentum.longitudo() et documentum.sectio(meta_start, meta_start + 1) ≡ newline {
+        meta_start ← meta_start + 1
+    }
+
+    fixum numerus close_line ← _finis_delimitris(documentum, delimiter, delim_len)
+
+    si close_line < 0 ergo iace "missing closing delimiter"
+
+    fixum textus metadatum ← _amputa_postremam_newline(documentum.sectio(meta_start, close_line))
+    varia numerus corpus_start ← (close_line + 1) + delim_len
+
+    # Corpus begins after the optional newline that follows the closing
+    # delimiter line.
+    si corpus_start < documentum.longitudo() et documentum.sectio(corpus_start, corpus_start + 1) ≡ newline {
+        corpus_start ← corpus_start + 1
+    }
+
+    fixum textus corpus ← residuum(documentum, corpus_start)
+    redde [metadatum, corpus]
+}
+
+# =========================================================================
+# TRUST BOUNDARY (narrowing — not wire encode/decode)
+# =========================================================================
+
+# Name: comprimata from comprimere, "to press together."
+# Morphologia: Perfectum result adjective; spacing has been compressed in
+# the returned cord.
+# Why: Collapse runs of ASCII spaces to a single space. This is
+# normalization, not byte encoding.
+functio comprimata(textus s) → textus {
+    mori "norma:chorda.comprimata is deferred pending Stage 2 dispatch"
+}
+
+# Name: angustata from angustare, "to narrow."
+# Morphologia: Perfectum result adjective; the returned value is narrowed to
+# ascii when every scalar can be represented.
+# Why: Trust-boundary narrowing from textus to ascii.
+# Edge: Throws textus when any codepoint cannot be represented as ascii.
+functio angustata(textus s) → ascii ⇥ textus {
+    mori "norma:chorda.angustata is deferred pending Stage 2 dispatch"
+}
+
+# Name: temptat from temptare, "to try."
+# Morphologia: Praesens active verb; it attempts narrowing and reports
+# absence with nihil instead of throwing.
+# Why: Trust-boundary twin of angustata, distinct from mechanical tempta.
+functio temptat(textus s) → ascii ∪ nihil {
+    mori "norma:chorda.temptat is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# SPLIT (limited — unbounded split stays on textus.divide)
+# =========================================================================
+
+# Name: discissa from discidere, "to cut apart."
+# Morphologia: Perfectum result adjective; the returned list is the cord
+# after it has been cut into pieces.
+# Why: Split s by separator into at most limitem segments.
+# Edge: Unbounded split remains on textus.divide; this is the limited form.
+functio discissa(textus s, textus separator, numerus limitem) → lista<textus> {
+    mori "norma:chorda.discissa is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# MECHANICAL TRIO (UTF-8 textus ↔ octeti)
+# =========================================================================
+
+# Name: pange from pangere, "to fasten" or "to compose."
+# Morphologia: Imperativus mechanical verb shared with structured codecs.
+# Why: Materialize textus as UTF-8 octeti for outward or storable byte form.
+functio pange(textus s) → octeti {
+    mori "norma:chorda.pange is deferred pending Stage 2 dispatch"
+}
+
+# Name: solve from solvere, "to loosen" or "to untangle."
+# Morphologia: Imperativus mechanical verb paired with pange.
+# Why: Interpret UTF-8 octeti as textus.
+# Edge: Invalid UTF-8 throws through the backing runtime.
+functio solve(octeti data) → textus {
+    mori "norma:chorda.solve is deferred pending Stage 2 dispatch"
+}
+
+# Name: tempta from temptare, "to try" or "to attempt."
+# Morphologia: Imperativus mechanical verb; try decode without alternate
+# exit propagation.
+# Why: Decode UTF-8 when possible and return nihil on invalid bytes.
+functio tempta(octeti data) → textus ∪ nihil {
+    mori "norma:chorda.tempta is deferred pending Stage 2 dispatch"
+}

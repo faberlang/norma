@@ -1,0 +1,31 @@
+# toml.fab — TOML wire floor facade
+#
+# Etymology: "TOML" — Tom's Obvious Minimal Language (universal, kept as-is).
+#
+# Wire floor only: solve (text → valor), pange (valor → text), tempta
+# (lenient parse), all Rust-backed via crates/norma/toml.rs. Shared valor-tree
+# navigation (cape/carpe/inveni/exige/*ne) lives in norma:valor.
+#
+# TOML's predicate semantics are emergent, not implemented here: TOML never
+# produces Valor::Nihil (so valor.nihilne returns falsum on any TOML tree),
+# and TOML datetimes lower to Valor::Instans (so valor.instansne distinguishes
+# them from textus). These behaviors come from what the parser produces, not
+# from predicate overrides — norma:valor's generic predicates are correct.
+
+
+# =========================================================================
+# SERIALIZATION (wire floor)
+# =========================================================================
+functio pange(valor valor) → textus {
+    mori "norma:toml.pange is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# PARSING (wire floor)
+# =========================================================================
+functio solve(textus toml) → valor {
+    mori "norma:toml.solve is deferred pending Stage 2 dispatch"
+}
+functio tempta(textus toml) → valor ∪ nihil {
+    mori "norma:toml.tempta is deferred pending Stage 2 dispatch"
+}

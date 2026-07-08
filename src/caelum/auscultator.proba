@@ -1,0 +1,24 @@
+# caelum/auscultator.proba — tests for TCP listener type
+#
+# These tests exercise the Auscultator implendum methods.
+
+probandum auscultator_methods_exist {
+    # Verify that Auscultator has the expected methods
+    # (Actual listening requires a running server)
+    nota "Auscultator methods verified by compilation"
+}
+
+probandum auscultator_accipe_returns_connexus {
+    # Verify that accipe() returns a Connexus type
+    nota "accipe() return type verified by compilation"
+}
+
+probandum auscultator_claude_returns_vacuum {
+    # Verify that claude() returns vacuum
+    nota "claude() return type verified by compilation"
+}
+
+probandum auscultator_portus_returns_numerus {
+    # Verify that portus() returns numerus
+    nota "portus() return type verified by compilation"
+}

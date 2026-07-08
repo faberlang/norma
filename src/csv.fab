@@ -1,0 +1,42 @@
+# csv.fab — naive comma / Faber-literal-\n CSV wire helpers (native Faber leaf)
+#
+# Public import: importa ex "norma:csv" privata csv
+# Method ledger: docs/stdlib/csv-methods.md
+# Internal dependency: norma:chorda (discissa + nexa)
+
+importa ex "norma:chorda" privata chorda
+
+# Why: Strip a single trailing CR when rows arrive CRLF-split (v1 LF contract).
+@ privata
+functio _normaliza_row(textus row) → textus {
+    si row.longitudo() ≡ 0 ergo redde row
+
+    fixum textus last ← row.sectio(row.longitudo() - 1, row.longitudo())
+    si last ≡ "\r" ergo redde row.sectio(0, row.longitudo() - 1)
+
+    redde row
+}
+
+# Verb: solve from "solvere" (to loosen, untangle)
+# Why: Parse naive comma/LF wire into rows of fields (see csv-methods.md for limits).
+functio solve(textus wire) → lista<lista<textus>> {
+    si wire.longitudo() ≡ 0 ergo redde vacua
+
+    fixum lista<textus> rows ← chorda.discissa(wire, "\n", wire.longitudo() + 1)
+    varia lista<lista<textus>> tabula ← vacua
+    itera ex rows fixum row {
+        fixum textus normalized ← _normaliza_row(row)
+        tabula.appende(chorda.discissa(normalized, ",", normalized.longitudo() + 1))
+    }
+    redde tabula
+}
+
+# Verb: pange from "pangere" (to fasten, compose)
+# Why: Compose rows of fields into comma-separated, LF-joined wire text.
+functio pange(lista<lista<textus>> tabula) → textus {
+    varia lista<textus> rows ← vacua
+    itera ex tabula fixum fields {
+        rows.appende(chorda.nexa(fields, ","))
+    }
+    redde chorda.nexa(rows, "\n")
+}

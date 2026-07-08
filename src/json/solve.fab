@@ -1,0 +1,454 @@
+# json/solve.fab — native Faber JSON parser (text → valor)
+#
+# Recursive descent over RFC 8259. No Rust backing.
+# Imports norma:json/lexica for character classification and escape tables.
+#
+# Position threading: Faber has no tuple returns, so each _x parser returns a
+# Resultus genus carrying both the parsed valor and the next scan index.
+#
+# Failable propagation: every _x helper is `→ Resultus ⇥ textus` and throws
+# (via iace) on syntax error. Calls propagate to the enclosing ⇥ function
+# without fac/cape wrapping — the same rule already granted to ↦ and iace.
+
+importa ex "norma:json/lexica" privata lexica
+
+@ privata
+genus Resultus {
+    valor v
+    numerus i
+}
+
+# =========================================================================
+# PUBLIC ENTRY
+# =========================================================================
+
+functio solve(textus json) → valor ⇥ textus {
+    fixum Resultus r ← _valor(json, 0)
+    fixum numerus tail ← lexica._salta_sponte(json, r.i)
+    si tail ≠ json.longitudo() {
+        iace "trailing characters after JSON value"
+    }
+    redde r.v
+}
+
+functio tempta(textus json) → valor ∪ nihil {
+    fac {
+        redde solve(json)
+    }
+    cape err {
+        redde nihil
+    }
+}
+
+# =========================================================================
+# VALUE DISPATCH
+# =========================================================================
+
+@ privata
+functio _valor(textus s, numerus start) → Resultus ⇥ textus {
+    fixum numerus i ← lexica._salta_sponte(s, start)
+    si i ≥ s.longitudo() {
+        iace "unexpected end of input"
+    }
+
+    fixum textus c ← s.sectio(i, i + 1)
+    si c ≡ "{" ergo redde _obiectum(s, i)
+    si c ≡ "[" ergo redde _array(s, i)
+    si c ≡ "\"" ergo redde _valor_chordam(s, i)
+    si c ≡ "t" aut c ≡ "f" ergo redde _valor_bivalens(s, i)
+    si c ≡ "n" ergo redde _valor_nihil(s, i)
+    si lexica._est_digita(c) aut c ≡ "-" ergo redde _valor_numeri(s, i)
+
+    iace "unexpected character: §"(c)
+}
+
+# =========================================================================
+# OBJECT
+# =========================================================================
+
+@ privata
+functio _obiectum(textus s, numerus start) → Resultus ⇥ textus {
+    varia numerus i ← start + 1
+    varia tabula<textus, valor> out ← vacua
+
+    fixum numerus n ← s.longitudo()
+    i ← lexica._salta_sponte(s, i)
+    si i < n et s.sectio(i, i + 1) ≡ "}" {
+        redde Resultus { v = out ↦ valor, i = i + 1 }
+    }
+
+    dum verum {
+        i ← lexica._salta_sponte(s, i)
+        si i ≥ n ergo iace "unterminated object"
+        si s.sectio(i, i + 1) ≠ "\"" ergo iace "expected string key"
+
+        # Key (a JSON string).
+        fixum Resultus kr ← _valor_chordam(s, i)
+        fixum textus clavis ← kr.v ↦ textus
+        i ← lexica._salta_sponte(s, kr.i)
+
+        si i ≥ n aut s.sectio(i, i + 1) ≠ ":" ergo iace "expected ':' after key"
+        i ← i + 1
+
+        # Value.
+        fixum Resultus vr ← _valor(s, i)
+        out.pone(clavis, vr.v)
+        i ← lexica._salta_sponte(s, vr.i)
+
+        si i ≥ n ergo iace "unterminated object"
+        fixum textus sep ← s.sectio(i, i + 1)
+        si sep ≡ "," {
+            i ← i + 1
+            perge
+        }
+        si sep ≡ "}" {
+            redde Resultus { v = out ↦ valor, i = i + 1 }
+        }
+        iace "expected ',' or '}' in object"
+    }
+}
+
+# =========================================================================
+# ARRAY
+# =========================================================================
+
+@ privata
+functio _array(textus s, numerus start) → Resultus ⇥ textus {
+    varia numerus i ← start + 1
+    varia lista<valor> out ← vacua
+
+    fixum numerus n ← s.longitudo()
+    i ← lexica._salta_sponte(s, i)
+    si i < n et s.sectio(i, i + 1) ≡ "]" {
+        redde Resultus { v = out ↦ valor, i = i + 1 }
+    }
+
+    dum verum {
+        fixum Resultus vr ← _valor(s, i)
+        out.appende(vr.v)
+        i ← lexica._salta_sponte(s, vr.i)
+
+        si i ≥ n ergo iace "unterminated array"
+        fixum textus sep ← s.sectio(i, i + 1)
+        si sep ≡ "," {
+            i ← i + 1
+            perge
+        }
+        si sep ≡ "]" {
+            redde Resultus { v = out ↦ valor, i = i + 1 }
+        }
+        iace "expected ',' or ']' in array"
+    }
+}
+
+# =========================================================================
+# STRING
+# =========================================================================
+
+@ privata
+functio _valor_chordam(textus s, numerus start) → Resultus ⇥ textus {
+    varia numerus i ← start + 1
+    varia lista<textus> partes ← vacua
+
+    fixum numerus n ← s.longitudo()
+    dum i < n {
+        fixum textus c ← s.sectio(i, i + 1)
+        si c ≡ "\"" {
+            redde Resultus { v = _iunge(partes) ↦ valor, i = i + 1 }
+        }
+        si c ≡ "\\" {
+            fixum Resultus er ← _evadunt(s, i + 1)
+            partes.appende(er.v ↦ textus)
+            i ← er.i
+            perge
+        }
+        partes.appende(c)
+        i ← i + 1
+    }
+    iace "unterminated string"
+}
+
+# Decode a single backslash escape starting at index `esc` (the char after \).
+@ privata
+functio _evadunt(textus s, numerus esc) → Resultus ⇥ textus {
+    fixum numerus n ← s.longitudo()
+    si esc ≥ n ergo iace "unterminated escape"
+
+    fixum textus e ← s.sectio(esc, esc + 1)
+    si e ≡ "u" {
+        redde _evadunt_unicode(s, esc + 1)
+    }
+
+    fixum textus ∪ nihil lit ← lexica._destruat_liber(e)
+    si lit est nihil ergo iace "invalid escape: §"(e)
+    redde Resultus { v = lit ↦ valor, i = esc + 1 }
+}
+
+# Decode a \uXXXX sequence. `hex` points at the first hex digit.
+@ privata
+functio _evadunt_unicode(textus s, numerus hex) → Resultus ⇥ textus {
+    fixum numerus cp ← _lege_quattuor_hex(s, hex)
+
+    # High surrogate (D800-DBFF) must be followed by \uXXXX low surrogate.
+    si cp ≥ 55296 et cp ≤ 56319 {
+        si hex + 6 ≥ s.longitudo() ergo iace "unterminated surrogate pair"
+        si s.sectio(hex + 4, hex + 6) ≠ "\\u" ergo iace "expected low surrogate"
+        fixum numerus lo ← _lege_quattuor_hex(s, hex + 6)
+        si lo < 56320 aut lo > 57343 ergo iace "invalid low surrogate"
+        # LIMITATION: non-BMP assembly requires a codepoint→textus intrinsic
+        # Faber does not yet expose. Real JSON with emoji is uncommon in
+        # config data; track full surrogate pair handling separately.
+        iace "non-BMP \\u escapes not yet supported"
+    }
+    si cp ≥ 56320 et cp ≤ 57343 ergo iace "unexpected low surrogate"
+
+    # BMP codepoint. ASCII (< 128) is handled via a lookup; non-ASCII BMP
+    # is deferred for the same intrinsic reason as non-BMP.
+    si cp < 128 {
+        redde Resultus { v = _ascii_valens(cp) ↦ valor, i = hex + 4 }
+    }
+    iace "non-ASCII \\u escapes not yet supported"
+}
+
+# Read four hex digits at `hex` and return their numeric value.
+@ privata
+functio _lege_quattuor_hex(textus s, numerus hex) → numerus ⇥ textus {
+    si hex + 4 > s.longitudo() ergo iace "unterminated \\u escape"
+    fixum numerus h0 ← _digitum_hex(s.sectio(hex, hex + 1))
+    fixum numerus h1 ← _digitum_hex(s.sectio(hex + 1, hex + 2))
+    fixum numerus h2 ← _digitum_hex(s.sectio(hex + 2, hex + 3))
+    fixum numerus h3 ← _digitum_hex(s.sectio(hex + 3, hex + 4))
+    redde ((h0 * 4096) + (h1 * 256)) + ((h2 * 16) + h3)
+}
+
+# Hex digit → value, throwing on non-hex.
+@ privata
+functio _digitum_hex(textus c) → numerus ⇥ textus {
+    fixum numerus ∪ nihil v ← lexica._valor_hexadecimalis(c)
+    si v est nihil ergo iace "invalid hex digit: §"(c)
+    redde v
+}
+
+# ASCII codepoint (0-127) → single-char textus. Covers the practical
+# \uXXXX cases for control chars and ASCII punctuation/letters.
+@ privata
+functio _ascii_valens(numerus cp) → textus ⇥ textus {
+    si cp ≡ 34 ergo redde "\""
+    si cp ≡ 92 ergo redde "\\"
+    si cp ≡ 47 ergo redde "/"
+    si cp ≡ 8 ergo redde "\u{08}"
+    si cp ≡ 12 ergo redde "\u{0C}"
+    si cp ≡ 10 ergo redde "\n"
+    si cp ≡ 13 ergo redde "\r"
+    si cp ≡ 9 ergo redde "\t"
+    si cp ≡ 32 ergo redde " "
+    si cp ≡ 33 ergo redde "!"
+    si cp ≡ 35 ergo redde "#"
+    si cp ≡ 36 ergo redde "$"
+    si cp ≡ 37 ergo redde "%"
+    si cp ≡ 38 ergo redde "&"
+    si cp ≡ 39 ergo redde "'"
+    si cp ≡ 40 ergo redde "("
+    si cp ≡ 41 ergo redde ")"
+    si cp ≡ 42 ergo redde "*"
+    si cp ≡ 43 ergo redde "+"
+    si cp ≡ 44 ergo redde ","
+    si cp ≡ 45 ergo redde "-"
+    si cp ≡ 46 ergo redde "."
+    si cp ≡ 48 ergo redde "0"
+    si cp ≡ 49 ergo redde "1"
+    si cp ≡ 50 ergo redde "2"
+    si cp ≡ 51 ergo redde "3"
+    si cp ≡ 52 ergo redde "4"
+    si cp ≡ 53 ergo redde "5"
+    si cp ≡ 54 ergo redde "6"
+    si cp ≡ 55 ergo redde "7"
+    si cp ≡ 56 ergo redde "8"
+    si cp ≡ 57 ergo redde "9"
+    si cp ≡ 58 ergo redde ":"
+    si cp ≡ 59 ergo redde ";"
+    si cp ≡ 60 ergo redde "<"
+    si cp ≡ 61 ergo redde "="
+    si cp ≡ 62 ergo redde ">"
+    si cp ≡ 63 ergo redde "?"
+    si cp ≡ 64 ergo redde "@"
+    si cp ≡ 65 ergo redde "A"
+    si cp ≡ 66 ergo redde "B"
+    si cp ≡ 67 ergo redde "C"
+    si cp ≡ 68 ergo redde "D"
+    si cp ≡ 69 ergo redde "E"
+    si cp ≡ 70 ergo redde "F"
+    si cp ≡ 71 ergo redde "G"
+    si cp ≡ 72 ergo redde "H"
+    si cp ≡ 73 ergo redde "I"
+    si cp ≡ 74 ergo redde "J"
+    si cp ≡ 75 ergo redde "K"
+    si cp ≡ 76 ergo redde "L"
+    si cp ≡ 77 ergo redde "M"
+    si cp ≡ 78 ergo redde "N"
+    si cp ≡ 79 ergo redde "O"
+    si cp ≡ 80 ergo redde "P"
+    si cp ≡ 81 ergo redde "Q"
+    si cp ≡ 82 ergo redde "R"
+    si cp ≡ 83 ergo redde "S"
+    si cp ≡ 84 ergo redde "T"
+    si cp ≡ 85 ergo redde "U"
+    si cp ≡ 86 ergo redde "V"
+    si cp ≡ 87 ergo redde "W"
+    si cp ≡ 88 ergo redde "X"
+    si cp ≡ 89 ergo redde "Y"
+    si cp ≡ 90 ergo redde "Z"
+    si cp ≡ 91 ergo redde "["
+    si cp ≡ 93 ergo redde "]"
+    si cp ≡ 94 ergo redde "^"
+    si cp ≡ 95 ergo redde "_"
+    si cp ≡ 96 ergo redde "`"
+    si cp ≡ 97 ergo redde "a"
+    si cp ≡ 98 ergo redde "b"
+    si cp ≡ 99 ergo redde "c"
+    si cp ≡ 100 ergo redde "d"
+    si cp ≡ 101 ergo redde "e"
+    si cp ≡ 102 ergo redde "f"
+    si cp ≡ 103 ergo redde "g"
+    si cp ≡ 104 ergo redde "h"
+    si cp ≡ 105 ergo redde "i"
+    si cp ≡ 106 ergo redde "j"
+    si cp ≡ 107 ergo redde "k"
+    si cp ≡ 108 ergo redde "l"
+    si cp ≡ 109 ergo redde "m"
+    si cp ≡ 110 ergo redde "n"
+    si cp ≡ 111 ergo redde "o"
+    si cp ≡ 112 ergo redde "p"
+    si cp ≡ 113 ergo redde "q"
+    si cp ≡ 114 ergo redde "r"
+    si cp ≡ 115 ergo redde "s"
+    si cp ≡ 116 ergo redde "t"
+    si cp ≡ 117 ergo redde "u"
+    si cp ≡ 118 ergo redde "v"
+    si cp ≡ 119 ergo redde "w"
+    si cp ≡ 120 ergo redde "x"
+    si cp ≡ 121 ergo redde "y"
+    si cp ≡ 122 ergo redde "z"
+    si cp ≡ 123 ergo redde "{"
+    si cp ≡ 124 ergo redde "|"
+    si cp ≡ 125 ergo redde "}"
+    si cp ≡ 126 ergo redde "~"
+    iace "unsupported ASCII codepoint"
+}
+
+# =========================================================================
+# NUMBER
+# =========================================================================
+
+@ privata
+functio _valor_numeri(textus s, numerus start) → Resultus ⇥ textus {
+    varia numerus i ← start
+    fixum numerus n ← s.longitudo()
+
+    # Optional sign.
+    si i < n et s.sectio(i, i + 1) ≡ "-" {
+        i ← i + 1
+    }
+
+    # Integer part: either a single 0, or 1-9 followed by 0-9*.
+    si i ≥ n ergo iace "invalid number"
+    si s.sectio(i, i + 1) ≡ "0" {
+        i ← i + 1
+    } secus {
+        si lexica._est_digita(s.sectio(i, i + 1)) ≠ verum ergo iace "invalid number"
+        dum i < n et lexica._est_digita(s.sectio(i, i + 1)) {
+            i ← i + 1
+        }
+    }
+
+    # Optional fraction.
+    si i < n et s.sectio(i, i + 1) ≡ "." {
+        i ← i + 1
+        si i ≥ n aut lexica._est_digita(s.sectio(i, i + 1)) ≠ verum ergo iace "invalid fraction"
+        dum i < n et lexica._est_digita(s.sectio(i, i + 1)) {
+            i ← i + 1
+        }
+    }
+
+    # Optional exponent.
+    si i < n {
+        fixum textus e ← s.sectio(i, i + 1)
+        si e ≡ "e" aut e ≡ "E" {
+            i ← i + 1
+            si i < n {
+                fixum textus sign ← s.sectio(i, i + 1)
+                si sign ≡ "+" aut sign ≡ "-" {
+                    i ← i + 1
+                }
+            }
+            si i ≥ n aut lexica._est_digita(s.sectio(i, i + 1)) ≠ verum ergo iace "invalid exponent"
+            dum i < n et lexica._est_digita(s.sectio(i, i + 1)) {
+                i ← i + 1
+            }
+        }
+    }
+
+    # Convert. The grammar scan above validated the shape; the final
+    # base-10 conversion delegates to Rust parse via ↦. Try numerus
+    # first; on overflow or float-shape input, fall back to fractus.
+    fixum textus digits ← s.sectio(start, i)
+    fac {
+        fixum numerus m ← digits ↦ numerus
+        redde Resultus { v = m ↦ valor, i = i }
+    }
+    cape err {
+        fac {
+            fixum fractus f ← digits ↦ fractus
+            redde Resultus { v = f ↦ valor, i = i }
+        }
+        cape err {
+            iace "invalid number: §"(digits)
+        }
+    }
+}
+
+# =========================================================================
+# LITERALS (true, false, null)
+# =========================================================================
+
+@ privata
+functio _valor_bivalens(textus s, numerus start) → Resultus ⇥ textus {
+    si _exige_literal(s, start, "true") {
+        redde Resultus { v = verum ↦ valor, i = start + 4 }
+    }
+    si _exige_literal(s, start, "false") {
+        redde Resultus { v = falsum ↦ valor, i = start + 5 }
+    }
+    iace "invalid literal"
+}
+
+@ privata
+functio _valor_nihil(textus s, numerus start) → Resultus ⇥ textus {
+    si _exige_literal(s, start, "null") {
+        redde Resultus { v = nihil ↦ valor, i = start + 4 }
+    }
+    iace "invalid literal"
+}
+
+# Match a fixed literal keyword at `start`; returns verum on full match.
+@ privata
+functio _exige_literal(textus s, numerus start, textus lit) → bivalens {
+    fixum numerus end ← start + lit.longitudo()
+    si end > s.longitudo() ergo redde falsum
+    redde s.sectio(start, end) ≡ lit
+}
+
+# =========================================================================
+# LOCAL HELPER
+# =========================================================================
+
+# Join a lista<textus> into one textus. Kept here to avoid a chorda import
+# just for concatenation; the serializer (pange.fab) imports chorda.nexa.
+@ privata
+functio _iunge(lista<textus> partes) → textus {
+    varia textus out ← ""
+    itera ex partes fixum pars {
+        out ← out + pars
+    }
+    redde out
+}

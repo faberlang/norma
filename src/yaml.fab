@@ -1,0 +1,52 @@
+# yaml.fab — YAML wire floor facade
+#
+# Etymology: "YAML" — YAML Ain't Markup Language (universal, kept as-is).
+#
+# Wire floor only: solve (text → valor), pange (valor → text), tempta
+# (lenient parse), necto (multi-doc bind), collige (multi-doc gather), all
+# Rust-backed via crates/norma/yaml.rs. Shared valor-tree navigation
+# (cape/carpe/inveni/exige/*ne) lives in norma:valor.
+
+
+# =========================================================================
+# SERIALIZATION
+# =========================================================================
+# Verb: pange from "pangere" (to fasten, compose)
+
+# Serialize value to YAML string
+functio pange(valor valor) → textus {
+    mori "norma:yaml.pange is deferred pending Stage 2 dispatch"
+}
+
+# Verb: necto from "nectere" (to bind, tie together)
+# Why: Binding multiple documents into a single YAML stream.
+
+# Bind multiple documents into multi-doc YAML string
+functio necto(lista<valor> documenta) → textus {
+    mori "norma:yaml.necto is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# PARSING
+# =========================================================================
+# Verb: solve from "solvere" (to loosen, untangle)
+
+# Parse YAML string to value (throws on error)
+functio solve(textus yaml) → valor {
+    mori "norma:yaml.solve is deferred pending Stage 2 dispatch"
+}
+
+# Verb: tempta from "temptare" (to try, attempt)
+
+# Attempt to parse YAML string (returns null on error)
+functio tempta(textus yaml) → valor ∪ nihil {
+    mori "norma:yaml.tempta is deferred pending Stage 2 dispatch"
+}
+
+# Verb: collige from "colligere" (to collect, gather)
+# Why: Gathering all documents from a multi-doc YAML stream.
+
+# Gather all documents from multi-doc YAML string
+functio collige(textus yaml) → lista<valor> {
+    mori "norma:yaml.collige is deferred pending Stage 2 dispatch"
+}

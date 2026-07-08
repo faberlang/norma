@@ -1,0 +1,49 @@
+# aleator.fab - Entropy Device (random number generation)
+#
+# Etymology: "aleator" - dice player, gambler. Games of chance.
+#
+# Effect verbs: native Faber bodies over stream `ad` (`aleator:*` routes).
+#
+# Design notes:
+# - fractum/sortire use Math.random (fast, not crypto-secure)
+# - octetos/uuid use crypto.getRandomValues (secure)
+# - semina seeds the RNG for reproducible tests
+
+
+# =========================================================================
+# BASIC GENERATION
+# =========================================================================
+
+# Random float in [0, 1)
+functio fractum() → fractus {
+    redde ad 'aleator:fractum' ↦ fractus
+}
+
+# Random integer in [min, max] inclusive (draw by lot)
+functio sortire(numerus min, numerus max) → numerus {
+    redde ad 'aleator:sortire' ([min, max]) ↦ numerus
+}
+
+# =========================================================================
+# CRYPTOGRAPHIC
+# =========================================================================
+
+# Random bytes (crypto-secure)
+functio octetos(numerus n) → octeti {
+    redde ad 'aleator:octetos' (n) ↦ octeti
+}
+
+# UUID v4 string (crypto-secure)
+functio uuid() → textus {
+    redde ad 'aleator:uuid' ↦ textus
+}
+
+# =========================================================================
+# SEEDING (for reproducible tests)
+# =========================================================================
+
+# Seed the RNG. Only affects non-crypto functions.
+# Pass 0 or negative to reset to true random.
+functio semina(numerus n) → vacuum {
+    redde ad 'aleator:semina' (n) ↦ vacuum
+}

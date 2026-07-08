@@ -1,0 +1,75 @@
+# codex.fab - Encoding/Decoding
+#
+# Etymology: "codex" - book, code, system of laws. Encoding systems.
+#
+# Part of the Standard Library.
+#
+# Design notes:
+# - All operations are synchronous (pure in-memory transforms)
+# - Encoding: raw bytes → text representation
+# - Decoding: text representation → raw bytes
+# - URL encoding operates on text (percent-encoding)
+# - Public surface migrates to norma:chorda (pange/solve/tempta). See
+# docs/stdlib/chorda-methods.md and docs/stdlib/stdlib-mechanical-verbs.md.
+
+# =========================================================================
+# BASE64
+# =========================================================================
+
+# Encode bytes to base64 string
+functio base64(octeti data) → textus {
+    mori "norma:codex.base64 is deferred pending Stage 2 dispatch"
+}
+
+# Decode base64 string to bytes (throws on invalid input)
+functio deBase64(textus data) → octeti {
+    mori "norma:codex.deBase64 is deferred pending Stage 2 dispatch"
+}
+
+# Attempt to decode base64 (returns nihil on invalid input)
+functio temptaBase64(textus data) → octeti ∪ nihil {
+    mori "norma:codex.temptaBase64 is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# HEX
+# =========================================================================
+
+# Encode bytes to lowercase hex string
+functio hex(octeti data) → textus {
+    mori "norma:codex.hex is deferred pending Stage 2 dispatch"
+}
+
+# Decode hex string to bytes (throws on invalid input)
+functio deHex(textus data) → octeti {
+    mori "norma:codex.deHex is deferred pending Stage 2 dispatch"
+}
+
+# Attempt to decode hex (returns nihil on invalid input)
+functio temptaHex(textus data) → octeti ∪ nihil {
+    mori "norma:codex.temptaHex is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# URL ENCODING (percent-encoding)
+# =========================================================================
+
+# Encode text for URL (percent-encoding)
+functio url(textus data) → textus {
+    mori "norma:codex.url is deferred pending Stage 2 dispatch"
+}
+
+# Decode URL-encoded text
+functio deUrl(textus data) → textus {
+    mori "norma:codex.deUrl is deferred pending Stage 2 dispatch"
+}
+
+# Encode for URL query component (also encodes &, =, etc.)
+functio urlComponentum(textus data) → textus {
+    mori "norma:codex.urlComponentum is deferred pending Stage 2 dispatch"
+}
+
+# Decode URL query component
+functio deUrlComponentum(textus data) → textus {
+    mori "norma:codex.deUrlComponentum is deferred pending Stage 2 dispatch"
+}

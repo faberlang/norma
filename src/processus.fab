@@ -1,0 +1,175 @@
+# processus.fab - Process Device
+#
+# Etymology: "processus" from "pro-" (forward) + "cedere" (to go)
+# A going forward, a process in motion.
+#
+# Every verb blocks on its `ad` frame response. Async is host-side plumbing:
+# the gateway decides how long to hold a request; Faber's posture is uniform.
+# There is no `@ futura` — sync/async is a route-naming distinction, not a
+# Faber-side marker. Sync and async verbs name distinct `processus:*` routes.
+# `genera` remains deferred: it returns the `Subprocessus` genus, which the
+# ad materializer does not yet support (same blocker as solum.describe).
+#
+# Design principles:
+# - Different verbs for different spawn semantics:
+# - genera: spawn attached, caller manages lifecycle
+# - dimitte: spawn detached, dismiss to run independently
+# - Shell execution uses traditional sync/async:
+# - Imperative (exsequi): sync, blocks until complete
+# - Future (exsequetur): async, returns promise
+# - Environment uses lege/scribe (read/write) - simple and consistent
+
+
+# =============================================================================
+# TYPES
+# =============================================================================
+
+# Spawned subprocess handle for attached processes
+# Maps to: Bun.spawn() result
+genus Subprocessus {
+    numerus pid
+}
+
+# =========================================================================
+# SPAWN - Attached
+# =========================================================================
+# Verb: genera from "generare" (to generate, beget, bring forth)
+# Why: Creating/generating a new process. Caller maintains control -
+# can wait for exit, capture output via handle.
+# Maps to: Bun.spawn() with handle returned
+
+# Spawn attached process - caller can wait for exit via handle.expiravit
+# WHY: deferred because the ad materializer does not yet support
+# arbitrary genera like Subprocessus — only vacuum, valor, scalars, octeti,
+# instans, and lista<T>. The param name `argumenta` is also a reserved
+# keyword (TokenKind::Argumenta, used for CLI argument binding), so a
+# native body would need to rename it.
+functio genera(lista<textus> argumenta, textus directorium sponte, tabula<textus, textus> ambitus sponte) → Subprocessus {
+    mori "norma:processus.genera is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# SPAWN - Detached
+# =========================================================================
+# Verb: dimitte from "dimittere" (to send away, dismiss, release)
+# Why: Dismissing the process to run on its own - fire and forget.
+# Process continues independently, survives parent exit.
+# Distinct verb from genera to indicate different lifecycle semantics.
+# Maps to: Bun.spawn() with proc.unref(), stdio ignored
+
+# Dismiss process to run independently - returns PID
+# WHY: param renamed from `argumenta` (reserved keyword, TokenKind::Argumenta
+# used for CLI argument binding) to `args`. The sponte defaults for
+# directorium and ambitus lower correctly to None at the handler call.
+functio dimitte(lista<textus> args, textus directorium sponte, tabula<textus, textus> ambitus sponte) → numerus {
+    redde ad 'processus:dimitte' (args) ↦ numerus
+}
+
+# =========================================================================
+# SHELL EXECUTION
+# =========================================================================
+# Verb: exsequi/exsequetur from "exsequi" (to follow out, execute, accomplish)
+# Why: Executing a command through to completion. Shell features available
+# (pipes, redirects, &&, ||, etc). Returns stdout.
+# Maps to: sh -c "cmd" via Bun.spawnSync / Bun.spawn
+
+# Execute shell command, block until complete, return stdout (sync)
+functio exsequi(textus imperium) → textus {
+    redde ad 'processus:exsequi' (imperium) ↦ textus
+}
+
+# Execute shell command, return stdout when complete (async route; Faber blocks)
+functio exsequetur(textus imperium) → textus {
+    redde ad 'processus:exsequetur' (imperium) ↦ textus
+}
+
+# =========================================================================
+# ENVIRONMENT - Read
+# =========================================================================
+# Verb: lege from "legere" (to read, gather)
+# Why: Reading a value from the process environment. Same verb as file
+# reading - context (processus vs solum) disambiguates.
+# Maps to: Bun.env[name] / process.env[name]
+
+# Read environment variable (Imperativus: fails when unset; set-to-empty → "")
+functio lege(textus nomen) → textus {
+    redde ad 'processus:lege' (nomen) ↦ textus
+}
+
+# =========================================================================
+# ENVIRONMENT - Write
+# =========================================================================
+# Verb: scribe from "scribere" (to write)
+# Why: Writing a value to the process environment. Same verb as file
+# writing - context disambiguates.
+# Maps to: Bun.env[name] = value / process.env[name] = value
+
+# Write environment variable
+functio scribe(textus nomen, textus valor) → vacuum {
+    redde ad 'processus:scribe' ([nomen, valor]) ↦ vacuum
+}
+
+# =========================================================================
+# PROCESS INFO - Working Directory
+# =========================================================================
+# Noun: sedes (seat, dwelling place, residence)
+# Why: Where the process "dwells" in the filesystem tree. The CWD is
+# the process's seat/residence. Avoids collision with solum.directorium
+# which extracts directory from path strings.
+# Maps to: process.cwd()
+
+# Get current working directory (where the process dwells)
+functio sedes() → textus {
+    redde ad 'processus:sedes' ↦ textus
+}
+
+# =========================================================================
+# PROCESS INFO - Change Directory
+# =========================================================================
+# Verb: muta from "mutare" (to change, alter)
+# Why: Changing/altering the working directory. Generic "change" verb
+# fits well - you're mutating process state.
+# Maps to: process.chdir(path)
+
+# Change current working directory
+functio muta(textus via) → vacuum {
+    redde ad 'processus:muta' (via) ↦ vacuum
+}
+
+# =========================================================================
+# PROCESS INFO - Identity
+# =========================================================================
+# Noun: identitas (identity)
+# Why: Accessor for process identity (PID). Not a verb - it's a property.
+# Maps to: process.pid
+
+# Get process ID
+functio identitas() → numerus {
+    redde ad 'processus:identitas' ↦ numerus
+}
+
+# =========================================================================
+# PROCESS INFO - Arguments
+# =========================================================================
+# Noun: argumenta (arguments)
+# Why: Accessor for command line arguments. Not a verb - it's a property.
+# Maps to: Bun.argv.slice(2) / process.argv.slice(2)
+
+# Get command line arguments (excludes runtime and script path)
+functio argumenta() → lista<textus> {
+    redde ad 'processus:argumenta' ↦ lista<textus>
+}
+
+# =========================================================================
+# EXIT
+# =========================================================================
+# Verb: exi from "exire" (to go out, exit, depart)
+# Why: Direct Latin root of English "exit". Process departs/goes out.
+# Returns numquam (never) - this call does not return.
+# Maps to: process.exit(code)
+
+# Exit process with code (never returns)
+functio exi(numerus code) → numquam {
+    fixum vacuum _ ← ad 'processus:exi' (code) ↦ vacuum
+    mori "process exit returned unexpectedly"
+}

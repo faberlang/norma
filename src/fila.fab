@@ -1,0 +1,172 @@
+# copula/fila.fab — double-ended queue (deque)
+#
+# Etymology: "fila" — thread, string, strand. A sequence drawn from either end.
+# Counterpart to lista (ordered random access) and acervus (heap-priority).
+#
+# TARGET: This module is written in its target form and assumes the
+# generic-genus-construction factory goal
+# (docs/factory/generic-genus-construction/goal.md) has landed. Until that
+# goal ships, `Fila<T>` construction at call sites does not typecheck and this
+# module will not compile. It is committed in target form so the public surface
+# is fixed and ready for the moment the compiler fix lands.
+#
+# Layering: pure native Faber over the builtin lista<T>. No Rust backing, no
+# ad routes, no I/O. Backed by two listas: `caput` (its tail is the queue
+# head) and `post` (its tail is the queue tail). Pushes append to the
+# relevant lista; pops read from the relevant tail. When a pop-side is empty,
+# the other side is reversed into it — amortized O(1) per operation.
+# (`ante` would be the natural Latin name for the head-side buffer but is a
+# reserved Faber keyword — TokenKind::Ante — so `caput` is used instead.)
+#
+# Import: the file-namespace-imports goal (docs/factory/file-namespace-imports)
+# shipped; this file is imported directly as norma:fila. The genus lives at
+# file top level.
+#
+# Morphologia: receiver methods on the Fila<T> genus (implicit ego), matching
+# how the builtin lista<T> exposes its surface (myFila.longitudo(),
+# myFila.appende(v), ...). Stems reuse builtin lista stems where the operation
+# is identical (appende, decapita, detrahe) so users cross-walking between
+# lista and fila see the same verbs; fila adds praepone (head push) because
+# lista has no head-push intrinsic. Imperativus throughout for mutation
+# (varia receiver required); nominal for projections (longitudo, primus,
+# ultimus); present-predicate for state (vacua); Perfectum for copy-out
+# (collecta).
+
+# =============================================================================
+# TYPE
+# =============================================================================
+
+# Double-ended queue over T. See module header for the two-lista scheme.
+genus Fila<T> {
+    # caput plays the role of "the ante buffer" (head-side storage). `ante`
+    # itself is a reserved keyword and cannot be a field name.
+    lista<T> caput = vacua
+    lista<T> post = vacua
+
+    # =========================================================================
+    # STATE (nominal / present predicate)
+    # =========================================================================
+
+    # Total element count across both halves. Nominal projection, matches
+    # lista.longitudo() and tabula.longitudo().
+    functio longitudo() → numerus {
+        redde ego.caput.longitudo() + ego.post.longitudo()
+    }
+
+    # Whether the queue holds no elements. Present predicate; matches
+    # lista.vacua() and tabula.vacua() — returns bivalens from a bare adjective.
+    functio vacua() → bivalens {
+        redde ego.caput.vacua() et ego.post.vacua()
+    }
+
+    # =========================================================================
+    # MUTATION (Imperativus — in-place on a varia receiver)
+    # =========================================================================
+    # All mutation methods require the receiver to be bound `varia`. They
+    # mirror builtin lista stems where the operation is identical so the
+    # learning surface transfers between lista and fila.
+
+    # Push to the tail of the queue. Reuses the lista tail-push stem.
+    functio appende(T v) → vacuum {
+        ego.post.appende(v)
+    }
+
+    # Push to the head of the queue. lista has no head-push intrinsic, so
+    # fila names it with `praepone` (to place in front). Distinct stem from
+    # `appende` because the operation is structurally different at the
+    # builtin level.
+    functio praepone(T v) → vacuum {
+        ego.caput.appende(v)
+    }
+
+    # Pop from the tail of the queue. Returns nihil if empty.
+    # Reuses the lista tail-pop stem.
+    functio detrahe() → T ∪ nihil {
+        si non ego.post.vacua() ergo redde ego.post.detrahe()
+        si non ego.caput.vacua() {
+            # Rebalance: reverse caput into post so the head-side elements
+            # become accessible from the tail end.
+            dum non ego.caput.vacua() {
+                ego.post.appende(ego.caput.detrahe())
+            }
+            redde ego.post.detrahe()
+        }
+        redde nihil
+    }
+
+    # Pop from the head of the queue. Returns nihil if empty.
+    # Reuses the lista head-pop stem.
+    functio decapita() → T ∪ nihil {
+        si non ego.caput.vacua() ergo redde ego.caput.detrahe()
+        si non ego.post.vacua() {
+            # Rebalance: reverse post into caput so the tail-side elements
+            # become accessible from the head end.
+            dum non ego.post.vacua() {
+                ego.caput.appende(ego.post.detrahe())
+            }
+            redde ego.caput.detrahe()
+        }
+        redde nihil
+    }
+
+    # =========================================================================
+    # ACCESS (nominal — read without mutation)
+    # =========================================================================
+
+    # Read the head element without removing it. Returns nihil if empty.
+    # `caput` stores the head-side reversed, so its tail is the queue head.
+    functio primus() → T ∪ nihil {
+        si non ego.caput.vacua() ergo redde ego.caput.ultimus()
+        si non ego.post.vacua() ergo redde ego.post.primus()
+        redde nihil
+    }
+
+    # Read the tail element without removing it. Returns nihil if empty.
+    functio ultimus() → T ∪ nihil {
+        si non ego.post.vacua() ergo redde ego.post.ultimus()
+        si non ego.caput.vacua() ergo redde ego.caput.primus()
+        redde nihil
+    }
+
+    # =========================================================================
+    # COPY-OUT (Perfectum — return a new value, do not mutate)
+    # =========================================================================
+
+    # Materialize the queue as a lista in head-to-tail order. Does not
+    # consume the queue. Perfectum stem `collecta` (gathered) — the natural
+    # Latin participle for "the elements, gathered into a list."
+    functio collecta() → lista<T> {
+        varia lista<T> out ← vacua
+        # caput is stored reversed (its tail is the queue head), so walk it
+        # tail-first to emit in head order.
+        varia numerus i ← ego.caput.longitudo()
+        dum i > 0 {
+            i ← i - 1
+            out.appende(ego.caput.accipe(i))
+        }
+        itera ex ego.post fixum v {
+            out.appende(v)
+        }
+        redde out
+    }
+}
+
+# =============================================================================
+# CONSTRUCTION (catalog constructors — not receiver methods)
+# =============================================================================
+# WHY: free functions rather than genus methods because they construct a fresh
+# Fila<T> rather than operating on an existing one. Named with the Perfectum
+# stem `creata` to match the construction verbs used elsewhere in the stdlib
+# (tensor.creata, tensor.structa). `vacua` is reserved for the emptiness
+# predicate above.
+
+# Empty queue constructor.
+functio creata() → Fila<T> {
+    redde Fila<T> { }
+}
+
+# Build a queue from a lista, preserving order. The first element of the
+# source becomes the head of the queue.
+functio creata_ex(lista<T> res) → Fila<T> {
+    redde Fila<T> { post = res }
+}

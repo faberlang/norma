@@ -1,0 +1,142 @@
+# http.fab - HTTP Client/Server
+#
+# HTTP protocol module (high-altitude conversation over bridge-owned transport).
+# For raw TCP/UDP sockets, see caelum.fab.
+#
+# Design notes:
+# - Verb conjugation encodes sync/async:
+# - Future (-et, -abit): async operations
+# - Imperative: sync operations
+# - Client: petet (GET), mittet (POST), ponet (PUT), delet (DELETE), mutabit (PATCH)
+# - Server: exspectabit starts server, handler receives Rogatio, returns Replicatio
+# Server runtime support is deferred beyond the first Rust client slice.
+# - Response builders: replica (full), scribe (text), funde (bytes), json (JSON)
+
+
+# =========================================================================
+# HTTP CLIENT - Simple Methods
+# =========================================================================
+
+# GET request
+@ futura
+functio petet(textus url) → Replicatio {
+    mori "norma:http.petet is deferred pending Stage 2 dispatch"
+}
+
+# POST request with body
+@ futura
+functio mittet(textus url, textus corpus) → Replicatio {
+    mori "norma:http.mittet is deferred pending Stage 2 dispatch"
+}
+
+# PUT request with body
+@ futura
+functio ponet(textus url, textus corpus) → Replicatio {
+    mori "norma:http.ponet is deferred pending Stage 2 dispatch"
+}
+
+# DELETE request
+@ futura
+functio delet(textus url) → Replicatio {
+    mori "norma:http.delet is deferred pending Stage 2 dispatch"
+}
+
+# PATCH request with body
+@ futura
+functio mutabit(textus url, textus corpus) → Replicatio {
+    mori "norma:http.mutabit is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# HTTP CLIENT - Advanced
+# =========================================================================
+
+# Generic request with full control
+@ futura
+functio rogabit(textus modus, textus url, tabula<textus, textus> capita, textus corpus) → Replicatio {
+    mori "norma:http.rogabit is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# HTTP SERVER - Deferred
+# =========================================================================
+
+# Start server on port with handler.
+# Deferred: the first Rust client slice implements client requests only.
+@ futura
+functio exspectabit(numerus portus, (Rogatio) → Replicatio handler) → Servitor {
+    mori "norma:http.exspectabit is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# RESPONSE BUILDERS - Deferred
+# Deferred with server support. Signatures stay here to preserve the file
+# interface while the first Rust client slice implements client response snapshots.
+# =========================================================================
+
+# Full control: explicit status, headers, body
+functio replica(numerus status, tabula<textus, textus> capita, textus corpus) → Replicatio {
+    mori "norma:http.replica is deferred pending Stage 2 dispatch"
+}
+
+# Text response (Content-Type: text/plain)
+functio scribe(numerus status, textus corpus) → Replicatio {
+    mori "norma:http.scribe is deferred pending Stage 2 dispatch"
+}
+
+# Binary response (Content-Type: application/octet-stream)
+functio funde(numerus status, octeti data) → Replicatio {
+    mori "norma:http.funde is deferred pending Stage 2 dispatch"
+}
+
+# JSON response (Content-Type: application/json, auto-serializes)
+functio json(numerus status, valor data) → Replicatio {
+    mori "norma:http.json is deferred pending Stage 2 dispatch"
+}
+
+# Redirect response (302 + Location header)
+functio redirige(textus url) → Replicatio {
+    mori "norma:http.redirige is deferred pending Stage 2 dispatch"
+}
+
+# HTTP Response
+implendum Replicatio {
+    functio status() → numerus
+
+    functio corpus() → textus
+
+    functio corpus_octeti() → octeti
+
+    functio corpus_json() → valor
+
+    functio capita() → tabula<textus, textus>
+
+    functio caput(textus nomen) → textus ∪ nihil
+
+    # True if status is 2xx
+    functio bene() → bivalens
+}
+
+# HTTP Request (received by server)
+implendum Rogatio {
+    functio modus() → textus
+
+    functio via() → textus
+
+    functio corpus() → textus
+
+    functio corpus_json() → valor
+
+    functio capita() → tabula<textus, textus>
+
+    functio caput(textus nomen) → textus ∪ nihil
+
+    functio param(textus nomen) → textus ∪ nihil
+}
+
+# HTTP Server handle
+implendum Servitor {
+    functio siste() → vacuum
+
+    functio portus() → numerus
+}

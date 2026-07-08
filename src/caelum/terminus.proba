@@ -1,0 +1,16 @@
+# caelum/terminus.proba — tests for TCP endpoint type
+
+probandum terminus_construction {
+    fixum terminus.Terminus t ← forma(textus hospes = "127.0.0.1", numerus portus = 8080)
+    
+    proba t.hospes ≡ "127.0.0.1"
+    proba t.portus ≡ 8080
+}
+
+probandum terminus_different_endpoints {
+    fixum terminus.Terminus local ← forma(textus hospes = "127.0.0.1", numerus portus = 8080)
+    fixum terminus.Terminus remote ← forma(textus hospes = "192.168.1.1", numerus portus = 443)
+    
+    proba local.hospes ≠ remote.hospes
+    proba local.portus ≠ remote.portus
+}

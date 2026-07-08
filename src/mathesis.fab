@@ -1,0 +1,270 @@
+# mathesis.fab — native Faber scalar math catalog
+#
+# Public import: importa ex "norma:mathesis" privata mathesis
+# Method ledger: docs/stdlib/mathesis-methods.md
+
+# -------------------------------------------------------------------------
+# Constants
+# -------------------------------------------------------------------------
+
+# Why: Ratio of a circle's circumference to its diameter (f64 catalog constant).
+functio PI() → fractus {
+    redde 3.141592653589793
+}
+
+# Why: Base of natural logarithms (f64 catalog constant).
+functio E() → fractus {
+    redde 2.718281828459045
+}
+
+# Why: Full circle radians — 2π (composed from PI).
+functio TAU() → fractus {
+    redde PI() * 2.0
+}
+
+# -------------------------------------------------------------------------
+# Clamp (present participle)
+# -------------------------------------------------------------------------
+
+# Verb: constringens from "constringere" (to bind tight) — present participle
+# Why: Clamp x to the closed interval [lo, hi] via maximus/minimus.
+functio constringens(fractus x, fractus lo, fractus hi) → fractus {
+    redde (x.maximus(lo)).minimus(hi)
+}
+
+# -------------------------------------------------------------------------
+# Arithmetic catalog (Perfectum — glyph twins)
+# -------------------------------------------------------------------------
+
+# Why: Perfectum twin of `+` — returns a + b without mutating operands.
+functio addita(fractus a, fractus b) → fractus {
+    redde a + b
+}
+
+# Why: Perfectum twin of `−` — returns a − b.
+functio subtracta(fractus a, fractus b) → fractus {
+    redde a - b
+}
+
+# Why: Perfectum twin of `×` — returns a × b.
+functio multiplicata(fractus a, fractus b) → fractus {
+    redde a * b
+}
+
+# Why: Perfectum twin of `÷` — returns a ÷ b.
+functio divisa(fractus a, fractus b) → fractus {
+    redde a / b
+}
+
+# Why: Perfectum twin of `%` — returns a mod b.
+functio modulata(fractus a, fractus b) → fractus {
+    redde a % b
+}
+
+# Why: Perfectum twin of unary `−` — returns negated a.
+functio negativa(fractus a) → fractus {
+    redde -a
+}
+
+# -------------------------------------------------------------------------
+# Ordering catalog (Perfectum queries)
+# -------------------------------------------------------------------------
+
+# Why: Perfectum twin of `<` — returns whether a is less than b.
+functio minor(fractus a, fractus b) → bivalens {
+    redde a < b
+}
+
+# Why: Perfectum twin of `>` — returns whether a is greater than b.
+functio maior(fractus a, fractus b) → bivalens {
+    redde a > b
+}
+
+# Why: Perfectum twin of `≤` — returns whether a is at most b.
+functio minime(fractus a, fractus b) → bivalens {
+    redde a ≤ b
+}
+
+# Why: Perfectum twin of `≥` — returns whether a is at least b.
+functio maxime(fractus a, fractus b) → bivalens {
+    redde a ≥ b
+}
+
+# -------------------------------------------------------------------------
+# Bitwise catalog (integer numerus only — v1)
+# -------------------------------------------------------------------------
+
+# Why: Perfectum twin of `∧` — bitwise AND on integer numerus operands.
+functio coniuncta(numerus a, numerus b) → numerus {
+    redde a ∧ b
+}
+
+# Why: Perfectum twin of `∨` — bitwise OR on integer numerus operands.
+functio disiuncta(numerus a, numerus b) → numerus {
+    redde a ∨ b
+}
+
+# Why: Perfectum twin of `⊻` — bitwise XOR on integer numerus operands.
+functio alternata(numerus a, numerus b) → numerus {
+    redde a ⊻ b
+}
+
+# Why: Perfectum twin of `¬` — bitwise complement of integer numerus a.
+functio complementata(numerus a) → numerus {
+    redde ¬a
+}
+
+# -------------------------------------------------------------------------
+# Shift catalog (integer numerus only — v1)
+# -------------------------------------------------------------------------
+
+# Why: Perfectum twin of `⇐` — left-shift a by b bit positions.
+functio sinistrata(numerus a, numerus b) → numerus {
+    redde a ⇐ b
+}
+
+# Why: Perfectum twin of `⇒` — right-shift a by b bit positions.
+functio dextrata(numerus a, numerus b) → numerus {
+    redde a ⇒ b
+}
+
+# -------------------------------------------------------------------------
+# Transcendentals (nominal catalog — series / Newton in Faber)
+# -------------------------------------------------------------------------
+
+# Why: Sine of x radians via range reduction and Taylor series (self-hosted v1).
+functio sinus(fractus x) → fractus {
+    redde _sinus_series(_reduce_angle(x))
+}
+
+# Why: Cosine of x radians via range reduction and Taylor series.
+functio cosinus(fractus x) → fractus {
+    redde _cosinus_series(_reduce_angle(x))
+}
+
+# Why: Tangent of x radians — sinus/cosinus ratio; near-zero cosine → 0.0.
+functio tangens(fractus x) → fractus {
+    fixum fractus c ← cosinus(x)
+    si c.absolutum() ≤ 0.000000000001 ergo redde 0.0
+
+    redde sinus(x) / c
+}
+
+# Why: Natural exponential e^x via Taylor series.
+functio exponens(fractus x) → fractus {
+    redde _exponens_series(x)
+}
+
+# Why: Natural logarithm of x; non-positive x → 0.0 (v1 silent guard).
+functio logarithmus(fractus x) → fractus {
+    si x ≤ 0.0 ergo redde 0.0
+
+    redde _logarithmus_series(x)
+}
+
+# Why: Base-10 logarithm via natural log identity.
+functio logarithmus10(fractus x) → fractus {
+    redde logarithmus(x) / logarithmus(10.0)
+}
+
+# Why: Square root of x via Newton iteration; negative x → 0.0 (v1 guard).
+functio radix(fractus x) → fractus {
+    si x < 0.0 ergo redde 0.0
+
+    si x ≡ 0.0 ergo redde 0.0
+
+    redde _radix_newton(x)
+}
+
+# potentia: ⋆ glyph not shipped — exp/log identity fallback (potentia-glyph goal)
+# Why: Raise base to exp via exp(exp * log(base)); non-positive base → 0.0.
+functio potentia(fractus base, fractus exp) → fractus {
+    si base ≤ 0.0 ergo redde 0.0
+
+    redde exponens(exp * logarithmus(base))
+}
+
+# -------------------------------------------------------------------------
+# Private series / iteration helpers
+# -------------------------------------------------------------------------
+
+# Why: Reduce angle to principal range for stable Taylor evaluation.
+@ privata
+functio _reduce_angle(fractus x) → fractus {
+    fixum fractus tau ← TAU()
+    fixum fractus half_tau ← tau / 2.0
+    fixum numerus k ← ((x + half_tau) / tau).pavimentum()
+    redde x - tau * k
+}
+
+# Why: Taylor series for sin(x) on reduced angle (fixed iteration count).
+@ privata
+functio _sinus_series(fractus x) → fractus {
+    varia fractus term ← x
+    varia fractus sum ← x
+    varia fractus x2 ← x * x
+    varia numerus n ← 1
+    dum n < 12 {
+        term ← (term * (-x2)) / ((2 * n) * (2 * n + 1))
+        sum ← sum + term
+        n ← n + 1
+    }
+    redde sum
+}
+
+# Why: Taylor series for cos(x) on reduced angle.
+@ privata
+functio _cosinus_series(fractus x) → fractus {
+    varia fractus term ← 1.0
+    varia fractus sum ← 1.0
+    varia fractus x2 ← x * x
+    varia numerus n ← 1
+    dum n < 12 {
+        term ← (term * (-x2)) / ((2 * n - 1) * (2 * n))
+        sum ← sum + term
+        n ← n + 1
+    }
+    redde sum
+}
+
+# Why: Taylor series for e^x.
+@ privata
+functio _exponens_series(fractus x) → fractus {
+    varia fractus term ← 1.0
+    varia fractus sum ← 1.0
+    varia numerus n ← 1
+    dum n < 20 {
+        term ← (term * x) / n
+        sum ← sum + term
+        n ← n + 1
+    }
+    redde sum
+}
+
+# Why: Series for ln(x) valid when x > 0 (caller guards non-positive inputs).
+@ privata
+functio _logarithmus_series(fractus x) → fractus {
+    fixum fractus y ← (x - 1.0) / (x + 1.0)
+    varia fractus y2 ← y * y
+    varia fractus term ← y
+    varia fractus sum ← y
+    varia numerus n ← 1
+    dum n < 24 {
+        term ← term * y2
+        sum ← sum + term / (2 * n + 1)
+        n ← n + 1
+    }
+    redde 2.0 * sum
+}
+
+# Why: Newton–Raphson square root iteration for positive x.
+@ privata
+functio _radix_newton(fractus x) → fractus {
+    varia fractus guess ← x / 2.0
+    varia numerus i ← 0
+    dum i < 20 {
+        guess ← (guess + x / guess) / 2.0
+        i ← i + 1
+    }
+    redde guess
+}

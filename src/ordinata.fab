@@ -1,0 +1,250 @@
+# copula/ordinata.fab — key-ordered associative collection
+#
+# Etymology: "ordinata" — arranged, put in order (fem. of ordinatus).
+# Counterpart to tabula (hash-unordered map). Keys iterate in sorted order.
+#
+# TARGET: This module is written in its target form and assumes two parked
+# factory goals have landed:
+#   1. generic-genus-construction (docs/factory/generic-genus-construction/goal.md)
+#      — `Ordinata<K, V>` construction at call sites.
+#   2. an `Ord`-equivalent bound on K. Until user-specified type-parameter
+#      bounds exist, the workaround documented in the generic-genus-construction
+#      goal restricts K to compiler-ordered primitives (numerus, textus,
+#      fractus) and codegen emits the unconditional bound set.
+# Until both ship, this module will not compile. It is committed in target
+# form so the public surface is fixed and ready for the moment the compiler
+# work lands.
+#
+# Layering: pure native Faber over the builtin tabula<K, V> (for O(1) lookup)
+# plus a lista<K> kept in sorted order (for ordered iteration). No Rust
+# backing, no ad routes, no I/O.
+#
+# Import: the file-namespace-imports goal (docs/factory/file-namespace-imports)
+# shipped; this file is imported directly as norma:ordinata. The genus lives at
+# file top level.
+#
+# Morphologia: receiver methods on the Ordinata<K, V> genus (implicit ego),
+# matching how the builtin tabula<K, V> exposes its surface (myOrdinata.pone(),
+# myOrdinata.accipe(), ...). Stems reuse builtin tabula stems where the
+# operation is identical (pone, accipe, dele, habet) so users cross-walking
+# between tabula and ordinata see the same verbs. Imperativus for in-place
+# mutation (varia receiver required); nominal for projections (longitudo,
+# claves, valores); the sorted-iteration surface (claves, valores, fines) is
+# what ordinata adds on top of tabula.
+#
+# Internal helpers (_insere, _amputa, _insere_ad, _amputa_ad) live at file
+# scope as free functions with their own <K> type parameter, called from
+# genus methods via turbofish (_insere<K>(...)). File-scope free functions
+# do not inherit the enclosing genus's type parameters — they declare their
+# own. This matches how generic functions already work elsewhere in the stdlib.
+
+# =============================================================================
+# TYPE
+# =============================================================================
+
+# Key-ordered map. `index` holds keys in ascending order; `entries` holds
+# the actual key→value bindings. Maintaining both lets lookup stay O(1)
+# (tabula accipe) while ordered iteration is O(n) over an already-sorted
+# lista, instead of O(n log n) sort-on-each-iteration.
+genus Ordinata<K, V> {
+    lista<K> index = vacua
+    tabula<K, V> entries = vacua
+
+    # =========================================================================
+    # STATE (nominal / present predicate)
+    # =========================================================================
+
+    # Number of entries. Nominal projection, matches tabula.longitudo().
+    functio longitudo() → numerus {
+        redde ego.index.longitudo()
+    }
+
+    # Whether the map holds no entries. Present predicate, matches
+    # tabula.vacua().
+    functio vacua() → bivalens {
+        redde ego.index.vacua()
+    }
+
+    # =========================================================================
+    # LOOKUP
+    # =========================================================================
+
+    # Get value by key; nihil if absent. Reuses the tabula lookup stem.
+    functio accipe(K clavis) → V ∪ nihil {
+        redde ego.entries.accipe(clavis)
+    }
+
+    # Whether the key is present. Reuses the tabula presence-probe stem.
+    functio habet(K clavis) → bivalens {
+        redde ego.entries.habet(clavis)
+    }
+
+    # =========================================================================
+    # MUTATION (Imperativus — in-place on a varia receiver)
+    # =========================================================================
+
+    # Insert or update a binding. Maintains the sorted key index.
+    # Reuses the tabula insert stem.
+    functio pone(K clavis, V valor) → vacuum {
+        si non ego.entries.habet(clavis) {
+            _insere<K>(ego.index, clavis)
+        }
+        ego.entries.pone(clavis, valor)
+    }
+
+    # Remove a binding. No-op if the key was absent.
+    # Reuses the tabula delete stem.
+    functio dele(K clavis) → vacuum {
+        si ego.entries.habet(clavis) {
+            ego.entries.dele(clavis)
+            _amputa<K>(ego.index, clavis)
+        }
+    }
+
+    # =========================================================================
+    # ORDERED ITERATION (what ordinata adds over tabula)
+    # =========================================================================
+
+    # Keys in ascending order. O(1) — returns the maintained sorted index.
+    # Nominal projection (the keys, as a stable fact about the map).
+    functio claves() → lista<K> {
+        redde ego.index
+    }
+
+    # Values in key-ascending order. Nominal projection.
+    functio valores() → lista<V> {
+        varia lista<V> out ← vacua
+        itera ex ego.index fixum k {
+            # habet verified by construction; accipe cannot miss.
+            fixum V v ← ego.entries.accipe(k)
+            out.appende(v)
+        }
+        redde out
+    }
+
+    # =========================================================================
+    # RANGE QUERIES (the second thing ordinata adds over tabula)
+    # =========================================================================
+
+    # Keys in [inferior, superior). `inferior` included, `superior` excluded.
+    # Named `fines` (bounds/limits, plural noun) — one Latin word for the
+    # range concept. (`intra` would be the more natural preposition but is a
+    # reserved Faber keyword — TokenKind::Intra.)
+    #
+    # WHY: both bounds required rather than nullable because Faber's param
+    # grammar does not accept `T ∪ nihil` in parameter position today. One-
+    # sided ranges are handled by the caller iterating claves() and filtering;
+    # a nullable-bound variant can be added if param-position unions ship.
+    functio fines(K inferior, K superior) → lista<K> {
+        varia lista<K> out ← vacua
+        itera ex ego.index fixum k {
+            si k < inferior ergo perge
+            si k ≥ superior ergo perge
+            out.appende(k)
+        }
+        redde out
+    }
+}
+
+# =============================================================================
+# CONSTRUCTION (catalog constructors — not receiver methods)
+# =============================================================================
+# WHY: free functions rather than genus methods because they construct a fresh
+# Ordinata<K, V> rather than operating on an existing one. Named with the
+# Perfectum stem `creata` to match fila.creata and tensor.creata. `vacua` is
+# reserved for the emptiness predicate above.
+
+# Empty sorted map constructor.
+functio creata() → Ordinata<K, V> {
+    redde Ordinata<K, V> { }
+}
+
+# Build a sorted map from a tabula, sorting keys once at construction.
+# WHY: One sort at build time is cheaper than re-sorting on every ordered
+# iteration, which is the common ordinata use case.
+#
+# EDGE: This constructor depends on tabula.claves(), a planned intrinsic for
+# reading all keys of a tabula. Until that ships, this constructor cannot
+# compile. The empty constructor creata() above is unaffected. Tracked as a
+# separate gap from the generic-construction work.
+functio creata_ex(tabula<K, V> res) → Ordinata<K, V> {
+    varia Ordinata<K, V> out ← Ordinata<K, V> { entries = res }
+    varia lista<K> claves ← res.claves()
+    claves.ordina()
+    out.index ← claves
+    redde out
+}
+
+# =============================================================================
+# INTERNALS (private file-scope helpers — real Latin stems, no snake_case glue)
+# =============================================================================
+# WHY: file-scope free functions, not genus methods, because they are pure
+# algorithms over a lista<K> that do not need the Ordinata<K, V> receiver.
+# They declare their own <K> type parameter and are called via turbofish
+# (_insere<K>(...)) from the genus methods. This is the standard generic-
+# function pattern; file-scope functions do not inherit enclosing genus type
+# parameters.
+
+# Insert a key into the sorted index at its sorted position.
+@ privata
+functio _insere<K>(lista<K> index, K clavis) → vacuum {
+    varia numerus i ← 0
+    dum i < index.longitudo() {
+        fixum K extans ← index.accipe(i)
+        # WHY: strict-less keeps the insert position stable; duplicates
+        # can't occur here because callers check habet first.
+        si clavis < extans {
+            _insere_ad<K>(index, i, clavis)
+            redde
+        }
+        i ← i + 1
+    }
+    index.appende(clavis)
+}
+
+# Insert at a positional index. lista has no positional-insert intrinsic
+# yet, so this rebuilds the lista around the insertion point.
+@ privata
+functio _insere_ad<K>(lista<K> index, numerus positio, K clavis) → vacuum {
+    varia lista<K> out ← vacua
+    varia numerus i ← 0
+    dum i < index.longitudo() {
+        si i ≡ positio {
+            out.appende(clavis)
+        }
+        out.appende(index.accipe(i))
+        i ← i + 1
+    }
+    si positio ≡ index.longitudo() {
+        out.appende(clavis)
+    }
+    index ← out
+}
+
+# Remove a key from the sorted index. Reuses the `amputa` (cut away) stem
+# rather than English "remove".
+@ privata
+functio _amputa<K>(lista<K> index, K clavis) → vacuum {
+    varia numerus i ← 0
+    dum i < index.longitudo() {
+        si index.accipe(i) ≡ clavis {
+            _amputa_ad<K>(index, i)
+            redde
+        }
+        i ← i + 1
+    }
+}
+
+# Positional removal helper — rebuilds the lista without index `positio`.
+@ privata
+functio _amputa_ad<K>(lista<K> index, numerus positio) → vacuum {
+    varia lista<K> out ← vacua
+    varia numerus i ← 0
+    dum i < index.longitudo() {
+        si i ≠ positio {
+            out.appende(index.accipe(i))
+        }
+        i ← i + 1
+    }
+    index ← out
+}

@@ -1,0 +1,72 @@
+# tensor.fab — native Faber tensor bridge and recipe module
+#
+# Public import: importa ex "norma:tensor" privata tensor
+# Method ledger: docs/stdlib/tensor-methods.md
+# Layering: bodies delegate to ↦ conversio and compiler-owned receiver intrinsics only.
+
+# =========================================================================
+# BRIDGES (lista ↔ tensor via conversio)
+# =========================================================================
+
+# Verb: planata from "planare" (to flatten) — Perfectum
+# Why: Flatten grid to lista<T> via default conversio (row-major layout).
+functio planata<T, magnitudo Figura>(tensor<T, Figura> grid) → lista<T> {
+    redde grid ↦ lista<T>
+}
+
+# Verb: structa from "struere" (to build) — 1-d bridge
+# Why: Promote lista<T> to 1-d tensor via default conversio.
+functio structa<T, magnitudo Figura>(lista<T> data) → tensor<T, Figura> {
+    redde data ↦ tensor<T, Figura>
+}
+
+# =========================================================================
+# CONSTRUCTION
+# =========================================================================
+
+# Shaped construction uses compiler-owned static spellings:
+#   tensor.creata<tensor<T, Figura>>(fill)
+#   tensor.structa<tensor<T, Figura>>(data)
+# Dynamic runtime shapes use receiver methods:
+#   seed.crea(fill, shape)
+#   seed.strue(data, shape)
+
+# Why: Product of dimension sizes; empty shape → 1 (scalar degenerate).
+functio productum(lista<numerus> shape) → numerus {
+    varia numerus product ← 1
+    itera ex shape fixum dim {
+        product ← product * dim
+    }
+    redde product
+}
+
+# =========================================================================
+# ELEMENT-WISE MAP (staging recipe)
+# =========================================================================
+
+# Verb: applicata from "applicare" (to apply) — Perfectum
+# Why: Map f over every element preserving shape (flatten → walk → reshape).
+functio applicata<T, magnitudo Figura>(tensor<T, Figura> grid, (T) → T f) → tensor<T, Figura> {
+    fixum lista<numerus> shape ← grid.magnitudines()
+    fixum lista<T> flat ← grid ↦ lista<T>
+    varia lista<T> mapped ← vacua
+    itera ex flat fixum elem {
+        mapped.appende(f(elem))
+    }
+    fixum tensor<T, []> seed ← vacua
+    redde seed.strue(mapped, shape)
+}
+
+# =========================================================================
+# REDUCTIONS (thin delegates to receiver intrinsics)
+# =========================================================================
+
+# Why: Total sum of integer tensor elements — delegates to grid.summa().
+functio summa<magnitudo Figura>(tensor<numerus, Figura> grid) → numerus {
+    redde grid.summa()
+}
+
+# Why: Total sum of f32 fractus tensor elements — delegates to grid.summa().
+functio summa_fractus<magnitudo Figura>(tensor<fractus<f32>, Figura> grid) → fractus<f32> {
+    redde grid.summa()
+}

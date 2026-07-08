@@ -1,0 +1,8 @@
+# caelum/terminus.fab — TCP endpoint type
+#
+# Public import: importa ex "norma:caelum/terminus" privata terminus
+
+genus Terminus {
+    textus hospes
+    numerus portus
+}

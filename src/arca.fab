@@ -1,0 +1,102 @@
+# arca.fab - Database Device
+#
+# Etymology: "arca" - chest, strongbox, treasury. Where data is stored.
+#
+# Part of the host effect surface (gateway-dispatched `arca:*` routes).
+#
+# Design notes:
+# - Connection via URL: postgres://, mysql://, sqlite:///path, sqlite://:memory:
+# - Verb conjugation encodes sync/async and cardinality:
+# - Future singular (-et): async, returns one value
+# - Future plural (-ent): async generator, yields multiple values
+# - Parameterized queries prevent SQL injection
+
+
+# =========================================================================
+# CONNECTION
+# =========================================================================
+
+# Connect to database (driver inferred from URL scheme)
+# URLs: postgres://, mysql://, sqlite:///path, sqlite://:memory:
+@ futura
+functio connectet(textus url) → Connexio {
+    mori "norma:arca.connectet is deferred pending Stage 2 dispatch"
+}
+
+# Database connection
+implendum Connexio {
+    # =========================================================================
+    # QUERIES
+    # =========================================================================
+
+    # Stream rows as async generator
+    @ futura
+    @ cursor
+    functio quaerent(textus sql, lista<valor> params) → cursor<series>
+
+    # Return all rows as list
+    @ futura
+    functio quaeret(textus sql, lista<valor> params) → lista<series>
+
+    # Return first row or nihil
+    @ futura
+    functio capiet(textus sql, lista<valor> params) → series ∪ nihil
+
+    # =========================================================================
+    # MUTATIONS
+    # =========================================================================
+
+    # Execute INSERT/UPDATE/DELETE, return affected row count
+    @ futura
+    functio exsequetur(textus sql, lista<valor> params) → numerus
+
+    # Execute INSERT, return last inserted ID
+    @ futura
+    functio inseret(textus sql, lista<valor> params) → numerus
+
+    # =========================================================================
+    # TRANSACTIONS
+    # =========================================================================
+
+    # Begin transaction
+    @ futura
+    functio incipiet() → Transactio
+
+    # =========================================================================
+    # LIFECYCLE
+    # =========================================================================
+
+    # Close connection
+    functio claude() → vacuum
+
+    # Check if connection is open
+    functio aperta() → bivalens
+}
+
+# Database transaction
+implendum Transactio {
+    # Stream rows as async generator
+    @ futura
+    @ cursor
+    functio quaerent(textus sql, lista<valor> params) → cursor<series>
+
+    # Return all rows as list
+    @ futura
+    functio quaeret(textus sql, lista<valor> params) → lista<series>
+
+    # Return first row or nihil within transaction
+    @ futura
+    functio capiet(textus sql, lista<valor> params) → series ∪ nihil
+
+    # Execute mutation within transaction
+    @ futura
+    functio exsequetur(textus sql, lista<valor> params) → numerus
+
+    # Commit transaction
+    @ futura
+    functio committet() → vacuum
+
+    # Rollback transaction
+    @ futura
+    functio revertet() → vacuum
+}

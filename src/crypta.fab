@@ -1,0 +1,100 @@
+# crypta.fab - Cryptography Device
+#
+# Etymology: "crypta" - vault, crypt, hidden chamber. Secret operations.
+#
+# Part of the host effect surface (gateway-dispatched `crypta:*` routes).
+#
+# Design notes:
+# - digere: hash (digerere = to digest)
+# - authenfica: HMAC (authenticare = to authenticate)
+# - cela/revela: encrypt/decrypt (celare/revelare = to hide/reveal)
+# - signa/verifica: asymmetric signatures
+# - genera/gemina: key generation
+# - derivabit: key derivation (async - intentionally slow)
+#
+# Algorithms:
+# - Hash: sha256, sha384, sha512, md5, blake2b
+# - HMAC: hmac-sha256, hmac-sha384, hmac-sha512
+# - Symmetric: aes-256-gcm, aes-256-cbc
+# - Asymmetric: ed25519, rsa-2048, rsa-4096
+
+# =========================================================================
+# HASHING
+# =========================================================================
+
+# Hash bytes (sha256, sha384, sha512, md5, blake2b)
+functio digere(textus alg, octeti data) → octeti {
+    mori "norma:crypta.digere is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# MESSAGE AUTHENTICATION
+# =========================================================================
+
+# HMAC (hmac-sha256, hmac-sha384, hmac-sha512)
+functio authenfica(textus alg, octeti clavis, octeti data) → octeti {
+    mori "norma:crypta.authenfica is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# SYMMETRIC ENCRYPTION
+# =========================================================================
+
+# Encrypt (aes-256-gcm, aes-256-cbc)
+# Returns ciphertext with IV prepended
+functio cela(textus alg, octeti clavis, octeti data) → octeti {
+    mori "norma:crypta.cela is deferred pending Stage 2 dispatch"
+}
+
+# Decrypt (expects IV prepended to ciphertext)
+functio revela(textus alg, octeti clavis, octeti data) → octeti {
+    mori "norma:crypta.revela is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# ASYMMETRIC SIGNATURES
+# =========================================================================
+
+# Sign with private key
+functio signa(octeti arcana, octeti data) → octeti {
+    mori "norma:crypta.signa is deferred pending Stage 2 dispatch"
+}
+
+# Verify with public key
+functio verifica(octeti aperta, octeti data, octeti signatura) → bivalens {
+    mori "norma:crypta.verifica is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# KEY GENERATION
+# =========================================================================
+
+# Generate symmetric key (aes-256)
+functio genera(textus alg) → octeti {
+    mori "norma:crypta.genera is deferred pending Stage 2 dispatch"
+}
+
+# Generate asymmetric key pair (ed25519, rsa-2048, rsa-4096)
+functio gemina(textus alg) → ParClavium {
+    mori "norma:crypta.gemina is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# KEY DERIVATION
+# =========================================================================
+
+# Derive key from password (pbkdf2, argon2id, scrypt)
+# Async because intentionally slow for security
+@ futura
+functio derivabit(textus alg, textus password, octeti sal, numerus longitudo) → octeti {
+    mori "norma:crypta.derivabit is deferred pending Stage 2 dispatch"
+}
+
+# Asymmetric key pair
+implendum ParClavium {
+    functio publica() → octeti
+
+    functio privata() → octeti
+
+    functio algorithmus() → textus
+}

@@ -1,0 +1,52 @@
+# caelum.fab - Network Socket Device (TCP/UDP)
+#
+# Public import: importa ex "norma:caelum" privata caelum
+# Method ledger: docs/design/caelum-methods.md
+# Sub-modules:
+#   norma:caelum/terminus    — TCP endpoint type
+#   norma:caelum/connexus    — connected socket (depends on terminus)
+#   norma:caelum/auscultator — listener (depends on connexus)
+#
+# Etymology: "caelum" - sky, ether. The transport layer beneath HTTP.
+# Counterpart to solum (ground/local I/O).
+#
+# Design notes:
+# - Verb conjugation encodes sync/async:
+# - Imperative (-a, -e, -i): synchronous (blocking)
+# - Future indicative (-et, -ebit): asynchronous
+# - TLS enabled via optional cert/key params (listen) or tute flag (connect)
+# - TCP: ausculta/auscultabit (listen), connecte/connectet (connect)
+# - Sockets are bidirectional byte streams
+
+importa ex "norma:caelum/terminus" privata terminus
+importa ex "norma:caelum/connexus" privata connexus
+importa ex "norma:caelum/auscultator" privata auscultator
+
+
+# =========================================================================
+# TCP SERVER
+# =========================================================================
+
+# Create TCP listener (TLS when cert/key provided)
+functio ausculta(numerus portus, textus cert sponte, textus key sponte) → auscultator.Auscultator {
+    mori "norma:caelum.ausculta is deferred pending Stage 2 dispatch"
+}
+
+@ futura
+functio auscultabit(numerus portus, textus cert sponte, textus key sponte) → auscultator.Auscultator {
+    mori "norma:caelum.auscultabit is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# TCP CLIENT
+# =========================================================================
+
+# Connect to TCP server (TLS when tute=verum)
+functio connecte(textus hospes, numerus portus, bivalens tute sponte vel falsum) → connexus.Connexus {
+    mori "norma:caelum.connecte is deferred pending Stage 2 dispatch"
+}
+
+@ futura
+functio connectet(textus hospes, numerus portus, bivalens tute sponte vel falsum) → connexus.Connexus {
+    mori "norma:caelum.connectet is deferred pending Stage 2 dispatch"
+}

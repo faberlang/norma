@@ -1,0 +1,206 @@
+# tempus.fab — public Faber datetime library (native Faber catalog)
+#
+# Public import: importa ex "norma:tempus" privata tempus
+# Method ledger: docs/stdlib/tempus-methods.md
+# Layering: wire/civil native; clock read and timer verbs over stream `ad`
+# (`tempus:*` routes). Duration constants are pure numeric literals.
+#
+# Timer model: rather than Faber implementing the delay itself or registering
+# callbacks, timers open an `ad` route to the host, which holds the request
+# for the requested duration before responding. One-shot timers (expectet)
+# block on the materialized response; recurring timers (vigila) return a
+# cursor that drains indefinitely. This matches the HTTP server pattern —
+# the host is the event edge; Faber owns the iteration.
+
+
+# Why: Pad a single-digit field to two decimal characters for RFC3339 wire.
+@ privata
+functio _duo(numerus n) → textus {
+    si n < 10 ergo redde "0" + (n ↦ textus)
+
+    redde n ↦ textus
+}
+
+# Why: Pad a year (or similar) to four decimal digits on the wire.
+@ privata
+functio _quattuor(numerus n) → textus {
+    varia textus out ← n ↦ textus
+    dum out.longitudo() < 4 {
+        out ← "0" + out
+    }
+    redde out
+}
+
+# Why: Slice a fixed wire substring and parse it as a civil integer field.
+@ privata
+functio _campus(instans t, numerus initium, numerus finis) → numerus {
+    fixum textus wire ← t ↦ textus
+    redde wire.sectio(initium, finis) ↦ numerus
+}
+
+# Why: Build canonical UTC RFC3339 wire from civil components (always ends with Z).
+@ privata
+functio _wire(numerus annus, numerus mensis, numerus dies, numerus hora, numerus minuta, numerus secunda) → textus {
+    redde ((((((((((_quattuor(annus) + "-") + _duo(mensis)) + "-") + _duo(dies)) + "T") + _duo(hora)) + ":") + _duo(minuta)) + ":") + _duo(secunda)) + "Z"
+}
+
+# =========================================================================
+# WIRE ↔ INSTANS
+# =========================================================================
+
+# Verb: solve from "solvere" (to loosen, untangle)
+# Why: Parse RFC3339 UTC wire text into instans via conversio.
+functio solve(textus wire) → instans {
+    redde wire ↦ instans
+}
+
+# Verb: exprimit from "exprimere" (to express, render outward)
+# Why: Render instans as RFC3339 UTC wire text via conversio.
+functio exprimit(instans t) → textus {
+    redde t ↦ textus
+}
+
+# =========================================================================
+# CIVIL PROJECTION (UTC wire fields, 1-indexed months)
+# =========================================================================
+
+# Why: Four-digit calendar year from wire positions [0, 4).
+functio annus(instans t) → numerus {
+    redde _campus(t, 0, 4)
+}
+
+# Why: Month of year (1-indexed) from wire positions [5, 7).
+functio mensis(instans t) → numerus {
+    redde _campus(t, 5, 7)
+}
+
+# Why: Day of month from wire positions [8, 10).
+functio dies(instans t) → numerus {
+    redde _campus(t, 8, 10)
+}
+
+# Why: UTC hour from wire positions [11, 13).
+functio hora(instans t) → numerus {
+    redde _campus(t, 11, 13)
+}
+
+# Why: UTC minute from wire positions [14, 16).
+functio minuta(instans t) → numerus {
+    redde _campus(t, 14, 16)
+}
+
+# Why: UTC second from wire positions [17, 19); sub-second wire tails are floored.
+functio secunda(instans t) → numerus {
+    redde _campus(t, 17, 19)
+}
+
+# =========================================================================
+# STRICT CIVIL CONSTRUCTION (UTC)
+# =========================================================================
+
+# Verb: structa from "struere" (to build, arrange)
+# Why: Construct midnight UTC instans from calendar date; invalid civil input throws.
+functio structa(numerus annus, numerus mensis, numerus dies) → instans ⇥ textus {
+    fixum textus wire ← _wire(annus, mensis, dies, 0, 0, 0)
+    redde wire ↦ instans
+}
+
+# Verb: structa_momenti — full civil moment (date + time)
+# Why: Construct UTC instans from all civil components; invalid input throws.
+functio structa_momenti(numerus annus, numerus mensis, numerus dies, numerus hora, numerus minuta, numerus secunda) → instans ⇥ textus {
+    fixum textus wire ← _wire(annus, mensis, dies, hora, minuta, secunda)
+    redde wire ↦ instans
+}
+
+# =========================================================================
+# WALL CLOCK (can jump forward/backward)
+# =========================================================================
+
+# Current epoch time in nanoseconds (canonical wall clock; downconvert at use site)
+functio nunc() → instans<ns> {
+    redde ad 'tempus:nunc' ↦ instans<ns>
+}
+
+# =========================================================================
+# MONOTONIC CLOCK (never decreases)
+# =========================================================================
+
+functio monotonicum() → numerus {
+    redde ad 'tempus:monotonicum' ↦ numerus
+}
+
+functio activum() → numerus {
+    redde ad 'tempus:activum' ↦ numerus
+}
+
+# =========================================================================
+# SLEEP / DELAY (host-side timer — Faber blocks on the host response)
+# =========================================================================
+# Verb: dormit/dormiet from "dormire" (to sleep)
+# Why: The host holds the request for `ms` milliseconds before responding,
+# so the caller's materialization blocks for the delay. No callback
+# registration, no Faber-side timing — the host is the event edge.
+# This is the one-shot timer pattern: ad + materialize, host delays.
+
+# Sleep (block) for `ms` milliseconds (async route; Faber blocks).
+# Same one-shot timer shape as expectet, distinct route so the host can
+# dispatch to an async handler if it chooses. Faber's posture is uniform.
+functio dormiet(numerus ms) → vacuum {
+    redde ad 'tempus:dormiet' (ms) ↦ vacuum
+}
+
+# Sleep (block) for `ms` milliseconds. Sync one-shot timer: blocks the
+# calling thread on the host response. Same route as dormiet; the
+# difference is sync vs async posture, mirroring the lege/leget split.
+functio expectet(numerus ms) → vacuum {
+    redde ad 'tempus:expectet' (ms) ↦ vacuum
+}
+
+# =========================================================================
+# TIMER STREAMS (host pushes events; Faber drains via cursor)
+# =========================================================================
+# Verb: vigila from "vigilare" (to watch, stay awake)
+# Why: A recurring timer that fires every `ms` milliseconds. Opens an ad
+# route; the host pushes a frame each interval; Faber drains via cursor.
+# To stop, drop the cursor or rumpe out of the iteration.
+# WHY: returns cursor<TempusPulsus> rather than registering a callback —
+# the cursor model gives Faber ownership of the iteration loop, matching
+# the HTTP server pattern (host pushes, Faber drains).
+
+# Recurring timer cursor. Each frame marks one interval elapse.
+# WHY: deferred cursor route rather than native Faber `ad` body because the
+# runtime does not yet allow returning live inbound cursor values from
+# functions ("live tuus cursor values cannot be returned from functions
+# yet"). Matches the thesaurus.nuntiabunt precedent. The Rust backing
+# opens the ad route, drains the sermo, and yields frames as a generator.
+# A native-Faber form becomes possible once cursor-return-from-function
+# ships.
+@ cursor
+functio vigila(numerus ms) → cursor<instans> {
+    mori "norma:tempus.vigila is deferred pending Stage 2 dispatch"
+}
+
+# =========================================================================
+# DURATION CONSTANTS (milliseconds — pure numeric literals)
+# =========================================================================
+# Why: trivial native Faber bodies; no host route needed.
+
+functio MILLISECUNDUM() → numerus {
+    redde 1
+}
+
+functio SECUNDUM() → numerus {
+    redde 1000
+}
+
+functio MINUTUM() → numerus {
+    redde 60000
+}
+
+functio HORA() → numerus {
+    redde 3600000
+}
+
+functio DIES() → numerus {
+    redde 86400000
+}

@@ -1,0 +1,155 @@
+# json/pange.fab — native Faber JSON serializer (valor → text)
+#
+# No Rust backing. Walks a valor tree via ↦ conversio probes (the only valor-
+# kind discriminator Faber offers) and accumulates text into lista<textus>,
+# joined at the end via chorda.nexa to avoid O(n²) textus concatenation.
+#
+# Compact emission only (v1). Pretty-printing (indentum > 0) is deferred.
+
+importa ex "norma:json/lexica" privata lexica
+importa ex "norma:chorda" privata chorda
+
+# =========================================================================
+# PUBLIC ENTRY
+# =========================================================================
+
+# Serialize a valor to compact JSON text. The indentum parameter is
+# accepted for API compatibility with the prior Rust-backed pange but
+# only compact emission is implemented in v1.
+functio pange(valor v, numerus indentum sponte) → textus ⇥ textus {
+    redde _pange_valor(v)
+}
+
+# =========================================================================
+# VALUE DISPATCH (est variant checks)
+# =========================================================================
+
+@ privata
+functio _pange_valor(valor v) → textus ⇥ textus {
+    # Dispatch via est variant tag checks — flat si chain, no conversio
+    # cascade. After confirming the variant, ↦ extracts the typed value.
+    si v est nihil ergo redde "null"
+    si v est bivalens ergo redde _pange_bivalens(v ↦ bivalens)
+    si v est numerus ergo redde (v ↦ numerus) ↦ textus
+    si v est fractus ergo redde _pange_fractum(v ↦ fractus)
+    si v est textus ergo redde _pange_chordam(v ↦ textus)
+    si v est lista<valor> ergo redde _pange_listam(v ↦ lista<valor>)
+    si v est tabula<textus, valor> ergo redde _pange_tabulam(v ↦ tabula<textus, valor>)
+    iace "valor non-serializable"
+}
+
+# =========================================================================
+# SCALAR EMITTERS
+# =========================================================================
+
+@ privata
+functio _pange_bivalens(bivalens b) → textus {
+    si b ergo redde "true"
+    redde "false"
+}
+
+# Float formatting. Rust's f64.to_string() emits "1.5" for 1.5 but "1"
+# (no decimal) for integral floats. JSON requires a digit after the dot
+# to distinguish from numerus, so append ".0" when the rendered form
+# lacks one.
+@ privata
+functio _pange_fractum(fractus f) → textus {
+    fixum textus s ← f ↦ textus
+    si _habet_formam_fractam(s) {
+        redde s
+    }
+    redde s + ".0"
+}
+
+# Does the rendered float already carry fractional or exponent form
+# ('.', 'e', 'E')? If not, the integral rendering needs ".0" appended
+# so the JSON output parses back as a fractus, not a numerus.
+@ privata
+functio _habet_formam_fractam(textus s) → bivalens {
+    varia numerus i ← 0
+    dum i < s.longitudo() {
+        fixum textus c ← s.sectio(i, i + 1)
+        si c ≡ "." aut c ≡ "e" aut c ≡ "E" {
+            redde verum
+        }
+        i ← i + 1
+    }
+    redde falsum
+}
+
+# =========================================================================
+# STRING EMITTER
+# =========================================================================
+
+@ privata
+functio _pange_chordam(textus s) → textus {
+    varia lista<textus> partes ← vacua
+    partes.appende("\"")
+
+    varia numerus i ← 0
+    dum i < s.longitudo() {
+        fixum textus c ← s.sectio(i, i + 1)
+        si lexica._postulat_transeum(c) {
+            fixum textus esc ← lexica._transeant_liber(c)
+            si esc non est nihil {
+                partes.appende(esc)
+            } secus {
+                # Unnamed control char with no escape table entry.
+                # LIMITATION: full \u00XX emission requires an ord intrinsic
+                # Faber does not expose. Emit nothing for now; the char is
+                # preserved by skipping. See lexica._postulat_transeum note.
+            }
+        } secus {
+            partes.appende(c)
+        }
+        i ← i + 1
+    }
+
+    partes.appende("\"")
+    redde chorda.nexa(partes, "")
+}
+
+# =========================================================================
+# AGGREGATE EMITTERS
+# =========================================================================
+
+@ privata
+functio _pange_listam(lista<valor> xs) → textus ⇥ textus {
+    varia lista<textus> partes ← vacua
+    partes.appende("[")
+
+    varia numerus index ← 0
+    itera ex xs fixum x {
+        si index > 0 {
+            partes.appende(",")
+        }
+        partes.appende(_pange_valor(x))
+        index ← index + 1
+    }
+
+    partes.appende("]")
+    redde chorda.nexa(partes, "")
+}
+
+@ privata
+functio _pange_tabulam(tabula<textus, valor> m) → textus ⇥ textus {
+    varia lista<textus> partes ← vacua
+    partes.appende("{")
+
+    varia numerus index ← 0
+    # itera de iterates keys; look up each value. (BTreeMap order is
+    # sorted, which is deterministic but not insertion-preserving.)
+    itera de m fixum clavis {
+        si index > 0 {
+            partes.appende(",")
+        }
+        fixum valor x ← m.accipe(clavis)
+        partes.appende(_pange_chordam(clavis))
+        partes.appende(":")
+        partes.appende(_pange_valor(x))
+        index ← index + 1
+    }
+
+    partes.appende("}")
+    redde chorda.nexa(partes, "")
+}
