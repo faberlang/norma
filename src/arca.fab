@@ -1,102 +1,147 @@
-# arca.fab - Database Device
+# arca.fab — Database device (`norma:arca`)
 #
-# Etymology: "arca" - chest, strongbox, treasury. Where data is stored.
+# Etymology: arca — chest, strongbox, treasury. Where data is stored.
 #
-# Part of the host effect surface (gateway-dispatched `arca:*` routes).
+# Host effect surface (gateway-dispatched `arca:*` routes). Bodies are deferred
+# pending Stage 2 provider policy and handle materialization; this file freezes
+# the public conjugated API.
 #
-# Design notes:
-# - Connection via URL: postgres://, mysql://, sqlite:///path, sqlite://:memory:
-# - Verb conjugation encodes sync/async and cardinality:
-# - Future singular (-et): async, returns one value
-# - Future plural (-ent): async generator, yields multiple values
-# - Parameterized queries prevent SQL injection
+# Connection URLs (driver from scheme):
+#   postgres://…  mysql://…  sqlite:///path  sqlite://:memory:
+# Queries take parameterized SQL + lista<valor> (no string interpolation).
+#
+# ---------------------------------------------------------------------------
+# Morphology (interim — hand-expanded stems; future: stem decls + elaborator)
+# Authority: sibling radix docs/stdlib/morphologia.md
+#
+# Axes used: Axis A (time/flow). Axis B (mutate vs copy-out) does not apply —
+# these are host effects, not pure value transforms.
+#
+# Open cells in this module:
+#   future singular  → async, finite result   (@ futura)
+#   future plural    → async, cursor/stream   (@ futura @ cursor)
+#   imperative       → sync lifecycle command
+#   adjectival       → connection state
+# Not open yet: present plural (sync stream), sync finite query/connect.
+#
+# Stems (one root per operation; wrappers share the root):
+#   connect-  → connectet
+#               async-only open (no connecte pair; DB is futurum-first)
+#   quaer-    (quaerere)
+#               quaeret  — async finite package → lista<series>
+#               quaerent — async stream         → cursor<series>
+#   capi-     (capere)
+#               capiet   — async first row      → series ∪ nihil
+#               (distinct operation from quaer-; not a wrapper spelling)
+#   exsequ-   (exsequi)
+#               exsequetur — async mutation     → numerus (rows affected)
+#   inser-    (inserere)
+#               inseret  — async insert + last id → numerus
+#   incip-    (incipere)
+#               incipiet — async begin transaction → Transactio
+#   commit-   (committere)
+#               committet — async commit
+#   revert-   (revertere)
+#               revertet  — async rollback
+#   claud-    (claudere)
+#               claude   — sync close
+#   (state)
+#               aperta   — open?
+#
+# Types: bare series = dynamic SQL row (tabula<textus, valor>-shaped).
+# Typed census/series<S> adapters are out of scope for this module.
+# ---------------------------------------------------------------------------
 
 
 # =========================================================================
 # CONNECTION
 # =========================================================================
 
-# Connect to database (driver inferred from URL scheme)
-# URLs: postgres://, mysql://, sqlite:///path, sqlite://:memory:
+# Stem connect- · cell: future singular (async finite)
+# Driver inferred from URL scheme.
 @ futura
 functio connectet(textus url) → Connexio {
     mori "norma:arca.connectet is deferred pending Stage 2 dispatch"
 }
 
-# Database connection
+# Database connection handle
 implendum Connexio {
-    # =========================================================================
-    # QUERIES
-    # =========================================================================
+    # -----------------------------------------------------------------
+    # QUERIES — stem quaer- (quaerere) + stem capi- (capere)
+    # -----------------------------------------------------------------
 
-    # Stream rows as async generator
+    # Stem quaer- · cell: future singular (async finite package)
+    @ futura
+    functio quaeret(textus sql, lista<valor> params) → lista<series>
+
+    # Stem capi- · cell: future singular (async first row or nihil)
+    @ futura
+    functio capiet(textus sql, lista<valor> params) → series ∪ nihil
+
+    # Stem quaer- · cell: future plural (async stream)
     @ futura
     @ cursor
     functio quaerent(textus sql, lista<valor> params) → cursor<series>
 
-    # Return all rows as list
-    @ futura
-    functio quaeret(textus sql, lista<valor> params) → lista<series>
+    # -----------------------------------------------------------------
+    # MUTATIONS — stems exsequ- / inser-
+    # -----------------------------------------------------------------
 
-    # Return first row or nihil
-    @ futura
-    functio capiet(textus sql, lista<valor> params) → series ∪ nihil
-
-    # =========================================================================
-    # MUTATIONS
-    # =========================================================================
-
-    # Execute INSERT/UPDATE/DELETE, return affected row count
+    # Stem exsequ- · cell: future singular (async rows-affected)
     @ futura
     functio exsequetur(textus sql, lista<valor> params) → numerus
 
-    # Execute INSERT, return last inserted ID
+    # Stem inser- · cell: future singular (async last insert id)
     @ futura
     functio inseret(textus sql, lista<valor> params) → numerus
 
-    # =========================================================================
-    # TRANSACTIONS
-    # =========================================================================
+    # -----------------------------------------------------------------
+    # TRANSACTIONS — stem incip-
+    # -----------------------------------------------------------------
 
-    # Begin transaction
+    # Stem incip- · cell: future singular
     @ futura
     functio incipiet() → Transactio
 
-    # =========================================================================
+    # -----------------------------------------------------------------
     # LIFECYCLE
-    # =========================================================================
+    # -----------------------------------------------------------------
 
-    # Close connection
+    # Stem claud- · cell: imperative (sync command)
     functio claude() → vacuum
 
-    # Check if connection is open
+    # State · adjectival
     functio aperta() → bivalens
 }
 
-# Database transaction
+# Database transaction handle (same query/mutation stems as Connexio)
 implendum Transactio {
-    # Stream rows as async generator
+    # Stem quaer- · future singular
+    @ futura
+    functio quaeret(textus sql, lista<valor> params) → lista<series>
+
+    # Stem capi- · future singular
+    @ futura
+    functio capiet(textus sql, lista<valor> params) → series ∪ nihil
+
+    # Stem quaer- · future plural
     @ futura
     @ cursor
     functio quaerent(textus sql, lista<valor> params) → cursor<series>
 
-    # Return all rows as list
-    @ futura
-    functio quaeret(textus sql, lista<valor> params) → lista<series>
-
-    # Return first row or nihil within transaction
-    @ futura
-    functio capiet(textus sql, lista<valor> params) → series ∪ nihil
-
-    # Execute mutation within transaction
+    # Stem exsequ- · future singular
     @ futura
     functio exsequetur(textus sql, lista<valor> params) → numerus
 
-    # Commit transaction
+    # Stem inser- · future singular (parity with Connexio)
+    @ futura
+    functio inseret(textus sql, lista<valor> params) → numerus
+
+    # Stem commit- · future singular
     @ futura
     functio committet() → vacuum
 
-    # Rollback transaction
+    # Stem revert- · future singular
     @ futura
     functio revertet() → vacuum
 }
