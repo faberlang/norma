@@ -1,0 +1,69 @@
++++
+term = "tempus"
+kind = "concept"
+category = "stdlib"
+canonical = false
+summary = "norma:tempus wire catalog, civil projection, strict structa."
+syntax = "norma:tempus — solve | exprimit | annus | structa"
+related = ["instans", "stdlib-nativum", "tempus"]
++++
+# stdlib-nativum/tempus-civil — norma:tempus wire + civil surface
+#
+# EXPECTED OUTPUT:
+#   1979-05-27T07:32:00Z
+#   verum
+
+importa ex "norma:tempus" privata tempus
+
+functio epochZero() → instans {
+    redde "1970-01-01T00:00:00Z" ↦ instans
+}
+
+functio build(numerus y, numerus m, numerus d) → instans {
+    fac {
+        redde tempus.structa(y, m, d)
+    }
+    cape err {
+        redde epochZero()
+    }
+}
+
+functio buildMoment(numerus y, numerus m, numerus d, numerus h, numerus min, numerus s) → instans {
+    fac {
+        redde tempus.structa_momenti(y, m, d, h, min, s)
+    }
+    cape err {
+        redde epochZero()
+    }
+}
+
+functio expectInvalid() → bivalens {
+    fac {
+        fixum _ bad ← tempus.structa(2026, 2, 30)
+        redde falsum
+    }
+    cape err {
+        redde verum
+    }
+}
+
+incipit {
+    fixum instans t ← tempus.solve("1979-05-27T07:32:00Z")
+    adfirma tempus.exprimit(t) ≡ "1979-05-27T07:32:00Z"
+    adfirma tempus.annus(t) ≡ 1979
+    adfirma tempus.mensis(t) ≡ 5
+    adfirma tempus.dies(t) ≡ 27
+    adfirma tempus.hora(t) ≡ 7
+    adfirma tempus.minuta(t) ≡ 32
+    adfirma tempus.secunda(t) ≡ 0
+
+    fixum instans rebuilt ← buildMoment(1979, 5, 27, 7, 32, 0)
+    adfirma (rebuilt ↦ instans<ms>) ≡ (t ↦ instans<ms>)
+
+    fixum instans leap ← build(2024, 2, 29)
+    adfirma tempus.mensis(leap) ≡ 2
+    adfirma tempus.dies(leap) ≡ 29
+    adfirma expectInvalid()
+
+    nota tempus.exprimit(t)
+}

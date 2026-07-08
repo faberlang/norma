@@ -1,0 +1,14 @@
+/Users/ianzepp/work/ianzepp/faber/crates/exempla/corpus/chorda/target/debug/deps/thiserror-4c77e44f737a121d.d: /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/lib.rs /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/aserror.rs /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/display.rs /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/var.rs /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/private.rs /Users/ianzepp/work/ianzepp/faber/crates/exempla/corpus/chorda/target/debug/build/thiserror-5309764e38424bfe/out/private.rs
+
+/Users/ianzepp/work/ianzepp/faber/crates/exempla/corpus/chorda/target/debug/deps/libthiserror-4c77e44f737a121d.rlib: /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/lib.rs /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/aserror.rs /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/display.rs /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/var.rs /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/private.rs /Users/ianzepp/work/ianzepp/faber/crates/exempla/corpus/chorda/target/debug/build/thiserror-5309764e38424bfe/out/private.rs
+
+/Users/ianzepp/work/ianzepp/faber/crates/exempla/corpus/chorda/target/debug/deps/libthiserror-4c77e44f737a121d.rmeta: /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/lib.rs /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/aserror.rs /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/display.rs /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/var.rs /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/private.rs /Users/ianzepp/work/ianzepp/faber/crates/exempla/corpus/chorda/target/debug/build/thiserror-5309764e38424bfe/out/private.rs
+
+/Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/lib.rs:
+/Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/aserror.rs:
+/Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/display.rs:
+/Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/var.rs:
+/Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/thiserror-2.0.18/src/private.rs:
+/Users/ianzepp/work/ianzepp/faber/crates/exempla/corpus/chorda/target/debug/build/thiserror-5309764e38424bfe/out/private.rs:
+
+# env-dep:OUT_DIR=/Users/ianzepp/work/ianzepp/faber/crates/exempla/corpus/chorda/target/debug/build/thiserror-5309764e38424bfe/out

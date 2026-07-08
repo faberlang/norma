@@ -1,0 +1,36 @@
++++
+term = "chorda"
+kind = "concept"
+category = "stdlib"
+canonical = false
+summary = "Native stdlib chorda v1 subset: cord and UTF-8 mechanical trio."
+syntax = "norma:chorda — pange | solve | tempta"
+related = ["chorda", "stdlib-nativum", "textus"]
++++
+
+
+# stdlib-nativum/chorda — chorda v1 subset (cord + UTF-8 mechanical trio)
+#
+# EXPECTED OUTPUT:
+#   amor
+#   alpha_beta_gamma
+#   2
+#   verum
+#   Salve
+#   Salve
+
+importa ex "norma:chorda" privata chorda
+
+incipit {
+    nota chorda.retorta("roma")
+    nota chorda.nexa(["alpha", "beta", "gamma"], "_")
+    nota chorda.reputat("banana", "an")
+    nota chorda.reciprocus("anna")
+    fixum octeti raw ← chorda.pange("Salve")
+    nota chorda.solve(raw)
+    fixum octeti probe ← chorda.pange("Salve")
+    nota chorda.tempta(probe)
+    nota chorda.retenta("hello7!", "a", "z")
+    nota chorda.comprimata("  foo   bar  ")
+    nota chorda.discissa("a=b=c", "=", 2).primus()
+}

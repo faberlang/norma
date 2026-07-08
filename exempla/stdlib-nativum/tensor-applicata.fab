@@ -1,0 +1,23 @@
++++
+term = "tensor-applicata"
+kind = "concept"
+category = "stdlib"
+canonical = true
+summary = "norma:tensor applicata map and summa reduction."
+syntax = "norma:tensor — applicata | summa"
+related = ["tensor", "stdlib-nativum", "lista"]
++++
+# stdlib-nativum/tensor-applicata — loop-based map and intrinsic-backed sum
+#
+# EXPECTED OUTPUT:
+#   14
+
+importa ex "norma:tensor" privata tensor
+
+incipit {
+    fixum lista<numerus> flat ← [1, 2, 3, 4]
+    fixum tensor<numerus, [2, 2]> grid ← tensor.structa<tensor<numerus, [2, 2]>>(flat)
+    fixum tensor<numerus, [2, 2]> scaled ← tensor.applicata(grid, numerus x ∴ x + 1)
+    fixum numerus total ← tensor.summa(scaled)
+    nota total
+}

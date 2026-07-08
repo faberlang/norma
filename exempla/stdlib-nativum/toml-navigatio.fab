@@ -1,0 +1,57 @@
++++
+term = "toml"
+kind = "existing-home"
+category = "stdlib"
+canonical = false
+summary = "Native valor navigation over parsed TOML (cape, inveni, exige)."
+syntax = "toml.solve | valor.cape | valor.inveni | valor.exige"
+related = ["valor", "toml", "stdlib-nativum"]
++++
+# stdlib-nativum/toml-navigatio — native valor tree walk over parsed TOML
+#
+# EXPECTED OUTPUT:
+#   faber, 1, sample
+
+importa ex "norma:toml" privata toml
+importa ex "norma:valor" privata valor
+
+functio sampleToml() → textus {
+    redde «name = "faber"
+version = 1
+id = "sample"»
+}
+
+incipit {
+    fixum valor doc ← toml.solve(sampleToml())
+
+    adfirma valor.tabulane(doc)
+    adfirma valor.textusne(valor.cape(doc, "name"))
+    adfirma valor.numerusne(valor.cape(doc, "version"))
+    adfirma valor.nihilne(doc) ≡ falsum
+
+    fixum textus name ← valor.cape(doc, "name") ↦ textus ⇥ "missing"
+    fixum numerus version ← valor.cape(doc, "version") ↦ numerus ⇥ 0
+    fixum textus id ← valor.inveni(doc, "id") ↦ textus ⇥ "missing"
+
+    fac {
+        fixum textus required ← valor.exige(doc, "id")
+        adfirma required ≡ "sample"
+    }
+    cape err {
+        adfirma falsum
+    }
+
+    adfirma name ≡ "faber"
+    adfirma version ≡ 1
+    adfirma id ≡ "sample"
+
+    fac {
+        valor.exige(doc, "absent")
+        adfirma falsum
+    }
+    cape err {
+        adfirma err.continet("missing key")
+    }
+
+    nota name, version, id
+}

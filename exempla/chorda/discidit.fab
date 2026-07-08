@@ -1,0 +1,32 @@
++++
+term = "chorda"
+kind = "concept"
+category = "stdlib"
+canonical = false
+summary = "Limited split and residuum helpers on cords."
+syntax = "discissa(<cord>, <delimiter>, <limit>)"
+related = ["chorda", "textus"]
++++
+
+
+# chorda — limited split and residuum helpers
+#
+# discissa(<cord>, <delimiter>, <limit>) and residuum helpers on package path.
+#
+# GRAMMAR:
+#   chordaCall :← ident '(' cordExpr (',' expr)* ')'
+#
+# EXPECTED OUTPUT:
+#   chorda/discidit.expected — split segments and residuum.
+
+importa ex "norma:chorda" privata chorda
+
+incipit {
+    fixum lista<textus> head ← chorda.discissa("a=b=c", "=", 2)
+    adfirma head.longitudo() ≡ 2
+
+    fixum textus tail ← chorda.residuum("hello", 2)
+    adfirma tail ≡ "llo"
+
+    nota head.primus(), head.accipe(1), tail
+}

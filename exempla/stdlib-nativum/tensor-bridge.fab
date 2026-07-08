@@ -1,0 +1,38 @@
++++
+term = "tensor"
+kind = "concept"
+category = "stdlib"
+canonical = true
+summary = "norma:tensor bridge catalog — planata, structa, creata, productum."
+syntax = "norma:tensor — planata | structa | creata | productum"
+related = ["tensor", "lista"]
++++
+
+
+# stdlib-nativum/tensor-bridge — norma:tensor bridge and construction helpers
+#
+# EXPECTED OUTPUT:
+#   4
+#   6
+
+importa ex "norma:tensor" privata tensor
+
+incipit {
+    fixum lista<numerus> xs ← [1, 2, 3, 4]
+    fixum tensor<numerus, [4]> grid ← tensor.structa<tensor<numerus, [4]>>(xs)
+    fixum lista<numerus> flat ← tensor.planata(grid)
+    nota flat.longitudo()
+
+    fixum lista<fractus<f32>> data ← [
+        1.0,
+        2.0,
+        3.0,
+        4.0,
+        5.0,
+        6.0,
+    ]
+    fixum tensor<fractus<f32>, [2, 3]> shaped ← tensor.structa<tensor<fractus<f32>, [2, 3]>>(data)
+    fixum tensor<fractus<f32>, [2, 3]> filled ← tensor.creata<tensor<fractus<f32>, [2, 3]>>(0.0 ∷ fractus<f32>)
+    nota tensor.productum(shaped.magnitudines())
+    nota filled.longitudo()
+}

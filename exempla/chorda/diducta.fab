@@ -1,0 +1,47 @@
++++
+term = "chorda"
+kind = "concept"
+category = "stdlib"
+canonical = false
+summary = "Delimiter-leading document split into opaque metadata and corpus wires."
+syntax = "diducta(<documentum>, <delimiter>)"
+related = ["chorda", "toml", "textus"]
++++
+# chorda/diducta — front-block document split
+#
+# Structural split only: returns [metadataWire, corpusWire] for downstream parsers.
+# Matches EBNF `+++` file frontmatter convention (line-trimmed closing fence).
+
+importa ex "norma:chorda" privata chorda
+
+functio newline() → textus {
+    redde "\n"
+}
+
+functio sampleSkill() → textus {
+    redde ((((((((("+++" + newline()) + "version = 1") + newline()) + "id = sample") + newline()) + "+++") + newline()) + newline()) + "Body line one.") + newline()
+}
+
+incipit {
+    fac {
+        fixum textus doc ← sampleSkill()
+        fixum [metadatum, corpus] ← chorda.diducta(doc, "+++")
+
+        adfirma metadatum.continet("version = 1")
+        adfirma metadatum.continet("id = sample")
+        adfirma corpus.continet("Body line one.")
+
+        nota metadatum, corpus
+    }
+    cape err {
+        mone err
+    }
+
+    fac {
+        chorda.diducta("no front block", "+++")
+        adfirma falsum
+    }
+    cape err {
+        adfirma err.continet("missing opening delimiter")
+    }
+}

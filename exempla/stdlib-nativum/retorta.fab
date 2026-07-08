@@ -1,0 +1,22 @@
++++
+term = "retorta"
+kind = "concept"
+category = "stdlib"
+canonical = true
+summary = "First native stdlib body wired through norma:chorda."
+syntax = "retorta(<cord>)"
+related = ["chorda", "stdlib-nativum"]
++++
+
+
+# stdlib-nativum/retorta — first native stdlib body via norma:chorda
+#
+# EXPECTED OUTPUT:
+#   amor
+
+importa ex "norma:chorda" privata chorda
+
+incipit {
+    fixum textus reversed ← chorda.retorta("roma")
+    nota reversed
+}

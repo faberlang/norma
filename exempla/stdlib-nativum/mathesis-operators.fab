@@ -1,0 +1,44 @@
++++
+term = "mathesis-operators"
+kind = "concept"
+category = "stdlib"
+canonical = false
+summary = "mathesis operator catalog vs glyph and receiver method parity."
+syntax = "mathesis.addita | x.addita"
+related = ["mathesis", "stdlib-nativum"]
++++
+
+
+# stdlib-nativum/mathesis-operators — catalog + glyph + receiver parity
+#
+# EXPECTED OUTPUT:
+#   3.5
+#   3.5
+#   3.5
+#   verum
+#   16
+
+importa ex "norma:mathesis" privata mathesis
+
+incipit {
+    fixum fractus x ← 1.5
+
+    fixum fractus per_glyph ← x + 2.0
+    fixum fractus per_method ← x.addita(2.0)
+    fixum fractus per_catalog ← mathesis.addita(x, 2.0)
+    fixum fractus pipeline ← x.addita(1.0).multiplicata(3.0)
+
+    nota per_glyph
+    nota per_method
+    nota per_catalog
+    nota pipeline
+    adfirma mathesis.minime(pipeline, 5.0)
+
+    fixum numerus bits ← 1
+    fixum numerus per_shift_glyph ← bits ⇐ 4
+    fixum numerus per_shift_method ← bits.sinistrata(4)
+    fixum numerus per_shift_catalog ← mathesis.sinistrata(bits, 4)
+    adfirma per_shift_glyph ≡ per_shift_method
+    adfirma per_shift_method ≡ per_shift_catalog
+    nota per_shift_glyph
+}

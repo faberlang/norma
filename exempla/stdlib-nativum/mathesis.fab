@@ -1,0 +1,70 @@
++++
+term = "mathesis"
+kind = "concept"
+category = "stdlib"
+canonical = false
+summary = "Native norma:mathesis catalog — constants, clamp, transcendentals."
+syntax = "norma:mathesis"
+related = ["mathesis", "stdlib-nativum"]
++++
+
+
+# stdlib-nativum/mathesis — native scalar math catalog
+#
+# EXPECTED OUTPUT:
+#   3.141592653589793
+#   1.0
+#   0.0
+#   verum
+
+importa ex "norma:mathesis" privata mathesis
+
+incipit {
+    fixum fractus pi ← mathesis.PI()
+    fixum fractus s ← mathesis.sinus(0.0)
+    fixum fractus c ← mathesis.cosinus(0.0)
+    fixum fractus r ← mathesis.radix(4.0)
+    fixum fractus clamped ← mathesis.constringens(5.0, 0.0, 3.0)
+    fixum fractus t ← mathesis.tangens(0.0)
+    fixum fractus exp1 ← mathesis.exponens(1.0)
+    fixum fractus ln_e ← mathesis.logarithmus(mathesis.E())
+    fixum fractus ln10 ← mathesis.logarithmus10(100.0)
+    fixum fractus neg_sqrt ← mathesis.radix(-1.0)
+    fixum fractus neg_log ← mathesis.logarithmus(-1.0)
+    fixum fractus pole_tan ← mathesis.tangens(mathesis.PI() / 2.0)
+    fixum fractus pow_cat ← mathesis.potentia(2.0, 3.0)
+    fixum fractus b ← 2.0
+    fixum fractus pow_recv ← b.potentia(3.0)
+    fixum fractus neg_b ← -2.0
+    fixum fractus neg_pow_recv ← neg_b.potentia(2.0)
+    nota pi
+    nota s
+    nota c
+    nota r
+    nota clamped
+    nota t
+    nota exp1
+    nota ln_e
+    nota ln10
+    nota neg_sqrt
+    nota neg_log
+    nota pole_tan
+    nota pow_cat
+    nota pow_recv
+    nota neg_pow_recv
+    adfirma s ≈ 0.0
+    adfirma c ≈ 1.0
+    adfirma r ≈ 2.0
+    adfirma clamped ≡ 3.0
+    adfirma t ≈ 0.0
+    adfirma exp1.approximata(mathesis.E(), 0.000001)
+    adfirma ln_e.approximata(1.0, 0.000001)
+    adfirma ln10.approximata(2.0, 0.000001)
+    adfirma neg_sqrt ≡ 0.0
+    adfirma neg_log ≡ 0.0
+    adfirma pole_tan ≡ 0.0
+    adfirma pow_cat.approximata(8.0, 0.000001)
+    adfirma pow_recv ≡ pow_cat
+    adfirma neg_pow_recv ≡ 0.0
+    adfirma mathesis.potentia(-2.0, 2.0) ≡ 0.0
+}

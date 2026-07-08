@@ -8,6 +8,8 @@ development.
 ## Rules
 
 - Keep public modules under `src/**/*.fab`.
+- Keep stdlib instructional demos under `exempla/**/*.fab` (not in the language
+  keyword corpus under sibling `examples/corpus/`).
 - Do not add `@ externa` or `@ subsidia`; Norma source should stay native Faber,
   codegen-template, `ad`, or explicit `mori` deferral based.
 - Do not reintroduce public `norma:hal/*` imports. Use flat modules such as

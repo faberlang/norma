@@ -1,0 +1,25 @@
++++
+term = "csv-chorda"
+kind = "concept"
+category = "stdlib"
+canonical = true
+summary = "norma:csv v1 round-trip via transitive norma:chorda."
+syntax = "csv.solve(<wire>)"
+related = ["csv", "chorda", "stdlib-nativum"]
++++
+
+
+# stdlib-nativum/csv-chorda — user imports only norma:csv; chorda is transitive
+#
+# EXPECTED OUTPUT (Faber-literal row sep — displayed \n is two chars, not U+000A):
+#   3
+#   name,count\nalpha,1\nbeta,2
+
+importa ex "norma:csv" privata csv
+
+incipit {
+    fixum lista<lista<textus>> grid ← csv.solve("name,count\nalpha,1\nbeta,2")
+    nota grid.longitudo()
+    fixum textus wire ← csv.pange(grid)
+    nota wire
+}

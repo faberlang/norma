@@ -1,0 +1,37 @@
++++
+term = "chorda"
+kind = "concept"
+category = "stdlib"
+canonical = false
+summary = "Predicate and interval cord filtering."
+syntax = "retenta_iudicio(<cord>, <predicate>) | retenta(<cord>, <lo>, <hi>) | expurgata(<cord>, <lo>, <hi>)"
+related = ["chorda", "textus"]
++++
+# chorda/retenta — predicate and interval cord filtering
+#
+# Filter ≠ clamp: retention walks scalars; it does not snap a whole cord to an interval endpoint.
+# Scalar ordering (Seam B): `c ≥ 'a'` inside `retenta` and native interval bodies.
+
+importa ex "norma:chorda" privata chorda
+
+incipit {
+    fixum textus slug ← chorda.retenta("hello7!", "a", "z")
+    adfirma slug ≡ "hello"
+
+    fixum textus letters ← chorda.retenta_iudicio("hello7!", textus c ∴ c ≥ 'a' et c ≤ 'z')
+    adfirma letters ≡ slug
+
+    fixum textus digits ← chorda.retenta_iudicio("id42x", textus c ∴ (((c ≡ "0" aut c ≡ "1") aut c ≡ "2") aut c ≡ "3") aut c ≡ "4")
+    adfirma digits ≡ "42"
+
+    fixum textus stripped ← chorda.expurgata_iudicio("hi, world!", textus c ∴ (c ≡ "," aut c ≡ "!") aut c ≡ " ")
+    adfirma stripped ≡ "hiworld"
+
+    fixum textus without_digits ← chorda.expurgata("hello7!", "0", "9")
+    adfirma without_digits ≡ "hello!"
+
+    fixum lista<textus> scalae ← chorda.scala("ab")
+    adfirma scalae.longitudo() ≡ 2
+
+    nota slug, digits, stripped
+}
