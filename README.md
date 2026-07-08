@@ -31,8 +31,9 @@ Norma Rust crate.
 ## Layout
 
 ```text
-src/      public `norma:*` Faber modules
-scripta/  source-library checks
+src/           public `norma:*` Faber modules
+scripta/       source-library checks
+docs/factory/  open Norma-owned factory goals (when present)
 ```
 
 ## Checks
