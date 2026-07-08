@@ -1,9 +1,24 @@
 # Factory documentation (norma)
 
-Open factory tracks for the public Norma source library.
+Open factory tracks for the public **Norma** source library (`src/**/*.fab`).
 
-These goals were relocated from private Radix `docs/factory/` on 2026-07-08 so
-product-lane work can be planned and implemented in the owning public repo.
-Compiler-only factory work remains under `faberlang/radix/docs/factory/`.
+Relocated from private Radix on 2026-07-08.
 
-Each `goal.md` / `CAMPAIGN.md` owns its **Status** line.
+## Layout (current)
+
+```text
+norma/
+  src/                 public norma:* modules
+  docs/factory/        this control plane
+  scripta/             source checks
+# siblings
+  ../faber             public CLI
+  ../radix             private compiler / host docs
+  ../faber-runtime     Rust runtime carriers (not Norma source)
+```
+
+```bash
+./scripta/check-source
+```
+
+Each `goal.md` owns its **Status** line.

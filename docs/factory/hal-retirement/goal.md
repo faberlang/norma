@@ -4,8 +4,8 @@
 **Created**: 2026-07-01
 **Target repo**: `/Users/ianzepp/work/faberlang/norma`
 **Factory artifact dir**: `docs/factory/hal-retirement/`
-**Primary surface**: stdlib docs/imports, `crates/norma` runtime backing names,
-host capability docs, factory goals that still describe `HAL` as a layer.
+**Primary surface**: this repo's README/AGENTS and `src/**/*.fab` import guidance;
+sibling radix host docs and factory goals that still describe `HAL` as a layer.
 
 ---
 
@@ -19,17 +19,17 @@ depending on lane.
 
 The target language is:
 
-- `norma:*` is the application standard library.
-- `faber:*` is the script/kernel import namespace.
+- `norma:*` is the application standard library (this repo: `src/**/*.fab`).
+- `faber:*` is the script/kernel import namespace (private radix / CLI host).
 - `ad` / `sermo` is the effect boundary.
 - host/kernel routing owns syscall handling.
-- Rust files under `crates/norma` are runtime backing for `@ externa`, not a
-  public HAL tier.
+- There is **no** residual Rust `norma` crate and **no** public HAL tier.
+  Runtime carriers live in sibling `faber-runtime` (`use faber::…`).
 
 ## Problem
 
-The repo still uses `HAL` to mean several different things: old `norma:hal/*`
-imports, standard-library effect wrappers, Rust backing modules, host proof
+Docs and some host trees still use `HAL` to mean several different things: old
+`norma:hal/*` imports, standard-library effect wrappers, host proof
 capabilities, and syscall routes. That term now obscures the actual architecture.
 
 The old phrase "hardware abstraction layer" is wrong for current Faber. These
@@ -39,18 +39,19 @@ recreate a separate layer that the frame gateway design has superseded.
 
 ## Goals
 
-- Remove `HAL` as a current architecture term from README, AGENTS, design docs,
-  and active factory goals.
+- Remove `HAL` as a current architecture term from active README, AGENTS, design
+  docs, and open factory goals (this repo first; coordinate sibling radix/faber
+  docs as needed).
 - Rename active documentation language to "standard library", "runtime backing",
   "host capability", "kernel route", or "frame-routed effect" as appropriate.
 - Audit active import guidance so author-facing paths are flat:
   `norma:solum`, `norma:processus`, `faber:solum`, not `norma:hal/solum` or
   `faber:hal/solum`.
-- Rename or isolate code module paths where `hal` is only historical packaging,
-  especially `crates/norma/hal` and `hosts/macos-arm64/src/hal`, if the rename
-  can be done without confusing the public crate API.
-- Preserve release-history references and legacy website snapshots as history,
-  but mark them as historical where needed.
+- Rename or isolate code module paths where `hal` is only historical packaging
+  (e.g. sibling radix `hosts/macos-arm64/src/hal`), if the rename can be done
+  without confusing public APIs.
+- Preserve release-history references as history, but mark them as historical
+  where needed.
 - Update tests and docs so they assert the clean-break policy: no new active
   `HAL` surfaces, aliases, or compatibility imports.
 
@@ -58,81 +59,65 @@ recreate a separate layer that the frame gateway design has superseded.
 
 - Redesigning `ad`, `sermo`, frame payloads, route manifests, or gateway
   forwarding.
-- Migrating the entire standard library to `ad` in this goal.
-- Removing `@ externa`; runtime backing remains valid for irreducible host
-  calls and performance kernels.
+- Migrating the entire standard library body model in this goal.
 - Rewriting release notes or archived historical material except to avoid
   misleading current docs.
 - Preserving old `norma:hal/*` or `faber:hal/*` imports.
 
 ## Ground Truth Researched
 
-- `stdlib/norma/README.md` already says flat `norma:*` has retired
-  `norma:hal/*`, but still names a `HAL` layer and `HAL` floor.
-- `docs/factory/frame-gateway/goal.md` defines the current effect model:
-  `ad` opens a frame-stream conversation; route strings are opaque; typed APIs
-  live above the primitive.
-- `docs/factory/faber-script-kernel/goal.md` and related kernel goals already
-  require flat `faber:*` paths and reject `faber:hal/*`.
-- `crates/faber-cli/src/package_test.rs` contains rejection coverage for
+- This repo's `README.md` / `AGENTS.md` already forbid public `norma:hal/*`
+  imports and require flat modules such as `norma:solum`.
+- Sibling radix `docs/factory/frame-gateway/` (closed) defines the current effect
+  model: `ad` opens a frame-stream conversation; route strings are opaque.
+- Sibling radix kernel/script goals require flat `faber:*` paths and reject
+  `faber:hal/*`.
+- Sibling `../faber` package tests contain rejection coverage for
   `norma:hal/solum`.
-- Active code still has `crates/norma/hal/*` and `hosts/macos-arm64/src/hal/*`
-  module names.
-- `README.md`, `AGENTS.md`, host docs, and many factory/design docs still use
-  `HAL` as current architectural language.
+- Residual Rust `crates/norma` (including any `hal/` subtree) is **removed** from
+  the private workspace; do not plan work against it.
+- Host proof trees under sibling radix may still name `hal` directories
+  historically.
 
 ## Reference Packet
 
-- `README.md`
-- `AGENTS.md`
-- `stdlib/norma/README.md`
-- `docs/factory/frame-gateway/goal.md`
-- `docs/design/frame-stream-types.md`
-- `docs/factory/faber-script-kernel/goal.md`
-- `docs/factory/faber-kernel-solum/goal.md`
-- `docs/factory/faber-kernel-processus/goal.md`
-- `crates/norma/lib.rs`
-- `crates/norma/hal/`
-- `hosts/macos-arm64/src/hal/`
-- `crates/faber-cli/src/package_test.rs`
+- `README.md`, `AGENTS.md` (this repo)
+- `src/**/*.fab` (public Norma source)
+- sibling radix `docs/design/frame-stream-types.md`
+- sibling radix `docs/factory/frame-gateway/` (historical campaign)
+- sibling radix `docs/factory/faber-script-kernel/` (closed; pointer/stub)
+- sibling radix `hosts/macos-arm64/` (host capability naming)
+- sibling `../faber/src/package_test.rs` (legacy import rejection)
 
 ## Constraints And Invariants
 
 - There is no author-facing HAL namespace after this goal.
 - `HAL` must not be replaced by a vague synonym that keeps the same obsolete
   layer alive.
-- `@ externa` means runtime backing for a standard-library declaration; it does
-  not imply a HAL module.
 - Frame-routed effects are syscall-style conversations through `ad` / `sermo`;
   the compiler must not infer behavior from route names.
 - Script/kernel imports stay flat under `faber:*`.
-- Application stdlib imports stay flat under `norma:*`.
+- Application stdlib imports stay flat under `norma:*` from this repo's `src/`.
 - Historical release notes may keep the old term when clearly historical.
 
 ## Implementation Shape
 
-1. Documentation pass: update active README, AGENTS, stdlib README, frame gateway
-   docs, host docs, and current factory goals to use the new vocabulary.
+1. Documentation pass: update this repo's README/AGENTS and any Norma-owned docs;
+   file sibling radix/faber doc PRs for remaining active `HAL` language.
 2. Import policy pass: ensure active docs and examples do not recommend
-   `norma:hal/*`, `faber:hal/*`, or `stdlib/norma/hal/*` as current surfaces.
-3. Code naming pass: evaluate renaming `crates/norma/hal` to a runtime-backing
-   name such as `host` or `backing`, and `hosts/macos-arm64/src/hal` to
-   `capability` or `syscall`. Rename only if tests can prove the change without
-   preserving obsolete public aliases.
-4. Test pass: keep or add rejection tests for `norma:hal/*` and `faber:hal/*`;
-   add a hygiene check that flags new active-doc `HAL` usage outside approved
+   `norma:hal/*` or `faber:hal/*` as current surfaces.
+3. Host naming pass (sibling radix): evaluate renaming
+   `hosts/macos-arm64/src/hal` only if tests prove a clean break.
+4. Test pass: keep rejection tests for `norma:hal/*` and `faber:hal/*` in sibling
+   `faber`; add hygiene that flags new active-doc `HAL` usage outside approved
    historical paths.
-5. Closeout pass: update release notes for this cleanup and record the new
-   vocabulary in the stdlib and frame-gateway docs.
+5. Closeout pass: record the vocabulary in this repo's README.
 
 ## Acceptance Criteria
 
 - Active docs describe Faber effects as standard-library APIs over frame-routed
   host/kernel syscalls, not as HAL.
-- No active authoring guide recommends `norma:hal/*`, `faber:hal/*`, or
-  `stdlib/norma/hal/*`.
-- Runtime backing remains available for `@ externa` declarations without being
-  presented as a public HAL tier.
+- No active authoring guide recommends `norma:hal/*` or `faber:hal/*`.
 - Existing rejection tests for legacy HAL imports still pass.
 - Any remaining `HAL` mentions are historical, release-note-only, or explicitly
   marked transitional debt.
@@ -140,22 +125,30 @@ recreate a separate layer that the frame gateway design has superseded.
 
 ## Validation
 
+From this repo and siblings:
+
 ```bash
-rg -n "\bHAL\b|\bhal\b|norma:hal|faber:hal|stdlib/norma/hal" README.md AGENTS.md docs stdlib hosts crates
-cargo test -p faber-cli -- package
-cargo test -p radix -- kernel_namespace
-cargo test -p norma
+# Norma source policy
+./scripta/check-source
+
+# No public HAL imports in Norma source
+! rg -n 'norma:hal|faber:hal' src
+
+# Sibling faber still rejects legacy HAL imports
+cargo test --manifest-path ../faber/Cargo.toml -- package
+
+# Optional broader audit (expect historical hits until filtered)
+rg -n '\bHAL\b|norma:hal|faber:hal' README.md AGENTS.md docs src \
+  ../radix/docs ../radix/hosts ../faber/src
 ```
 
-The `rg` command is an audit gate, not an expected zero-result command until
+The broad `rg` is an audit gate, not an expected zero-result command until
 approved historical paths are filtered or documented.
 
 ## Open Questions
 
-- Should `crates/norma/hal` be renamed in the first implementation, or should
-  that be a second slice after docs and import policy are clean?
-- Preferred replacement names: `backing`, `host`, `effect`, `syscall`, or
-  `capability`?
+- Preferred replacement names for residual host `hal` directories in sibling
+  radix: `backing`, `host`, `effect`, `syscall`, or `capability`?
 - Should release notes and legacy website snapshots be excluded from automated
   hygiene checks by path, or annotated in place?
 
