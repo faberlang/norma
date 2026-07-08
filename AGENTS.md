@@ -16,6 +16,12 @@ development.
   `norma:solum`, `norma:json`, and nested modules such as `norma:solum/path`.
 - Do not treat any historical Radix `crates/norma` path as the source library —
   that crate is removed; this repo is canonical.
+- **Verb conjugation / method posture:** follow sibling radix
+  [`docs/stdlib/morphologia.md`](../radix/docs/stdlib/morphologia.md)
+  (authoritative). Hand-expand conjugations consistently with long-term
+  stem+elaborator vision: one stem per operation, real Latin forms, Axis A
+  (time/flow) and Axis B (ownership) as documented there. List stems and open
+  cells in module headers when a device pre-expands multiple forms.
 
 ## Validation
 
