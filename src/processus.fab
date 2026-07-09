@@ -65,6 +65,13 @@ functio dimitte(lista<textus> args, textus directorium sponte, tabula<textus, te
     redde ad 'processus:dimitte' (args) ↦ numerus
 }
 
+# Execute an argv vector directly and capture status, stdout, and stderr.
+# No shell is involved; args[0] is the executable and the remaining elements
+# are passed as literal argv entries.
+functio captura(lista<textus> args) → valor {
+    redde ad 'processus:captura' (args) ↦ valor
+}
+
 # =========================================================================
 # SHELL EXECUTION
 # =========================================================================
