@@ -27,6 +27,7 @@ genus ModelSummary {
     textus router_model_id
     lista<textus> files
     lista<MetadataTensor> tensors
+    numerus tensor_count
     lista<textus> shards
     textus quantization
     numerus estimated_bytes
@@ -76,6 +77,7 @@ functio vacua_summarium(textus alias, textus source, textus status, textus local
         router_model_id = router_model_id,
         files = vacua,
         tensors = vacua,
+        tensor_count = 0,
         shards = vacua,
         quantization = "",
         estimated_bytes = 0,
@@ -106,7 +108,7 @@ functio _u64le_primus(octeti data) → numerus ⇥ textus {
 functio _ascii_byte(numerus b) → textus ⇥ textus {
     fixum textus scalars ← " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
     si b ≥ 32 et b ≤ 126 ergo redde scalars.sectio(b - 32, b - 31)
-    iace "non-ascii safetensors header byte"
+    iace "non-ascii metadata byte"
 }
 
 functio safetensors_header_textus(octeti data) → textus ⇥ textus {
@@ -293,6 +295,7 @@ functio safetensors_summarium(textus alias, textus source, textus local_path, oc
     fixum textus header ← safetensors_header_textus(data)
     fixum lista<MetadataTensor> tensors ← _tensors_from_header(header)
     fixum numerus estimated ← _estimated_tensor_bytes(tensors)
+    fixum numerus tensor_count ← tensors.longitudo()
     fixum textus diagnosticum ← "tokenizer/config files not found beside " + local_path
     fixum textus file_path ← "" + local_path
     fixum lista<textus> files ← [file_path]
@@ -311,6 +314,7 @@ functio safetensors_summarium(textus alias, textus source, textus local_path, oc
         router_model_id = "",
         files = files,
         tensors = tensors,
+        tensor_count = tensor_count,
         shards = vacua,
         quantization = "",
         estimated_bytes = estimated,
@@ -341,6 +345,395 @@ functio tempta_safetensors_summarium(textus alias, textus source, textus local_p
             router_model_id = "",
             files = files,
             tensors = vacua,
+            tensor_count = 0,
+            shards = vacua,
+            quantization = "",
+            estimated_bytes = 0,
+            diagnostics = diagnostics
+        }
+    }
+}
+
+@ privata
+functio _u32le_at(octeti data, numerus index, textus context) → numerus ⇥ textus {
+    si data.longitudo() < index + 4 ergo iace context + " truncated"
+    redde _byte_at(data, index) +
+        (_byte_at(data, index + 1) * 256) +
+        (_byte_at(data, index + 2) * 65536) +
+        (_byte_at(data, index + 3) * 16777216)
+}
+
+@ privata
+functio _u64le_at(octeti data, numerus index, textus context) → numerus ⇥ textus {
+    si data.longitudo() < index + 8 ergo iace context + " truncated"
+    redde _byte_at(data, index) +
+        (_byte_at(data, index + 1) * 256) +
+        (_byte_at(data, index + 2) * 65536) +
+        (_byte_at(data, index + 3) * 16777216) +
+        (_byte_at(data, index + 4) * 4294967296) +
+        (_byte_at(data, index + 5) * 1099511627776) +
+        (_byte_at(data, index + 6) * 281474976710656) +
+        (_byte_at(data, index + 7) * 72057594037927936)
+}
+
+@ privata
+functio _metadata_text_at(octeti data, numerus index, numerus length, textus context) → textus ⇥ textus {
+    si data.longitudo() < index + length ergo iace context + " truncated"
+    varia textus out ← ""
+    varia numerus i ← 0
+    dum i < length {
+        out ← out + _ascii_byte(_byte_at(data, index + i))
+        i ← i + 1
+    }
+    redde out
+}
+
+@ privata
+functio _gguf_scalar_size(numerus type_id) → numerus {
+    si type_id ≡ 0 ergo redde 1
+    si type_id ≡ 1 ergo redde 1
+    si type_id ≡ 2 ergo redde 2
+    si type_id ≡ 3 ergo redde 2
+    si type_id ≡ 4 ergo redde 4
+    si type_id ≡ 5 ergo redde 4
+    si type_id ≡ 6 ergo redde 4
+    si type_id ≡ 7 ergo redde 1
+    si type_id ≡ 10 ergo redde 8
+    si type_id ≡ 11 ergo redde 8
+    si type_id ≡ 12 ergo redde 8
+    redde -1
+}
+
+@ privata
+functio _gguf_skip_value(octeti data, numerus cursor, numerus type_id) → numerus ⇥ textus {
+    fixum numerus scalar_size ← _gguf_scalar_size(type_id)
+    si scalar_size > 0 ergo redde cursor + scalar_size
+    si type_id ≡ 8 {
+        fixum numerus length ← _u64le_at(data, cursor, "gguf string")
+        si data.longitudo() < cursor + 8 + length ergo iace "gguf string truncated"
+        redde cursor + 8 + length
+    }
+    si type_id ≡ 9 {
+        fixum numerus element_type ← _u32le_at(data, cursor, "gguf array element type")
+        fixum numerus count ← _u64le_at(data, cursor + 4, "gguf array length")
+        fixum numerus element_size ← _gguf_scalar_size(element_type)
+        fixum numerus body_start ← cursor + 12
+        si element_size > 0 ergo redde body_start + (count * element_size)
+        si element_type ≡ 8 {
+            varia numerus item_cursor ← body_start
+            varia numerus i ← 0
+            dum i < count {
+                fixum numerus length ← _u64le_at(data, item_cursor, "gguf string array item")
+                si data.longitudo() < item_cursor + 8 + length ergo iace "gguf string array truncated"
+                item_cursor ← item_cursor + 8 + length
+                i ← i + 1
+            }
+            redde item_cursor
+        }
+        iace "unsupported gguf array element type: §"(element_type)
+    }
+    iace "unsupported gguf metadata value type: §"(type_id)
+}
+
+@ privata
+functio _ggml_type_name(numerus type_id) → textus {
+    si type_id ≡ 0 ergo redde "F32"
+    si type_id ≡ 1 ergo redde "F16"
+    si type_id ≡ 2 ergo redde "Q4_0"
+    si type_id ≡ 3 ergo redde "Q4_1"
+    si type_id ≡ 6 ergo redde "Q5_0"
+    si type_id ≡ 7 ergo redde "Q5_1"
+    si type_id ≡ 8 ergo redde "Q8_0"
+    si type_id ≡ 9 ergo redde "Q8_1"
+    si type_id ≡ 10 ergo redde "Q2_K"
+    si type_id ≡ 11 ergo redde "Q3_K"
+    si type_id ≡ 12 ergo redde "Q4_K"
+    si type_id ≡ 13 ergo redde "Q5_K"
+    si type_id ≡ 14 ergo redde "Q6_K"
+    si type_id ≡ 15 ergo redde "Q8_K"
+    si type_id ≡ 24 ergo redde "I8"
+    si type_id ≡ 25 ergo redde "I16"
+    si type_id ≡ 26 ergo redde "I32"
+    si type_id ≡ 27 ergo redde "I64"
+    si type_id ≡ 28 ergo redde "F64"
+    si type_id ≡ 30 ergo redde "BF16"
+    redde "GGML_TYPE_" + (type_id ↦ textus)
+}
+
+@ privata
+functio _llama_file_type_name(numerus type_id) → textus {
+    si type_id ≡ 0 ergo redde "F32"
+    si type_id ≡ 1 ergo redde "F16"
+    si type_id ≡ 2 ergo redde "Q4_0"
+    si type_id ≡ 3 ergo redde "Q4_1"
+    si type_id ≡ 7 ergo redde "Q8_0"
+    si type_id ≡ 8 ergo redde "Q5_0"
+    si type_id ≡ 9 ergo redde "Q5_1"
+    si type_id ≡ 10 ergo redde "Q2_K"
+    si type_id ≡ 11 ergo redde "Q3_K_S"
+    si type_id ≡ 12 ergo redde "Q3_K_M"
+    si type_id ≡ 13 ergo redde "Q3_K_L"
+    si type_id ≡ 14 ergo redde "Q4_K_S"
+    si type_id ≡ 15 ergo redde "Q4_K_M"
+    si type_id ≡ 16 ergo redde "Q5_K_S"
+    si type_id ≡ 17 ergo redde "Q5_K_M"
+    si type_id ≡ 18 ergo redde "Q6_K"
+    si type_id ≡ 32 ergo redde "BF16"
+    si type_id ≡ 36 ergo redde "TQ1_0"
+    si type_id ≡ 37 ergo redde "TQ2_0"
+    si type_id ≡ 38 ergo redde "MXFP4_MOE"
+    si type_id ≡ 39 ergo redde "NVFP4"
+    si type_id ≡ 40 ergo redde "Q1_0"
+    redde "FILE_TYPE_" + (type_id ↦ textus)
+}
+
+@ privata
+functio _ascii_byte_or_empty(numerus b) → textus {
+    fac {
+        redde _ascii_byte(b)
+    }
+    cape err {
+        redde ""
+    }
+}
+
+@ privata
+functio _ascii_key_matches(octeti data, numerus index, textus key) → bivalens {
+    si data.longitudo() < index + key.longitudo() {
+        redde falsum
+    }
+    varia numerus i ← 0
+    dum i < key.longitudo() {
+        fixum textus byte_text ← _ascii_byte_or_empty(_byte_at(data, index + i))
+        fixum textus expected ← key.sectio(i, i + 1)
+        si non (byte_text ≡ expected) {
+            redde falsum
+        }
+        i ← i + 1
+    }
+    redde verum
+}
+
+@ privata
+functio _gguf_find_value_cursor(octeti data, textus key, numerus expected_type) → numerus ⇥ textus {
+    varia numerus cursor ← 0
+    dum cursor + key.longitudo() + 4 < data.longitudo() {
+        si _ascii_key_matches(data, cursor, key) {
+            fixum numerus value_type ← _u32le_at(data, cursor + key.longitudo(), "gguf scanned metadata value type")
+            si value_type ≡ expected_type ergo redde cursor + key.longitudo() + 4
+        }
+        cursor ← cursor + 1
+    }
+    iace "gguf metadata key not found in prefix: " + key
+}
+
+@ privata
+functio _gguf_try_text_value(octeti data, textus key) → textus {
+    fac {
+        fixum numerus cursor ← _gguf_find_value_cursor(data, key, 8)
+        fixum numerus length ← _u64le_at(data, cursor, "gguf scanned text length")
+        redde _metadata_text_at(data, cursor + 8, length, "gguf scanned text")
+    }
+    cape err {
+        redde ""
+    }
+}
+
+@ privata
+functio _gguf_try_u32_value(octeti data, textus key) → numerus {
+    fac {
+        fixum numerus cursor ← _gguf_find_value_cursor(data, key, 4)
+        redde _u32le_at(data, cursor, "gguf scanned u32")
+    }
+    cape err {
+        redde -1
+    }
+}
+
+functio gguf_quantization_fragmentum(octeti data) → textus {
+    redde _llama_file_type_name(_gguf_try_u32_value(data, "general.file_type"))
+}
+
+functio gguf_summarium(textus alias, textus source, textus local_path, textus router_model_id, octeti data, numerus file_size) → ModelSummary ⇥ textus {
+    si data.longitudo() < 24 ergo iace "gguf header truncated"
+    si _byte_at(data, 0) ≠ 71 aut _byte_at(data, 1) ≠ 71 aut _byte_at(data, 2) ≠ 85 aut _byte_at(data, 3) ≠ 70 ergo iace "gguf magic missing"
+
+    fixum numerus version ← _u32le_at(data, 4, "gguf version")
+    si version ≠ 3 ergo iace "unsupported gguf version: §"(version)
+    fixum numerus tensor_total ← _u64le_at(data, 8, "gguf tensor count")
+    fixum numerus metadata_count ← _u64le_at(data, 16, "gguf metadata count")
+
+    varia numerus cursor ← 24
+    varia numerus metadata_index ← 0
+    varia textus architecture ← ""
+    varia textus model_name ← ""
+    varia numerus file_type ← -1
+    varia numerus quantization_version ← -1
+    fixum bivalens live_router_floor ← router_model_id.longitudo() > 0 et local_path.longitudo() ≡ 0
+
+    si live_router_floor {
+        architecture ← _gguf_try_text_value(data, "general.architecture")
+        model_name ← _gguf_try_text_value(data, "general.name")
+        file_type ← _gguf_try_u32_value(data, "general.file_type")
+        quantization_version ← _gguf_try_u32_value(data, "general.quantization_version")
+    } secus {
+        dum metadata_index < metadata_count {
+            fixum numerus key_length ← _u64le_at(data, cursor, "gguf metadata key length")
+            cursor ← cursor + 8
+            fixum textus key ← _metadata_text_at(data, cursor, key_length, "gguf metadata key")
+            cursor ← cursor + key_length
+            fixum numerus value_type ← _u32le_at(data, cursor, "gguf metadata value type")
+            cursor ← cursor + 4
+            fixum numerus value_cursor ← cursor
+
+            si key ≡ "general.architecture" et value_type ≡ 8 {
+                fixum numerus length ← _u64le_at(data, value_cursor, "gguf architecture")
+                architecture ← _metadata_text_at(data, value_cursor + 8, length, "gguf architecture")
+            }
+            si key ≡ "general.name" et value_type ≡ 8 {
+                fixum numerus length ← _u64le_at(data, value_cursor, "gguf model name")
+                model_name ← _metadata_text_at(data, value_cursor + 8, length, "gguf model name")
+            }
+            si key ≡ "general.file_type" et value_type ≡ 4 {
+                file_type ← _u32le_at(data, value_cursor, "gguf file type")
+            }
+            si key ≡ "general.quantization_version" et value_type ≡ 4 {
+                quantization_version ← _u32le_at(data, value_cursor, "gguf quantization version")
+            }
+
+            cursor ← _gguf_skip_value(data, value_cursor, value_type)
+            metadata_index ← metadata_index + 1
+        }
+    }
+
+    varia lista<MetadataTensor> tensors ← vacua
+    varia numerus tensor_index ← 0
+    dum live_router_floor ≠ verum et tensor_index < tensor_total et tensor_index < 8 {
+        fixum numerus name_length ← _u64le_at(data, cursor, "gguf tensor name length")
+        cursor ← cursor + 8
+        fixum textus tensor_name ← _metadata_text_at(data, cursor, name_length, "gguf tensor name")
+        cursor ← cursor + name_length
+        fixum numerus dims_count ← _u32le_at(data, cursor, "gguf tensor dimension count")
+        cursor ← cursor + 4
+        varia lista<numerus> dims ← vacua
+        varia numerus dim_index ← 0
+        dum dim_index < dims_count {
+            dims.appende(_u64le_at(data, cursor, "gguf tensor dimension"))
+            cursor ← cursor + 8
+            dim_index ← dim_index + 1
+        }
+        fixum numerus tensor_type ← _u32le_at(data, cursor, "gguf tensor type")
+        cursor ← cursor + 4
+        si data.longitudo() < cursor + 8 ergo iace "gguf tensor offset truncated"
+        cursor ← cursor + 8
+        fixum numerus parameter_count ← _productum(dims)
+        tensors.appende(MetadataTensor {
+            nomen = tensor_name,
+            dtype = _ggml_type_name(tensor_type),
+            figura = dims,
+            parameter_count = parameter_count
+        })
+        tensor_index ← tensor_index + 1
+    }
+
+    varia lista<textus> files ← vacua
+    si local_path.longitudo() > 0 {
+        files.appende("" + local_path)
+    }
+    varia lista<Diagnosticum> diagnostics ← vacua
+    diagnostics.appende(Diagnosticum {
+        severitas = "info",
+        nuntius = "gguf version: " + (version ↦ textus)
+    })
+    diagnostics.appende(Diagnosticum {
+        severitas = "info",
+        nuntius = "gguf metadata kvs: " + (metadata_count ↦ textus)
+    })
+    diagnostics.appende(Diagnosticum {
+        severitas = "info",
+        nuntius = "gguf tensors: " + (tensor_total ↦ textus)
+    })
+    si architecture.longitudo() > 0 {
+        diagnostics.appende(Diagnosticum {
+            severitas = "info",
+            nuntius = "gguf architecture: " + architecture
+        })
+    }
+    si model_name.longitudo() > 0 {
+        diagnostics.appende(Diagnosticum {
+            severitas = "info",
+            nuntius = "gguf model name: " + model_name
+        })
+    }
+    si quantization_version ≥ 0 {
+        diagnostics.appende(Diagnosticum {
+            severitas = "info",
+            nuntius = "gguf quantization version: " + (quantization_version ↦ textus)
+        })
+    }
+    si tensor_total > tensors.longitudo() {
+        fixum numerus shown_n ← tensors.longitudo()
+        fixum textus shown_count ← shown_n ↦ textus
+        fixum textus total_count ← tensor_total ↦ textus
+        diagnostics.appende(Diagnosticum {
+            severitas = "warning",
+            nuntius = "gguf tensor list truncated to " + shown_count + " of " + total_count
+        })
+    }
+    si live_router_floor {
+        diagnostics.appende(Diagnosticum {
+            severitas = "warning",
+            nuntius = "gguf tensor samples omitted for router-backed live metadata floor"
+        })
+    }
+
+    varia textus status ← "local"
+    si router_model_id.longitudo() > 0 {
+        status ← "router-backed"
+    }
+    redde ModelSummary {
+        alias = alias,
+        source = source,
+        status = status,
+        formatum = "gguf",
+        local_path = local_path,
+        router_model_id = router_model_id,
+        files = files,
+        tensors = tensors,
+        tensor_count = tensor_total,
+        shards = vacua,
+        quantization = _llama_file_type_name(file_type),
+        estimated_bytes = file_size,
+        diagnostics = diagnostics
+    }
+}
+
+functio tempta_gguf_summarium(textus alias, textus source, textus local_path, textus router_model_id, octeti data, numerus file_size) → ModelSummary {
+    fac {
+        redde gguf_summarium(alias, source, local_path, router_model_id, data, file_size)
+    }
+    cape err {
+        fixum textus diagnosticum ← "gguf metadata error: " + err
+        varia lista<textus> files ← vacua
+        si local_path.longitudo() > 0 {
+            files.appende("" + local_path)
+        }
+        fixum lista<Diagnosticum> diagnostics ← [
+            Diagnosticum {
+                severitas = "error",
+                nuntius = diagnosticum
+            }
+        ]
+        redde ModelSummary {
+            alias = alias,
+            source = source,
+            status = "error",
+            formatum = "gguf",
+            local_path = local_path,
+            router_model_id = router_model_id,
+            files = files,
+            tensors = vacua,
+            tensor_count = 0,
             shards = vacua,
             quantization = "",
             estimated_bytes = 0,
@@ -388,6 +781,22 @@ probandum "model metadata facade" {
             fixum lista<MetadataTensor> tensors ← summary.tensors
             adfirma tensors.longitudo() ≡ 1
             adfirma summary.estimated_bytes ≡ 24
+        }
+        cape err {
+            adfirma falsum
+        }
+    }
+
+    proba "reads gguf metadata floor" {
+        fixum octeti data ← |47 47 55 46 03 00 00 00 01 00 00 00 00 00 00 00 04 00 00 00 00 00 00 00 14 00 00 00 00 00 00 00 67 65 6e 65 72 61 6c 2e 61 72 63 68 69 74 65 63 74 75 72 65 08 00 00 00 03 00 00 00 00 00 00 00 74 6f 79 0c 00 00 00 00 00 00 00 67 65 6e 65 72 61 6c 2e 6e 61 6d 65 08 00 00 00 09 00 00 00 00 00 00 00 54 69 6e 79 20 47 47 55 46 11 00 00 00 00 00 00 00 67 65 6e 65 72 61 6c 2e 66 69 6c 65 5f 74 79 70 65 04 00 00 00 0f 00 00 00 1c 00 00 00 00 00 00 00 67 65 6e 65 72 61 6c 2e 71 75 61 6e 74 69 7a 61 74 69 6f 6e 5f 76 65 72 73 69 6f 6e 04 00 00 00 02 00 00 00 0d 00 00 00 00 00 00 00 6f 75 74 70 75 74 2e 77 65 69 67 68 74 02 00 00 00 02 00 00 00 00 00 00 00 03 00 00 00 00 00 00 00 0c 00 00 00 00 00 00 00 00 00 00 00|
+        fac {
+            fixum ModelSummary summary ← gguf_summarium("fixture", "fixture", "fixture.gguf", "", data, 238)
+            adfirma summary.formatum ≡ "gguf"
+            adfirma summary.quantization ≡ "Q4_K_M"
+            adfirma summary.tensor_count ≡ 1
+            fixum lista<MetadataTensor> tensors ← summary.tensors
+            adfirma tensors.longitudo() ≡ 1
+            adfirma summary.estimated_bytes ≡ 238
         }
         cape err {
             adfirma falsum

@@ -78,6 +78,18 @@ functio hauriet(textus via) → octeti {
     redde ad 'solum:hauriet' (via) ↦ octeti
 }
 
+# Draw a bounded byte range from a file.
+functio partem(textus via, numerus initium, numerus longitudo) → octeti {
+    fixum lista<valor> args ← [via ↦ valor, initium ↦ valor, longitudo ↦ valor]
+    redde ad 'solum:partem' (args) ↦ octeti
+}
+
+# Find a text byte pattern within a bounded file range, or -1 when absent.
+functio inveni(textus via, textus exemplar, numerus initium, numerus longitudo) → numerus {
+    fixum lista<valor> args ← [via ↦ valor, exemplar ↦ valor, initium ↦ valor, longitudo ↦ valor]
+    redde ad 'solum:inveni' (args) ↦ numerus
+}
+
 # =========================================================================
 # READING - Lines
 # =========================================================================
