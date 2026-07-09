@@ -179,6 +179,11 @@ functio regularene(textus via) → bivalens {
     redde ad 'solum:regularene' (via) ↦ bivalens
 }
 
+# True when path is a regular file and can be opened for reading.
+functio legibilene(textus via) → bivalens {
+    redde ad 'solum:legibilene' (via) ↦ bivalens
+}
+
 # True when path itself is a symbolic link.
 functio vinculumne(textus via) → bivalens {
     redde ad 'solum:vinculumne' (via) ↦ bivalens
