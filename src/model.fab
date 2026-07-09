@@ -1,0 +1,120 @@
+# model.fab — model metadata facade
+#
+# Public import: importa ex "norma:model" privata model
+#
+# Stage 1 facade only. Binary safetensors/GGUF parsing belongs to later
+# parser floors; this module owns the reusable summary records and fail-closed
+# classification helpers used by application packages.
+
+genus TensorMetadata {
+    textus nomen
+    textus dtype
+    lista<numerus> figura
+    numerus parameter_count
+}
+
+genus Diagnosticum {
+    textus severitas
+    textus nuntius
+}
+
+genus ModelSummary {
+    textus alias
+    textus source
+    textus status
+    textus formatum
+    textus local_path
+    textus router_model_id
+    lista<textus> files
+    lista<textus> tensors
+    lista<textus> shards
+    textus quantization
+    numerus estimated_bytes
+    lista<textus> diagnostics
+}
+
+functio formatum(textus status, textus source) → textus {
+    si status ≡ "missing-download" ergo redde "alias-missing"
+    si source.continet("GGUF") ergo redde "gguf"
+    si source.finis(".gguf") ergo redde "gguf"
+    si source.continet("safetensors") ergo redde "safetensors"
+    si source.finis(".safetensors") ergo redde "safetensors"
+    redde "unknown"
+}
+
+functio diagnosticum(textus status, textus source, textus router_model_id) → textus {
+    si status ≡ "router-backed" ergo redde "metadata parser pending; router model is " + router_model_id
+    si status ≡ "missing-download" ergo redde "missing local download for " + source
+    si status ≡ "unsupported" ergo redde "unsupported model format for " + source
+    si status ≡ "error" ergo redde "model metadata error for " + source
+    redde "unknown alias or unsupported path"
+}
+
+functio severitas_pro_status(textus status) → textus {
+    si status ≡ "error" ergo redde "error"
+    redde "warning"
+}
+
+functio inanis_diagnosticum(textus status, textus source, textus router_model_id) → lista<Diagnosticum> {
+    redde [
+        Diagnosticum {
+            severitas = severitas_pro_status(status),
+            nuntius = diagnosticum(status, source, router_model_id)
+        }
+    ]
+}
+
+functio diagnostica_textus(textus status, textus source, textus router_model_id) → lista<textus> {
+    redde [diagnosticum(status, source, router_model_id)]
+}
+
+functio vacua_summarium(textus alias, textus source, textus status, textus local_path, textus router_model_id) → ModelSummary {
+    fixum textus detected_format ← formatum(status, source)
+    fixum lista<textus> diagnostic_lines ← diagnostica_textus(status, source, router_model_id)
+    redde ModelSummary {
+        alias = alias,
+        source = source,
+        status = status,
+        formatum = detected_format,
+        local_path = local_path,
+        router_model_id = router_model_id,
+        files = vacua,
+        tensors = vacua,
+        shards = vacua,
+        quantization = "",
+        estimated_bytes = 0,
+        diagnostics = diagnostic_lines
+    }
+}
+
+probandum "model metadata facade" {
+    proba "classifies campaign alias formats" {
+        adfirma formatum("missing-download", "sentence-transformers/all-MiniLM-L6-v2") ≡ "alias-missing"
+        adfirma formatum("router-backed", "unsloth/Qwen3.6-35B-A3B-GGUF") ≡ "gguf"
+        adfirma formatum("local", "/tmp/model.safetensors") ≡ "safetensors"
+    }
+
+    proba "builds empty summary with diagnostic" {
+        fixum ModelSummary summary ← vacua_summarium(
+            "basic/minilm",
+            "sentence-transformers/all-MiniLM-L6-v2",
+            "missing-download",
+            "",
+            ""
+        )
+        adfirma summary.formatum ≡ "alias-missing"
+        adfirma summary.estimated_bytes ≡ 0
+        fixum lista<textus> diagnostics ← summary.diagnostics
+        adfirma diagnostics.longitudo() ≡ 1
+    }
+
+    proba "builds structured diagnostic records" {
+        fixum lista<Diagnosticum> diagnostics ← inanis_diagnosticum(
+            "error",
+            "/tmp/not-a-model.bin",
+            ""
+        )
+        adfirma diagnostics.longitudo() ≡ 1
+        adfirma severitas_pro_status("error") ≡ "error"
+    }
+}
