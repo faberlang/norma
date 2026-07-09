@@ -6,7 +6,7 @@
 # parser floors; this module owns the reusable summary records and fail-closed
 # classification helpers used by application packages.
 
-genus TensorMetadata {
+genus MetadataTensor {
     textus nomen
     textus dtype
     lista<numerus> figura
@@ -26,11 +26,11 @@ genus ModelSummary {
     textus local_path
     textus router_model_id
     lista<textus> files
-    lista<textus> tensors
+    lista<MetadataTensor> tensors
     lista<textus> shards
     textus quantization
     numerus estimated_bytes
-    lista<textus> diagnostics
+    lista<Diagnosticum> diagnostics
 }
 
 functio formatum(textus status, textus source) → textus {
@@ -64,13 +64,9 @@ functio inanis_diagnosticum(textus status, textus source, textus router_model_id
     ]
 }
 
-functio diagnostica_textus(textus status, textus source, textus router_model_id) → lista<textus> {
-    redde [diagnosticum(status, source, router_model_id)]
-}
-
 functio vacua_summarium(textus alias, textus source, textus status, textus local_path, textus router_model_id) → ModelSummary {
     fixum textus detected_format ← formatum(status, source)
-    fixum lista<textus> diagnostic_lines ← diagnostica_textus(status, source, router_model_id)
+    fixum lista<Diagnosticum> diagnostic_records ← inanis_diagnosticum(status, source, router_model_id)
     redde ModelSummary {
         alias = alias,
         source = source,
@@ -83,7 +79,7 @@ functio vacua_summarium(textus alias, textus source, textus status, textus local
         shards = vacua,
         quantization = "",
         estimated_bytes = 0,
-        diagnostics = diagnostic_lines
+        diagnostics = diagnostic_records
     }
 }
 
@@ -104,7 +100,7 @@ probandum "model metadata facade" {
         )
         adfirma summary.formatum ≡ "alias-missing"
         adfirma summary.estimated_bytes ≡ 0
-        fixum lista<textus> diagnostics ← summary.diagnostics
+        fixum lista<Diagnosticum> diagnostics ← summary.diagnostics
         adfirma diagnostics.longitudo() ≡ 1
     }
 
