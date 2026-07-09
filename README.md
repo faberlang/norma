@@ -31,10 +31,27 @@ Norma Rust crate.
 ## Layout
 
 ```text
-src/           public `norma:*` Faber modules
+cista.toml     package identity + version (cista install)
+src/           public `norma:*` Faber modules (source-repo path)
 scripta/       source-library checks
 docs/factory/  open Norma-owned factory goals (when present)
 ```
+
+Version in `cista.toml` is **independent of the faber crate**. Product-wise Norma
+is a platform default (not listed in app `faber.toml` `[dependencies]`).
+
+Install into the shared package store (from sibling `cista`):
+
+```bash
+cargo run -p cista -- install \
+  --path ../norma \
+  --target-language rust \
+  --store "${CISTAE_HOME:-$HOME/.faber/cistae}"
+```
+
+That snapshots `src/` to `$CISTAE_HOME/norma/<version>/interfaces/` (interfaces-
+only; no `libnorma.rlib`). Dev still uses `FABER_LIBRARY_HOME` until tooling
+consumes packaged paths.
 
 ## Checks
 
