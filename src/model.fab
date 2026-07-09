@@ -2,9 +2,19 @@
 #
 # Public import: importa ex "norma:model" privata model
 #
-# Stage 1 facade only. Binary safetensors/GGUF parsing belongs to later
-# parser floors; this module owns the reusable summary records and fail-closed
+# Stage 1 facade only. Binary safetensors/GGUF parsing belongs to small parser
+# floors; this module owns the reusable summary records and fail-closed
 # classification helpers used by application packages.
+#
+# Safetensors header floor, intentionally narrower than full JSON:
+# - the header length is the first 8 little-endian bytes;
+# - header text must be printable ASCII;
+# - the top-level value is walked as a JSON object with tensor-name keys;
+# - "__metadata__" is ignored;
+# - tensor records must use compact "dtype":"..." and "shape":[...] fields;
+# - shape entries are non-negative base-10 integers, with optional spaces after
+#   commas. Negative numbers, decimals, empty elements, and other JSON values
+#   fail closed.
 
 genus MetadataTensor {
     textus nomen
@@ -221,21 +231,38 @@ functio _digita_ne(textus c) → bivalens {
 functio _figura_payload(textus payload) → lista<numerus> ⇥ textus {
     varia lista<numerus> dims ← vacua
     varia textus current ← ""
+    varia bivalens gap ← falsum
+    varia bivalens trailing_separator ← falsum
     varia numerus i ← 0
     dum i < payload.longitudo() {
         fixum textus c ← payload.sectio(i, i + 1)
         si _digita_ne(c) {
+            si gap ergo iace "unsupported safetensors shape token: §"(c)
             current ← current + c
-        } secus {
+            trailing_separator ← falsum
+        } sin c ≡ " " {
+            si current.longitudo() > 0 {
+                gap ← verum
+            }
+        } sin c ≡ "," {
             si current.longitudo() > 0 {
                 dims.appende(current ↦ numerus)
                 current ← ""
+                trailing_separator ← verum
+            } secus {
+                iace "missing safetensors shape dimension"
             }
+        } sin c ≡ "-" {
+            iace "negative safetensors shape dimension"
+        } secus {
+            iace "unsupported safetensors shape token: §"(c)
         }
         i ← i + 1
     }
     si current.longitudo() > 0 {
         dims.appende(current ↦ numerus)
+    } sin trailing_separator {
+        iace "missing safetensors shape dimension"
     }
     redde dims
 }
@@ -296,7 +323,7 @@ functio safetensors_summarium(textus alias, textus source, textus local_path, oc
     fixum lista<MetadataTensor> tensors ← _tensors_from_header(header)
     fixum numerus estimated ← _estimated_tensor_bytes(tensors)
     fixum numerus tensor_count ← tensors.longitudo()
-    fixum textus diagnosticum ← "tokenizer/config files not found beside " + local_path
+    fixum textus diagnosticum ← "tokenizer/config sibling probe not yet implemented beside " + local_path
     fixum textus file_path ← "" + local_path
     fixum lista<textus> files ← [file_path]
     fixum lista<Diagnosticum> diagnostics ← [
@@ -785,6 +812,41 @@ probandum "model metadata facade" {
         cape err {
             adfirma falsum
         }
+    }
+
+    proba "accepts safetensors shape spaces" {
+        fixum octeti data ← |43 00 00 00 00 00 00 00 7b 22 65 6d 62 65 64 64 69 6e 67 73 22 3a 7b 22 64 74 79 70 65 22 3a 22 46 33 32 22 2c 22 73 68 61 70 65 22 3a 5b 32 2c 20 33 5d 2c 22 64 61 74 61 5f 6f 66 66 73 65 74 73 22 3a 5b 30 2c 32 34 5d 7d 7d|
+        fac {
+            fixum ModelSummary summary ← safetensors_summarium("fixture", "fixture", "fixture.safetensors", data)
+            adfirma summary.estimated_bytes ≡ 24
+        }
+        cape err {
+            adfirma falsum
+        }
+    }
+
+    proba "rejects negative safetensors shape dimensions" {
+        fixum octeti data ← |3c 00 00 00 00 00 00 00 7b 22 62 61 64 22 3a 7b 22 64 74 79 70 65 22 3a 22 46 33 32 22 2c 22 73 68 61 70 65 22 3a 5b 2d 31 2c 33 5d 2c 22 64 61 74 61 5f 6f 66 66 73 65 74 73 22 3a 5b 30 2c 31 32 5d 7d 7d|
+        fixum ModelSummary summary ← tempta_safetensors_summarium("fixture", "fixture", "bad.safetensors", data)
+        adfirma summary.status ≡ "error"
+        fixum lista<Diagnosticum> diagnostics ← summary.diagnostics
+        adfirma diagnostics.longitudo() ≡ 1
+    }
+
+    proba "rejects decimal safetensors shape dimensions" {
+        fixum octeti data ← |3b 00 00 00 00 00 00 00 7b 22 62 61 64 22 3a 7b 22 64 74 79 70 65 22 3a 22 46 33 32 22 2c 22 73 68 61 70 65 22 3a 5b 32 2e 35 5d 2c 22 64 61 74 61 5f 6f 66 66 73 65 74 73 22 3a 5b 30 2c 31 30 5d 7d 7d|
+        fixum ModelSummary summary ← tempta_safetensors_summarium("fixture", "fixture", "bad.safetensors", data)
+        adfirma summary.status ≡ "error"
+        fixum lista<Diagnosticum> diagnostics ← summary.diagnostics
+        adfirma diagnostics.longitudo() ≡ 1
+    }
+
+    proba "rejects trailing safetensors shape separators" {
+        fixum octeti data ← |39 00 00 00 00 00 00 00 7b 22 62 61 64 22 3a 7b 22 64 74 79 70 65 22 3a 22 46 33 32 22 2c 22 73 68 61 70 65 22 3a 5b 32 2c 5d 2c 22 64 61 74 61 5f 6f 66 66 73 65 74 73 22 3a 5b 30 2c 38 5d 7d 7d|
+        fixum ModelSummary summary ← tempta_safetensors_summarium("fixture", "fixture", "bad.safetensors", data)
+        adfirma summary.status ≡ "error"
+        fixum lista<Diagnosticum> diagnostics ← summary.diagnostics
+        adfirma diagnostics.longitudo() ≡ 1
     }
 
     proba "reads gguf metadata floor" {
