@@ -83,6 +83,272 @@ functio vacua_summarium(textus alias, textus source, textus status, textus local
     }
 }
 
+@ privata
+functio _byte_at(octeti data, numerus index) → numerus {
+    fixum numerus<u8> b ← data.accipe(index) vel (0 ∷ numerus<u8>)
+    redde b ↦ numerus
+}
+
+@ privata
+functio _u64le_primus(octeti data) → numerus ⇥ textus {
+    si data.longitudo() < 8 ergo iace "safetensors header length missing"
+    redde _byte_at(data, 0) +
+        (_byte_at(data, 1) * 256) +
+        (_byte_at(data, 2) * 65536) +
+        (_byte_at(data, 3) * 16777216) +
+        (_byte_at(data, 4) * 4294967296) +
+        (_byte_at(data, 5) * 1099511627776) +
+        (_byte_at(data, 6) * 281474976710656) +
+        (_byte_at(data, 7) * 72057594037927936)
+}
+
+@ privata
+functio _ascii_byte(numerus b) → textus ⇥ textus {
+    fixum textus scalars ← " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
+    si b ≥ 32 et b ≤ 126 ergo redde scalars.sectio(b - 32, b - 31)
+    iace "non-ascii safetensors header byte"
+}
+
+functio safetensors_header_textus(octeti data) → textus ⇥ textus {
+    fixum numerus header_len ← _u64le_primus(data)
+    si header_len < 2 ergo iace "safetensors header too small"
+    si data.longitudo() < header_len + 8 ergo iace "safetensors header truncated"
+
+    varia textus out ← ""
+    varia numerus i ← 0
+    dum i < header_len {
+        out ← out + _ascii_byte(_byte_at(data, i + 8))
+        i ← i + 1
+    }
+    redde out
+}
+
+@ privata
+functio _dtype_bytes(textus dtype) → numerus {
+    si dtype ≡ "F64" ergo redde 8
+    si dtype ≡ "I64" ergo redde 8
+    si dtype ≡ "U64" ergo redde 8
+    si dtype ≡ "F32" ergo redde 4
+    si dtype ≡ "I32" ergo redde 4
+    si dtype ≡ "U32" ergo redde 4
+    si dtype ≡ "F16" ergo redde 2
+    si dtype ≡ "BF16" ergo redde 2
+    si dtype ≡ "I16" ergo redde 2
+    si dtype ≡ "U16" ergo redde 2
+    si dtype ≡ "I8" ergo redde 1
+    si dtype ≡ "U8" ergo redde 1
+    si dtype ≡ "BOOL" ergo redde 1
+    redde 0
+}
+
+@ privata
+functio _productum(lista<numerus> figura) → numerus {
+    varia numerus product ← 1
+    itera ex figura fixum dim {
+        product ← product * dim
+    }
+    redde product
+}
+
+@ privata
+functio _estimated_tensor_bytes(lista<MetadataTensor> tensors) → numerus {
+    varia numerus total ← 0
+    itera ex tensors fixum tensor {
+        total ← total + (tensor.parameter_count * _dtype_bytes(tensor.dtype))
+    }
+    redde total
+}
+
+@ privata
+functio _find_from(textus s, textus needle, numerus start) → numerus {
+    fixum numerus n ← needle.longitudo()
+    varia numerus i ← start
+    dum i + n ≤ s.longitudo() {
+        si s.sectio(i, i + n) ≡ needle ergo redde i
+        i ← i + 1
+    }
+    redde -1
+}
+
+@ privata
+functio _object_end(textus s, numerus start) → numerus ⇥ textus {
+    varia numerus depth ← 0
+    varia numerus i ← start
+    dum i < s.longitudo() {
+        fixum textus c ← s.sectio(i, i + 1)
+        si c ≡ "{" {
+            depth ← depth + 1
+        }
+        si c ≡ "}" {
+            depth ← depth - 1
+            si depth ≡ 0 ergo redde i
+        }
+        i ← i + 1
+    }
+    iace "unterminated safetensors tensor object"
+}
+
+@ privata
+functio _field_textus(textus objectum, textus field) → textus ⇥ textus {
+    fixum textus pattern ← "\"" + field + "\":\""
+    fixum numerus start ← _find_from(objectum, pattern, 0)
+    si start < 0 ergo iace "missing safetensors field: §"(field)
+    fixum numerus value_start ← start + pattern.longitudo()
+    fixum numerus value_end ← _find_from(objectum, "\"", value_start)
+    si value_end < 0 ergo iace "unterminated safetensors field: §"(field)
+    redde objectum.sectio(value_start, value_end)
+}
+
+@ privata
+functio _field_array_payload(textus objectum, textus field) → textus ⇥ textus {
+    fixum textus pattern ← "\"" + field + "\":["
+    fixum numerus start ← _find_from(objectum, pattern, 0)
+    si start < 0 ergo iace "missing safetensors field: §"(field)
+    fixum numerus value_start ← start + pattern.longitudo()
+    fixum numerus value_end ← _find_from(objectum, "]", value_start)
+    si value_end < 0 ergo iace "unterminated safetensors array field: §"(field)
+    redde objectum.sectio(value_start, value_end)
+}
+
+@ privata
+functio _digita_ne(textus c) → bivalens {
+    redde c ≡ "0" aut c ≡ "1" aut c ≡ "2" aut c ≡ "3" aut c ≡ "4" aut c ≡ "5" aut c ≡ "6" aut c ≡ "7" aut c ≡ "8" aut c ≡ "9"
+}
+
+@ privata
+functio _figura_payload(textus payload) → lista<numerus> ⇥ textus {
+    varia lista<numerus> dims ← vacua
+    varia textus current ← ""
+    varia numerus i ← 0
+    dum i < payload.longitudo() {
+        fixum textus c ← payload.sectio(i, i + 1)
+        si _digita_ne(c) {
+            current ← current + c
+        } secus {
+            si current.longitudo() > 0 {
+                dims.appende(current ↦ numerus)
+                current ← ""
+            }
+        }
+        i ← i + 1
+    }
+    si current.longitudo() > 0 {
+        dims.appende(current ↦ numerus)
+    }
+    redde dims
+}
+
+@ privata
+functio _tensor_metadata(textus nomen, textus objectum) → MetadataTensor ⇥ textus {
+    fixum textus dtype ← _field_textus(objectum, "dtype")
+    fixum lista<numerus> figura ← _figura_payload(_field_array_payload(objectum, "shape"))
+    fixum numerus parameter_count ← _productum(figura)
+    redde MetadataTensor {
+        nomen = nomen,
+        dtype = dtype,
+        figura = figura,
+        parameter_count = parameter_count
+    }
+}
+
+@ privata
+functio _tensors_from_header(textus header) → lista<MetadataTensor> ⇥ textus {
+    varia lista<MetadataTensor> tensors ← vacua
+    varia numerus depth ← 0
+    varia numerus i ← 0
+
+    dum i < header.longitudo() {
+        fixum textus c ← header.sectio(i, i + 1)
+        si c ≡ "{" {
+            depth ← depth + 1
+            i ← i + 1
+            perge
+        }
+        si c ≡ "}" {
+            depth ← depth - 1
+            i ← i + 1
+            perge
+        }
+        si depth ≡ 1 et c ≡ "\"" {
+            fixum numerus key_end ← _find_from(header, "\"", i + 1)
+            si key_end < 0 ergo iace "unterminated safetensors tensor name"
+            fixum textus nomen ← header.sectio(i + 1, key_end)
+            fixum numerus colon ← _find_from(header, ":", key_end + 1)
+            si colon < 0 ergo iace "missing safetensors tensor object"
+            fixum numerus object_start ← _find_from(header, "{", colon + 1)
+            si object_start < 0 ergo iace "missing safetensors tensor object"
+            fixum numerus object_finish ← _object_end(header, object_start)
+            si nomen ≠ "__metadata__" {
+                tensors.appende(_tensor_metadata(nomen, header.sectio(object_start, object_finish + 1)))
+            }
+            i ← object_finish + 1
+            perge
+        }
+        i ← i + 1
+    }
+    redde tensors
+}
+
+functio safetensors_summarium(textus alias, textus source, textus local_path, octeti data) → ModelSummary ⇥ textus {
+    fixum textus header ← safetensors_header_textus(data)
+    fixum lista<MetadataTensor> tensors ← _tensors_from_header(header)
+    fixum numerus estimated ← _estimated_tensor_bytes(tensors)
+    fixum textus diagnosticum ← "tokenizer/config files not found beside " + local_path
+    fixum textus file_path ← "" + local_path
+    fixum lista<textus> files ← [file_path]
+    fixum lista<Diagnosticum> diagnostics ← [
+        Diagnosticum {
+            severitas = "warning",
+            nuntius = diagnosticum
+        }
+    ]
+    redde ModelSummary {
+        alias = alias,
+        source = source,
+        status = "local",
+        formatum = "safetensors",
+        local_path = local_path,
+        router_model_id = "",
+        files = files,
+        tensors = tensors,
+        shards = vacua,
+        quantization = "",
+        estimated_bytes = estimated,
+        diagnostics = diagnostics
+    }
+}
+
+functio tempta_safetensors_summarium(textus alias, textus source, textus local_path, octeti data) → ModelSummary {
+    fac {
+        redde safetensors_summarium(alias, source, local_path, data)
+    }
+    cape err {
+        fixum textus diagnosticum ← "safetensors metadata error: " + err
+        fixum textus file_path ← "" + local_path
+        fixum lista<textus> files ← [file_path]
+        fixum lista<Diagnosticum> diagnostics ← [
+            Diagnosticum {
+                severitas = "error",
+                nuntius = diagnosticum
+            }
+        ]
+        redde ModelSummary {
+            alias = alias,
+            source = source,
+            status = "error",
+            formatum = "safetensors",
+            local_path = local_path,
+            router_model_id = "",
+            files = files,
+            tensors = vacua,
+            shards = vacua,
+            quantization = "",
+            estimated_bytes = 0,
+            diagnostics = diagnostics
+        }
+    }
+}
+
 probandum "model metadata facade" {
     proba "classifies campaign alias formats" {
         adfirma formatum("missing-download", "sentence-transformers/all-MiniLM-L6-v2") ≡ "alias-missing"
@@ -112,5 +378,19 @@ probandum "model metadata facade" {
         )
         adfirma diagnostics.longitudo() ≡ 1
         adfirma severitas_pro_status("error") ≡ "error"
+    }
+
+    proba "reads safetensors header floor" {
+        fixum octeti data ← |42 00 00 00 00 00 00 00 7b 22 65 6d 62 65 64 64 69 6e 67 73 22 3a 7b 22 64 74 79 70 65 22 3a 22 46 33 32 22 2c 22 73 68 61 70 65 22 3a 5b 32 2c 33 5d 2c 22 64 61 74 61 5f 6f 66 66 73 65 74 73 22 3a 5b 30 2c 32 34 5d 7d 7d|
+        fac {
+            fixum ModelSummary summary ← safetensors_summarium("fixture", "fixture", "fixture.safetensors", data)
+            adfirma summary.formatum ≡ "safetensors"
+            fixum lista<MetadataTensor> tensors ← summary.tensors
+            adfirma tensors.longitudo() ≡ 1
+            adfirma summary.estimated_bytes ≡ 24
+        }
+        cape err {
+            adfirma falsum
+        }
     }
 }
