@@ -1,4 +1,4 @@
-# json/pange.fab — native Faber JSON serializer (valor → text)
+# json/pange.fab — native Faber JSON serializer (json → text)
 #
 # No Rust backing. Walks a valor tree via ↦ conversio probes (the only valor-
 # kind discriminator Faber offers) and accumulates text into lista<textus>,
@@ -13,11 +13,9 @@ importa ex "norma:chorda" privata chorda
 # PUBLIC ENTRY
 # =========================================================================
 
-# Serialize a valor to compact JSON text. The indentum parameter is
-# accepted for API compatibility with the prior Rust-backed pange but
-# only compact emission is implemented in v1.
-functio pange(valor v, numerus indentum sponte) → textus ⇥ textus {
-    redde _pange_valor(v)
+# Serialize an object-rooted JSON document to compact JSON text.
+functio pange(json v) → textus ⇥ textus {
+    redde _pange_valor(v ↦ valor)
 }
 
 # =========================================================================

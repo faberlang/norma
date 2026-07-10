@@ -2,7 +2,7 @@
 #
 # Etymology: "JSON" — JavaScript Object Notation (universal, kept as-is).
 #
-# Wire floor only: solve (text → valor), pange (valor → text), tempta
+# Wire floor only: solve (text → json), pange (json → text), tempta
 # (lenient parse). The parser and serializer live in json/{solve,pange};
 # shared valor-tree navigation (cape/carpe/inveni/exige/*ne) lives in
 # norma:valor, imported separately by callers that need it.
@@ -18,10 +18,10 @@ importa ex "norma:json/pange" privata pange ut pange_mod
 # =========================================================================
 # Verb: pange from "pangere" (to fasten, compose)
 # Why: Composing/fastening data into JSON text representation.
-# indentum = 0 or omitted: compact output (pretty-print is deferred in v1)
+# Compact output only (pretty-print is deferred).
 
-functio pange(valor valor, numerus indentum sponte) → textus ⇥ textus {
-    redde pange_mod.pange(valor, indentum)
+functio pange(json documentum) → textus ⇥ textus {
+    redde pange_mod.pange(documentum)
 }
 
 # =========================================================================
@@ -30,13 +30,13 @@ functio pange(valor valor, numerus indentum sponte) → textus ⇥ textus {
 # Verb: solve from "solvere" (to loosen, untangle)
 # Why: Untangling/extracting data from JSON text.
 
-functio solve(textus json) → valor ⇥ textus {
+functio solve(textus json) → json ⇥ textus {
     redde solve_mod.solve(json)
 }
 
 # Verb: tempta from "temptare" (to try, attempt)
 # Why: Attempting to parse, returning null on failure instead of throwing.
 
-functio tempta(textus json) → valor ∪ nihil {
+functio tempta(textus json) → json ∪ nihil {
     redde solve_mod.tempta(json)
 }

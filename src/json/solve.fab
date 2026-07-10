@@ -1,4 +1,4 @@
-# json/solve.fab — native Faber JSON parser (text → valor)
+# json/solve.fab — native Faber JSON parser (text → json)
 #
 # Recursive descent over RFC 8259. No Rust backing.
 # Imports norma:json/lexica for character classification and escape tables.
@@ -22,16 +22,16 @@ genus Resultus {
 # PUBLIC ENTRY
 # =========================================================================
 
-functio solve(textus json) → valor ⇥ textus {
+functio solve(textus json) → json ⇥ textus {
     fixum Resultus r ← _valor(json, 0)
     fixum numerus tail ← lexica._salta_sponte(json, r.i)
     si tail ≠ json.longitudo() {
         iace "trailing characters after JSON value"
     }
-    redde r.v
+    redde r.v ↦ json
 }
 
-functio tempta(textus json) → valor ∪ nihil {
+functio tempta(textus json) → json ∪ nihil {
     fac {
         redde solve(json)
     }
