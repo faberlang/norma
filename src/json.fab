@@ -3,40 +3,40 @@
 # Etymology: "JSON" — JavaScript Object Notation (universal, kept as-is).
 #
 # Wire floor only: solve (text → json), pange (json → text), tempta
-# (lenient parse). The parser and serializer live in json/{solve,pange};
-# shared valor-tree navigation (cape/carpe/inveni/exige/*ne) lives in
-# norma:valor, imported separately by callers that need it.
+# (lenient parse). The compiler/runtime-owned formal `json` conversio is the
+# single codec authority; this module is only a public naming facade.
 #
-# No Rust backing. No valor navigation surface here — that is codec-agnostic
-# and lives in norma:valor.
-
-importa ex "norma:json/solve" privata solve ut solve_mod
-importa ex "norma:json/pange" privata pange ut pange_mod
+# No valor navigation surface here — that is codec-agnostic and lives in
+# norma:valor.
 
 # =========================================================================
-# SERIALIZATION (wire floor — native Faber in json/pange)
+# SERIALIZATION
 # =========================================================================
 # Verb: pange from "pangere" (to fasten, compose)
 # Why: Composing/fastening data into JSON text representation.
-# Compact output only (pretty-print is deferred).
 
-functio pange(json documentum) → textus ⇥ textus {
-    redde pange_mod.pange(documentum)
+functio pange(json documentum) → textus {
+    redde documentum ↦ textus
 }
 
 # =========================================================================
-# PARSING (wire floor — native Faber in json/solve)
+# PARSING
 # =========================================================================
 # Verb: solve from "solvere" (to loosen, untangle)
 # Why: Untangling/extracting data from JSON text.
 
 functio solve(textus wire) → json ⇥ textus {
-    redde solve_mod.solve(wire)
+    redde wire ↦ json
 }
 
 # Verb: tempta from "temptare" (to try, attempt)
 # Why: Attempting to parse, returning null on failure instead of throwing.
 
 functio tempta(textus wire) → json ∪ nihil {
-    redde solve_mod.tempta(wire)
+    fac {
+        redde solve(wire)
+    }
+    cape err {
+        redde nihil
+    }
 }
