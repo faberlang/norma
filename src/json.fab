@@ -30,13 +30,13 @@ functio pange(json documentum) → textus ⇥ textus {
 # Verb: solve from "solvere" (to loosen, untangle)
 # Why: Untangling/extracting data from JSON text.
 
-functio solve(textus json) → json ⇥ textus {
-    redde solve_mod.solve(json)
+functio solve(textus wire) → json ⇥ textus {
+    redde solve_mod.solve(wire)
 }
 
 # Verb: tempta from "temptare" (to try, attempt)
 # Why: Attempting to parse, returning null on failure instead of throwing.
 
-functio tempta(textus json) → json ∪ nihil {
-    redde solve_mod.tempta(json)
+functio tempta(textus wire) → json ∪ nihil {
+    redde solve_mod.tempta(wire)
 }

@@ -22,18 +22,18 @@ genus Resultus {
 # PUBLIC ENTRY
 # =========================================================================
 
-functio solve(textus json) → json ⇥ textus {
-    fixum Resultus r ← _valor(json, 0)
-    fixum numerus tail ← lexica._salta_sponte(json, r.i)
-    si tail ≠ json.longitudo() {
+functio solve(textus wire) → json ⇥ textus {
+    fixum Resultus r ← _valor(wire, 0)
+    fixum numerus tail ← lexica._salta_sponte(wire, r.i)
+    si tail ≠ wire.longitudo() {
         iace "trailing characters after JSON value"
     }
     redde r.v ↦ json
 }
 
-functio tempta(textus json) → json ∪ nihil {
+functio tempta(textus wire) → json ∪ nihil {
     fac {
-        redde solve(json)
+        redde solve(wire)
     }
     cape err {
         redde nihil
