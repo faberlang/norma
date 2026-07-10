@@ -16,7 +16,7 @@
 # Why: Pad a single-digit field to two decimal characters for RFC3339 wire.
 @ privata
 functio _duo(numerus n) → textus {
-    si n < 10 ergo redde "0" + (n ↦ textus)
+    si n < 10 ergo redde "0§"(n ↦ textus)
 
     redde n ↦ textus
 }
@@ -26,7 +26,7 @@ functio _duo(numerus n) → textus {
 functio _quattuor(numerus n) → textus {
     varia textus out ← n ↦ textus
     dum out.longitudo() < 4 {
-        out ← "0" + out
+        out ← "0§"(out)
     }
     redde out
 }
@@ -41,7 +41,7 @@ functio _campus(instans t, numerus initium, numerus finis) → numerus {
 # Why: Build canonical UTC RFC3339 wire from civil components (always ends with Z).
 @ privata
 functio _wire(numerus annus, numerus mensis, numerus dies, numerus hora, numerus minuta, numerus secunda) → textus {
-    redde ((((((((((_quattuor(annus) + "-") + _duo(mensis)) + "-") + _duo(dies)) + "T") + _duo(hora)) + ":") + _duo(minuta)) + ":") + _duo(secunda)) + "Z"
+    redde "§-§-§T§:§:§Z"(_quattuor(annus), _duo(mensis), _duo(dies), _duo(hora), _duo(minuta), _duo(secunda))
 }
 
 # =========================================================================
@@ -142,9 +142,8 @@ functio activum() → numerus {
 # registration, no Faber-side timing — the host is the event edge.
 # This is the one-shot timer pattern: ad + materialize, host delays.
 
-# Sleep (block) for `ms` milliseconds (async route; Faber blocks).
-# Same one-shot timer shape as expectet, distinct route so the host can
-# dispatch to an async handler if it chooses. Faber's posture is uniform.
+# Sleep for `ms` milliseconds with async caller materialization.
+@ futura
 functio dormiet(numerus ms) → vacuum {
     redde ad 'tempus:dormiet' (ms) ↦ vacuum
 }
@@ -153,7 +152,7 @@ functio dormiet(numerus ms) → vacuum {
 # calling thread on the host response. Same route as dormiet; the
 # difference is sync vs async posture, mirroring the lege/leget split.
 functio expectet(numerus ms) → vacuum {
-    redde ad 'tempus:expectet' (ms) ↦ vacuum
+    redde ad 'tempus:dormiet' (ms) ↦ vacuum
 }
 
 # =========================================================================

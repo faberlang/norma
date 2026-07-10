@@ -7,14 +7,9 @@
 # home is norma:solum/path.
 #
 # Design principles:
-# - Every verb blocks on its `ad` frame response. Async is host-side plumbing:
-# the gateway decides how long to hold a request; Faber's posture is uniform.
-# There is no `@ futura` — sync/async is a route-naming distinction, not a
-# Faber-side marker. The host may dispatch `leget` to an async handler while
-# `lege` runs on a blocking thread; Faber sees the same `ad` shape either way.
-# - Verb conjugation names the route, not the posture:
-# - Imperative (-a, -e, -i) and Future (-et, -ebit) verbs name distinct
-# `solum:*` routes so the host can dispatch them differently if it chooses.
+# - Sync and async wrappers share the same `ad` route contract; `@ futura`
+# marks the caller posture, and Radix selects async materialization.
+# - Verb conjugation names the public API posture, not a second host route.
 # - Different verbs for different data types (text vs bytes vs lines)
 # - No "Latin as paint" - verbs chosen for semantic fit, not translation
 
@@ -55,9 +50,11 @@ functio lege<T>(textus via) → T {
     redde ad 'solum:lege' (via) ↦ T
 }
 
-# Read entire file as text (async route; Faber blocks on the frame)
-functio leget(textus via) → textus {
-    redde ad 'solum:leget' (via) ↦ textus
+# Read entire file as text with async caller materialization.
+@ radix typus T in textus lista<textus> octeti
+@ futura
+functio leget<T>(textus via) → T {
+    redde ad 'solum:lege' (via) ↦ T
 }
 
 # =========================================================================
@@ -438,9 +435,9 @@ functio temporarium() → textus {
 @ privata
 functio _iunge_duo(textus base, textus segmentum) → textus {
     si base.finis("/") {
-        redde base + segmentum
+        redde "§§"(base, segmentum)
     }
-    redde (base + "/") + segmentum
+    redde "§/§"(base, segmentum)
 }
 
 # =========================================================================
