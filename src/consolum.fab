@@ -61,13 +61,13 @@ functio leget() → textus {
 
 # Pour bytes to stdout (sync)
 functio funde(octeti data) → vacuum {
-    mori "norma:consolum.funde is deferred pending Stage 2 dispatch"
+    redde ad 'consolum:funde' (data) ↦ vacuum
 }
 
 # Pour bytes to stdout (async route; Faber blocks)
 @ futura
 functio fundet(octeti data) → vacuum {
-    mori "norma:consolum.fundet is deferred pending Stage 2 dispatch"
+    redde ad 'consolum:funde' (data) ↦ vacuum
 }
 
 # =========================================================================
