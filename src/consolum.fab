@@ -60,14 +60,15 @@ functio leget() → textus {
 # Maps to: fs.writeSync(1, data) / process.stdout.write
 
 # Pour bytes to stdout (sync)
+# Opener must be valor (SEM010); cast octeti → valor like solum.funde.
 functio funde(octeti data) → vacuum {
-    redde ad 'consolum:funde' (data) ↦ vacuum
+    redde ad 'consolum:funde' (data ↦ valor) ↦ vacuum
 }
 
 # Pour bytes to stdout (async route; Faber blocks)
 @ futura
 functio fundet(octeti data) → vacuum {
-    redde ad 'consolum:funde' (data) ↦ vacuum
+    redde ad 'consolum:funde' (data ↦ valor) ↦ vacuum
 }
 
 # =========================================================================
