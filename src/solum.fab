@@ -71,6 +71,7 @@ functio hauri(textus via) → octeti {
 }
 
 # Draw entire file as bytes (async route; Faber blocks on the frame)
+@ futura
 functio hauriet(textus via) → octeti {
     redde ad 'solum:hauriet' (via) ↦ octeti
 }
@@ -101,6 +102,7 @@ functio carpe(textus via) → lista<textus> {
 }
 
 # Pluck lines from file (async route; Faber blocks on the frame)
+@ futura
 functio carpiet(textus via) → lista<textus> {
     redde ad 'solum:carpiet' (via) ↦ lista<textus>
 }
@@ -119,6 +121,7 @@ functio scribe(textus via, textus data) → vacuum {
 }
 
 # Write text to file, overwrites existing (async route; Faber blocks)
+@ futura
 functio scribet(textus via, textus data) → vacuum {
     redde ad 'solum:scribet' ([via, data]) ↦ vacuum
 }
@@ -157,6 +160,7 @@ functio appone(textus via, textus data) → vacuum {
 }
 
 # Append text to file (async route; Faber blocks)
+@ futura
 functio apponet(textus via, textus data) → vacuum {
     redde ad 'solum:apponet' ([via, data]) ↦ vacuum
 }
@@ -174,6 +178,7 @@ functio exstat(textus via) → bivalens {
 }
 
 # Check if path exists (async route; Faber blocks)
+@ futura
 functio exstabit(textus via) → bivalens {
     redde ad 'solum:exstabit' (via) ↦ bivalens
 }
@@ -228,6 +233,7 @@ functio describe(textus via) → SolumStatus {
 }
 
 # Get file details (async — same materializer blocker as describe)
+@ futura
 functio describet(textus via) → SolumStatus {
     mori "norma:solum.describet is deferred pending Stage 2 dispatch"
 }
@@ -246,6 +252,7 @@ functio sequere(textus via) → textus {
 }
 
 # Follow symlink to get target path (async route; Faber blocks)
+@ futura
 functio sequetur(textus via) → textus {
     redde ad 'solum:sequetur' (via) ↦ textus
 }
@@ -269,6 +276,7 @@ functio dele(textus via) → vacuum {
 }
 
 # Delete file (async route; Faber blocks)
+@ futura
 functio delet(textus via) → vacuum {
     redde ad 'solum:delet' (via) ↦ vacuum
 }
@@ -287,6 +295,7 @@ functio exscribe(textus fons, textus destinatio) → vacuum {
 }
 
 # Copy file (async route; Faber blocks)
+@ futura
 functio exscribet(textus fons, textus destinatio) → vacuum {
     redde ad 'solum:exscribet' ([fons, destinatio]) ↦ vacuum
 }
@@ -305,6 +314,7 @@ functio renomina(textus fons, textus destinatio) → vacuum {
 }
 
 # Rename or move file (async route; Faber blocks)
+@ futura
 functio renominabit(textus fons, textus destinatio) → vacuum {
     redde ad 'solum:renominabit' ([fons, destinatio]) ↦ vacuum
 }
@@ -323,6 +333,7 @@ functio tange(textus via) → vacuum {
 }
 
 # Touch file - create or update mtime (async route; Faber blocks)
+@ futura
 functio tanget(textus via) → vacuum {
     redde ad 'solum:tanget' (via) ↦ vacuum
 }
@@ -347,6 +358,7 @@ functio crea(textus via) → vacuum {
 }
 
 # Create directory (async route; Faber blocks)
+@ futura
 functio creabit(textus via) → vacuum {
     redde ad 'solum:creabit' (via) ↦ vacuum
 }
@@ -365,6 +377,7 @@ functio enumera(textus via) → lista<textus> {
 }
 
 # List directory contents (async route; Faber blocks)
+@ futura
 functio enumerabit(textus via) → lista<textus> {
     redde ad 'solum:enumerabit' (via) ↦ lista<textus>
 }
@@ -384,6 +397,7 @@ functio amputa(textus via) → vacuum {
 }
 
 # Prune directory tree (async route; Faber blocks)
+@ futura
 functio amputabit(textus via) → vacuum {
     redde ad 'solum:amputabit' (via) ↦ vacuum
 }
