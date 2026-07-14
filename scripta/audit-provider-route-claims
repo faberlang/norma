@@ -15,6 +15,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 WORKSPACE = ROOT.parent
 HOST_PROVIDERS = WORKSPACE / "host-providers-rs"
+EXPECTED_HOST_PROVIDERS_REV = "ed34a67"
 
 PROVIDER_FAMILIES = ("aleator", "consolum", "processus", "solum", "tempus")
 
@@ -73,9 +74,47 @@ def dispatch_routes(family: str, host_providers: Path = HOST_PROVIDERS) -> set[s
     return set(route_pattern.findall(match_body))
 
 
-def run_audit(root: Path = ROOT, host_providers: Path = HOST_PROVIDERS) -> int:
+def git_short_head(repo: Path) -> str:
+    git_head = repo / ".git" / "HEAD"
+    if not git_head.is_file():
+        raise FileNotFoundError(f"missing git HEAD for provider evidence repo: {repo}")
+    head = git_head.read_text(encoding="utf-8").strip()
+    if head.startswith("ref: "):
+        ref = repo / ".git" / head.removeprefix("ref: ").strip()
+        if not ref.is_file():
+            raise FileNotFoundError(f"missing git ref for provider evidence repo: {ref}")
+        head = ref.read_text(encoding="utf-8").strip()
+    return head[:7]
+
+
+def check_expected_revision(
+    host_providers: Path,
+    expected_rev: str | None,
+) -> tuple[bool, str | None]:
+    actual = git_short_head(host_providers)
+    if expected_rev is None:
+        return True, actual
+    if actual != expected_rev:
+        print(
+            "audit-provider-route-claims: host-providers-rs revision mismatch: "
+            f"expected {expected_rev}, got {actual}",
+            file=sys.stderr,
+        )
+        return False, actual
+    return True, actual
+
+
+def run_audit(
+    root: Path = ROOT,
+    host_providers: Path = HOST_PROVIDERS,
+    expected_rev: str | None = EXPECTED_HOST_PROVIDERS_REV,
+) -> int:
+    revision_ok, actual_rev = check_expected_revision(host_providers, expected_rev)
     source = source_routes(root)
-    status = 0
+    status = 0 if revision_ok else 1
+
+    if actual_rev is not None:
+        print(f"host-providers-rs: rev={actual_rev}")
 
     for family in PROVIDER_FAMILIES:
         claimed = source[family]
@@ -144,6 +183,16 @@ def self_test() -> int:
         root = Path(tmp) / "norma"
         host_providers = Path(tmp) / "host-providers-rs"
         (root / "src").mkdir(parents=True)
+        git_ref = host_providers / ".git" / "refs" / "heads"
+        git_ref.mkdir(parents=True)
+        (host_providers / ".git" / "HEAD").write_text(
+            "ref: refs/heads/main\n",
+            encoding="utf-8",
+        )
+        (git_ref / "main").write_text(
+            f"{EXPECTED_HOST_PROVIDERS_REV}000000000000000000000000000000000\n",
+            encoding="utf-8",
+        )
         for family in PROVIDER_FAMILIES:
             provider_src = host_providers / "crates" / family / "src"
             provider_src.mkdir(parents=True)
@@ -206,6 +255,22 @@ def self_test() -> int:
                 file=sys.stderr,
             )
             return 1
+        with contextlib.redirect_stdout(io.StringIO()), contextlib.redirect_stderr(
+            stderr := io.StringIO()
+        ):
+            status = run_audit(root, host_providers, expected_rev="0000000")
+        if status == 0:
+            print(
+                "audit-provider-route-claims: self-test failed to reject a revision mismatch",
+                file=sys.stderr,
+            )
+            return 1
+        if "revision mismatch" not in stderr.getvalue():
+            print(
+                "audit-provider-route-claims: self-test did not report the expected revision mismatch",
+                file=sys.stderr,
+            )
+            return 1
     print("audit-provider-route-claims: self-test passed")
     return 0
 
@@ -217,10 +282,15 @@ def main() -> int:
         action="store_true",
         help="run an internal negative fixture for missing manifest dispatch coverage",
     )
+    parser.add_argument(
+        "--expected-rev",
+        default=EXPECTED_HOST_PROVIDERS_REV,
+        help="expected short host-providers-rs git revision for the evidence boundary",
+    )
     args = parser.parse_args()
     if args.self_test:
         return self_test()
-    return run_audit()
+    return run_audit(expected_rev=args.expected_rev)
 
 
 if __name__ == "__main__":
