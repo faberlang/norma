@@ -8,6 +8,8 @@ Recent status/audit packets:
 
 - `host-gateway-claim-gate-audit.md` - Host Gateway/Norma public-claim gate
   audit and P1 defer recommendation.
+- `provider-source-claim-matrix.md` - Source-library/provider claim matrix with
+  allowed claims, blocked claims, promotion triggers, and validation commands.
 
 ## Layout (current)
 
