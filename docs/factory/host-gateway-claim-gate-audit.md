@@ -56,7 +56,7 @@ materializer blockers:
 | Module | Evidence | Claim impact |
 | --- | --- | --- |
 | `src/solum.fab` | Many scalar/list filesystem routes use `ad 'solum:*'`; `describe` and `describet` still `mori` because arbitrary genera such as `SolumStatus` are not supported by the `ad` materializer. | Do not claim complete filesystem metadata API. |
-| `src/processus.fab` | Process routes such as `dimitte`, `captura`, `exsequi`, and environment calls use `ad 'processus:*'`; `genera` is deferred because `Subprocessus` cannot be materialized yet. | Do not claim complete process lifecycle API. |
+| `src/processus.fab` | Process routes such as `dimitte`, `captura`, `exsequi`, and environment calls use `ad 'processus:*'`; `genera` is deferred because `Subprocessus` cannot be materialized yet. `processus:exi` is a source-only never-returning exit intent and is excluded from provider coverage until host exit has a protocol-visible terminal response. | Do not claim complete process lifecycle API or provider-covered process exit. |
 | `src/tempus.fab` | Clock and sleep routes use `ad`; `vigila` is deferred because live inbound cursor returns from functions are not available. | Do not claim timer streams/cursor route support. |
 | `src/crypta.fab` and `src/nuncius.fab` | Headers describe gateway-dispatched routes, but sampled functions remain `mori` deferrals. | Do not claim crypto or IPC provider support. |
 | `docs/factory/nondum-mori-deferral-residual.md` | Runtime `mori` deferrals remain until free-function `@ nondum` support produces compile-time SEM017. | Public examples must not rely on deferred stubs without evidence. |
@@ -72,7 +72,7 @@ yet enough to unblock public product claims by itself:
 | --- | --- | --- |
 | `host-kernel-rs` | README says it owns transport-neutral prefix routing and manifest validation, not OS effects or worker scheduling. Source validates manifest versions, prefixes, duplicate routes, and supported routes. | Needs export/run evidence tied to the released compiler and public contracts. |
 | `host-native-rs` | README says it owns bounded worker scheduling and the `faber::HostDispatch` adapter, not Norma implementations. | Needs integration evidence for package bootstrap and released host dispatch. |
-| `host-providers-rs` | Commit `fc08be5` records local manifest/dispatch coverage for `aleator` 5 routes, `consolum` 16, `processus` 11, `solum` 45, and `tempus` 4, with no manifest route missing from matching Rust dispatch strings. | Needs package/export linkage, public contract generation, and public example run evidence before support claims. |
+| `host-providers-rs` | Commit `fc08be5` records local manifest/dispatch coverage for `aleator` 5 routes, `consolum` 16, `processus` 10 provider-covered routes, `solum` 45, and `tempus` 4, with no manifest route missing from matching Rust dispatch strings. `processus:exi` is intentionally unmanifested and rejected until host exit has a protocol-visible terminal response. | Needs package/export linkage, public contract generation, and public example run evidence before support claims. |
 
 Notable gaps relative to public copy:
 
@@ -83,6 +83,8 @@ Notable gaps relative to public copy:
   `nuncius`.
 - Some Norma functions require materializer/cursor work before a public API
   reference can mark them runnable.
+- `processus:exi` is intentionally source-only/deferred rather than part of the
+  local provider-covered process route count.
 - This pass intentionally did not inspect or edit `radix` or `faber` while
   hand-1 owns active work there.
 
@@ -106,4 +108,5 @@ The validation expectation for this artifact is:
 ```sh
 git diff --check
 ./scripta/check-source
+./scripta/audit-provider-route-claims
 ```

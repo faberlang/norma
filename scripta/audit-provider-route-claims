@@ -1,0 +1,97 @@
+#!/usr/bin/env python3
+"""Check Norma source ad routes against local host provider manifests."""
+
+from __future__ import annotations
+
+import json
+import re
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+WORKSPACE = ROOT.parent
+HOST_PROVIDERS = WORKSPACE / "host-providers-rs"
+
+PROVIDER_FAMILIES = ("aleator", "consolum", "processus", "solum", "tempus")
+
+SOURCE_ONLY_EXCLUSIONS = {
+    "processus:exi": "process exit is source-only until host exit has a protocol-visible terminal response",
+}
+
+
+def source_routes() -> dict[str, set[str]]:
+    routes: dict[str, set[str]] = {family: set() for family in PROVIDER_FAMILIES}
+    route_pattern = re.compile(r"\bad\s+'([^']+)'")
+    for path in sorted((ROOT / "src").rglob("*.fab")):
+        text = path.read_text(encoding="utf-8")
+        for route in route_pattern.findall(text):
+            prefix, sep, _verb = route.partition(":")
+            if sep and prefix in routes:
+                routes[prefix].add(route)
+    return routes
+
+
+def manifest_routes(family: str) -> set[str]:
+    manifest = HOST_PROVIDERS / "crates" / family / "src" / "manifest.json"
+    if not manifest.is_file():
+        raise FileNotFoundError(f"missing provider manifest: {manifest}")
+    payload = json.loads(manifest.read_text(encoding="utf-8"))
+    return {call["route"] for call in payload["calls"]}
+
+
+def main() -> int:
+    source = source_routes()
+    status = 0
+
+    for family in PROVIDER_FAMILIES:
+        claimed = source[family]
+        manifested = manifest_routes(family)
+        exclusions = {
+            route
+            for route in SOURCE_ONLY_EXCLUSIONS
+            if route.startswith(f"{family}:")
+        }
+        unexpected_source_only = claimed - manifested - exclusions
+        missing_from_source = manifested - claimed
+        stale_exclusions = exclusions - (claimed - manifested)
+
+        print(
+            f"{family}: source={len(claimed)} manifest={len(manifested)} "
+            f"excluded={len(exclusions - stale_exclusions)}"
+        )
+
+        for route in sorted(exclusions & (claimed - manifested)):
+            print(f"  excluded source-only: {route} ({SOURCE_ONLY_EXCLUSIONS[route]})")
+
+        if unexpected_source_only:
+            status = 1
+            print(
+                f"audit-provider-route-claims: {family} source routes missing from manifest:",
+                file=sys.stderr,
+            )
+            for route in sorted(unexpected_source_only):
+                print(f"  {route}", file=sys.stderr)
+
+        if missing_from_source:
+            status = 1
+            print(
+                f"audit-provider-route-claims: {family} manifest routes missing from Norma source:",
+                file=sys.stderr,
+            )
+            for route in sorted(missing_from_source):
+                print(f"  {route}", file=sys.stderr)
+
+        if stale_exclusions:
+            status = 1
+            print(
+                f"audit-provider-route-claims: stale source-only exclusions for {family}:",
+                file=sys.stderr,
+            )
+            for route in sorted(stale_exclusions):
+                print(f"  {route}", file=sys.stderr)
+
+    return status
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
