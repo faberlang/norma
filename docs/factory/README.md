@@ -4,6 +4,11 @@ Open factory tracks for the public **Norma** source library (`src/**/*.fab`).
 
 Relocated from private Radix on 2026-07-08.
 
+Recent status/audit packets:
+
+- `host-gateway-claim-gate-audit.md` - Host Gateway/Norma public-claim gate
+  audit and P1 defer recommendation.
+
 ## Layout (current)
 
 ```text
