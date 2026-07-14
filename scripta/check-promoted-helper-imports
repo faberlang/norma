@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+FABER="${FABER:-$ROOT/../faber/target/debug/faber}"
+LIB_HOME="${FABER_LIBRARY_HOME:-$(cd "$ROOT/.." && pwd)}"
+
+PROMOTED_MODULES=(
+  "csv"
+  "json"
+  "json/pange"
+  "json/solve"
+  "json/cursor"
+  "json/lexica"
+  "model"
+  "tensor"
+  "valor"
+  "vector"
+  "chorda"
+  "tempus"
+  "solum/path"
+)
+
+PARKED_OR_COMPILE_GAP_MODULES=(
+  "fila"
+  "ordinata"
+  "mathesis"
+)
+
+if [[ ! -x "$FABER" ]]; then
+  echo "check-promoted-helper-imports: missing executable faber at $FABER" >&2
+  exit 1
+fi
+
+matrix="$ROOT/docs/factory/provider-source-claim-matrix.md"
+promoted_line="$(grep '^| Compile/import-evidenced native helpers |' "$matrix" || true)"
+if [[ -z "$promoted_line" ]]; then
+  echo "check-promoted-helper-imports: missing promoted helper matrix row" >&2
+  exit 1
+fi
+
+for module in "${PROMOTED_MODULES[@]}"; do
+  if [[ "$promoted_line" != *"\`$module\`"* ]]; then
+    echo "check-promoted-helper-imports: matrix row missing promoted module $module" >&2
+    exit 1
+  fi
+done
+
+for module in "${PARKED_OR_COMPILE_GAP_MODULES[@]}"; do
+  if [[ "$promoted_line" == *"\`$module\`"* ]]; then
+    echo "check-promoted-helper-imports: parked/compile-gap module $module is listed as promoted" >&2
+    exit 1
+  fi
+done
+
+tmpdir="$(mktemp -d)"
+trap 'rm -rf "$tmpdir"' EXIT
+
+status=0
+for module in "${PROMOTED_MODULES[@]}"; do
+  file="$tmpdir/${module//\//_}.fab"
+  log="$tmpdir/${module//\//_}.log"
+  cat >"$file" <<EOF
+importa ex "norma:$module" privata m
+incipit { }
+EOF
+
+  if FABER_LIBRARY_HOME="$LIB_HOME" "$FABER" check "$file" >"$log" 2>&1; then
+    echo "ok: norma:$module"
+  else
+    echo "check-promoted-helper-imports: failed import smoke for norma:$module" >&2
+    cat "$log" >&2
+    status=1
+  fi
+done
+
+exit "$status"

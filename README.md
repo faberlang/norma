@@ -57,4 +57,5 @@ consumes packaged paths.
 
 ```bash
 ./scripta/check-source
+./scripta/check-promoted-helper-imports
 ```
