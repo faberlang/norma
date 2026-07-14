@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+status=0
+
+while IFS= read -r file; do
+  case "$file" in
+    target/*|*/target/*)
+      echo "check-generated-output: tracked generated output is not allowed: $file" >&2
+      status=1
+      ;;
+  esac
+done < <(git -C "$ROOT" ls-files)
+
+exit "$status"

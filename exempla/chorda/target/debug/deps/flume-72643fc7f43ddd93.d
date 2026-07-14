@@ -1,9 +1,0 @@
-/Users/ianzepp/work/ianzepp/faber/crates/exempla/corpus/chorda/target/debug/deps/flume-72643fc7f43ddd93.d: /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/flume-0.11.1/src/lib.rs /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/flume-0.11.1/src/async.rs /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/flume-0.11.1/src/signal.rs
-
-/Users/ianzepp/work/ianzepp/faber/crates/exempla/corpus/chorda/target/debug/deps/libflume-72643fc7f43ddd93.rlib: /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/flume-0.11.1/src/lib.rs /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/flume-0.11.1/src/async.rs /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/flume-0.11.1/src/signal.rs
-
-/Users/ianzepp/work/ianzepp/faber/crates/exempla/corpus/chorda/target/debug/deps/libflume-72643fc7f43ddd93.rmeta: /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/flume-0.11.1/src/lib.rs /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/flume-0.11.1/src/async.rs /Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/flume-0.11.1/src/signal.rs
-
-/Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/flume-0.11.1/src/lib.rs:
-/Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/flume-0.11.1/src/async.rs:
-/Users/ianzepp/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/flume-0.11.1/src/signal.rs:

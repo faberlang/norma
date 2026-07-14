@@ -40,5 +40,6 @@ while IFS= read -r -d '' file; do
 done < <(find "$SRC" -name '*.fab' -print0)
 
 "$ROOT/scripta/check-promoted-helper-imports" || status=1
+"$ROOT/scripta/check-generated-output" || status=1
 
 exit "$status"
