@@ -41,7 +41,7 @@ Blocked today:
 | Partial time routes | `tempus` | Clock/sleep `ad` routes exist; `vigila` remains deferred because live inbound cursor returns from functions are not available | Source route surface for clocks and one-shot waits | Timer stream / cursor support |
 | Deferred host-effect source shape | `arca`, `caelum`, `caelum/*`, `crypta`, `http`, `nuncius`, `pressura`, `thesaurus` | Public signatures and comments exist; bodies are `mori "norma:... deferred pending Stage 2 dispatch"` | Planned source shape only | Provider support, host gateway support, network/database/crypto/IPC/cache/compression runtime claims |
 | Deferred codec/mechanical routes | `codex`, `toml`, `yaml`; deferred portions of `chorda` | Public signatures exist; bodies are `mori` deferrals | Source facade or planned wire floor only | Encoding/TOML/YAML runtime behavior without conversion/provider evidence |
-| Deferral mechanism | modules with pure `mori "norma:..."` stubs | `nondum-mori-deferral-residual.md` records free-function `@ nondum` as blocked on Radix SEM017 support | Runtime deferrals are known debt | Compile-time unavailability, unless Radix free-function `@ nondum` support lands |
+| Deferral mechanism | 88 exact deferred `mori "norma:... deferred pending Stage ..."` stubs across 16 source files | `nondum-mori-deferral-residual.md` records `./scripta/audit-deferred-mori` output and keeps free-function `@ nondum` blocked on Radix SEM017 support | Runtime deferrals are known debt | Compile-time unavailability, unless Radix free-function `@ nondum` support lands |
 
 ## Promotion Triggers
 
@@ -65,6 +65,7 @@ For this docs-only matrix:
 ```bash
 git diff --check
 ./scripta/check-source
+./scripta/audit-deferred-mori
 ```
 
 For a future promotion packet, add the relevant public evidence command, such

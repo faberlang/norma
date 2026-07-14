@@ -1,12 +1,12 @@
 # Residual chart: norma deferred stubs — `mori` vs `@ nondum` (SEM017)
 
-**Status:** charted residual (2026-07-11) — **not** bulk-migrated  
-**Source:** purity `3b178bd` / hunter-1 task `7ed426b`  
+**Status:** exact residual inventory (2026-07-14) — **not** bulk-migrated
+**Source:** `./scripta/audit-deferred-mori`
 **Owner:** hunter-1 (norma main spine); radix free-function SEM017 is a **hard gate**
 
 ## Problem
 
-~90 norma public stubs use runtime `mori "norma:… deferred pending Stage N"`
+88 Norma public stubs use runtime `mori "norma:... deferred pending Stage N"`
 bodies. Callers **typecheck green** and only fail when executed.
 
 The compiler already owns a stronger hub:
@@ -19,12 +19,41 @@ The compiler already owns a stronger hub:
 Using `mori` for pure deferral hides unavailability until run — against
 fail-closed / truth camp norms.
 
-## Inventory (grep, approximate)
+## Inventory (repeatable)
 
-Pattern: `mori "norma:` under `norma/src/**/*.fab` — on the order of **~90**
-sites across **~17** packages (thesaurus, http, codex, crypta, chorda, caelum,
-yaml, nuncius, pressura, toml, …). Sampled pure-deferral bodies (single `mori`
-line). Any stub with real logic must **not** be auto-converted.
+Run from the Norma repo root:
+
+```bash
+./scripta/audit-deferred-mori
+```
+
+The command scans `src/**/*.fab` for
+`mori "norma:... deferred pending Stage ..."` and currently reports **88**
+matching stubs across **16** source files. All current matches are **Stage 2**.
+
+Current grouping:
+
+| Source file | Count |
+| --- | ---: |
+| `src/arca.fab` | 1 |
+| `src/caelum.fab` | 4 |
+| `src/caelum/auscultator.fab` | 4 |
+| `src/caelum/connexus.fab` | 7 |
+| `src/chorda.fab` | 7 |
+| `src/codex.fab` | 10 |
+| `src/crypta.fab` | 9 |
+| `src/http.fab` | 12 |
+| `src/nuncius.fab` | 5 |
+| `src/pressura.fab` | 4 |
+| `src/processus.fab` | 1 |
+| `src/solum.fab` | 3 |
+| `src/tempus.fab` | 1 |
+| `src/thesaurus.fab` | 12 |
+| `src/toml.fab` | 3 |
+| `src/yaml.fab` | 5 |
+
+Any future stub with real logic must **not** be auto-converted merely because it
+contains a `mori` expression.
 
 ## Preferred end state
 
@@ -64,5 +93,6 @@ or empty body).
 
 ## Done-when for residual close
 
-Unit A green + Unit B pilot green + inventory count of pure `mori` deferrals
-ratchets toward zero under Unit C (or explicit counted debt budget).
+Unit A green + Unit B pilot green + the `./scripta/audit-deferred-mori`
+inventory count ratchets toward zero under Unit C (or explicit counted debt
+budget).

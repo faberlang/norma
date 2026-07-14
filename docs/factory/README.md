@@ -10,6 +10,9 @@ Recent status/audit packets:
   audit and P1 defer recommendation.
 - `provider-source-claim-matrix.md` - Source-library/provider claim matrix with
   allowed claims, blocked claims, promotion triggers, and validation commands.
+- `nondum-mori-deferral-residual.md` - Exact repeatable inventory for deferred
+  `mori "norma:... deferred pending Stage ..."` stubs and the Radix SEM017
+  hard gate for free-function `@ nondum` cleanup.
 
 ## Layout (current)
 
@@ -26,6 +29,7 @@ norma/
 
 ```bash
 ./scripta/check-source
+./scripta/audit-deferred-mori
 ```
 
 Each `goal.md` owns its **Status** line.

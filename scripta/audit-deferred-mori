@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SRC="$ROOT/src"
+PATTERN='mori[[:space:]]+"norma:[^"]*deferred pending Stage [^"]+"'
+
+if [[ ! -d "$SRC" ]]; then
+  echo "audit-deferred-mori: missing src directory: $SRC" >&2
+  exit 1
+fi
+
+tmp="$(mktemp)"
+trap 'rm -f "$tmp"' EXIT
+
+while IFS= read -r -d '' file; do
+  grep -HnE "$PATTERN" "$file" >>"$tmp" || true
+done < <(find "$SRC" -name '*.fab' -print0 | sort -z)
+
+total="$(wc -l <"$tmp" | tr -d ' ')"
+
+echo "Deferred mori stubs: $total"
+echo
+echo "By source file:"
+awk -F: -v root="$ROOT/" '
+  {
+    file = $1
+    sub("^" root, "", file)
+    count[file] += 1
+  }
+  END {
+    for (file in count) {
+      print count[file], file
+    }
+  }
+' "$tmp" | sort -k2,2 | awk '{ printf "%4d %s\n", $1, $2 }'
+
+echo
+echo "By stage:"
+awk '
+  match($0, /Stage [^" ]+/) {
+    stage = substr($0, RSTART, RLENGTH)
+    count[stage] += 1
+  }
+  END {
+    for (stage in count) {
+      print count[stage], stage
+    }
+  }
+' "$tmp" | sort -k2,2 | awk '{ printf "%4d %s %s\n", $1, $2, $3 }'
