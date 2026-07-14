@@ -19,8 +19,8 @@ Allowed today:
   signatures, native Faber bodies, codegen templates, `ad` route intent, or
   explicit `mori` deferral state.
 - `aleator`, `consolum`, `processus`, `solum`, and `tempus` may be described as
-  route families that have provider-manifest/dispatch evidence in the host
-  audit, but not as public runnable support.
+  route families with local provider manifest/dispatch coverage evidence in
+  `host-providers-rs` commit `fc08be5`, but not as public runnable support.
 
 Blocked today:
 
@@ -36,7 +36,7 @@ Blocked today:
 | --- | --- | --- | --- | --- |
 | Public source shape | all `src/**/*.fab` modules | Canonical Norma source repo; `README.md` and `AGENTS.md` define the rules | Norma is a public source library with backend-agnostic Faber modules | Runnable standard library, packaged provider support, or installable app examples |
 | Pure/native source helpers | `csv`, `fila`, `json`, `json/*`, `mathesis`, `model`, `ordinata`, `tensor`, `valor`, `vector`; native portions of `chorda` and `tempus` | Native Faber bodies and compiler/runtime conversions where present | Source-level helper surface exists and can be audited in this repo | Broad runtime product claim without focused compile/run evidence |
-| Host-provider route evidence, not public support | `aleator:*`, `consolum:*`, `processus:*`, `solum:*`, `tempus:*` | Prior host-gateway audit records host-provider manifests for `aleator`, `consolum`, `processus`, `solum`, and `tempus`; Norma source has matching `ad` route families | Route intent and provider-evidence candidate families | Public support matrix, runnable examples, or parity claims before export/run evidence |
+| Host-provider route evidence, not public support | `aleator:*`, `consolum:*`, `processus:*`, `solum:*`, `tempus:*` | `host-providers-rs` commit `fc08be5` records local manifest/dispatch coverage with no manifest route missing from Rust dispatch strings: `aleator` 5 routes, `consolum` 16, `processus` 11, `solum` 45, `tempus` 4. Norma source has matching `ad` route families for the overlapping surfaces. | Local route intent plus provider manifest/dispatch coverage evidence | Public support matrix, runnable examples, package/install support, or parity claims before export/run evidence |
 | Partial filesystem/process routes | `solum`, `solum/path`, `processus` | Many `ad` routes exist; `solum.describe`, `solum.describet`, `solum.fundet`, and `processus.genera` remain deferred | Partial source route surface with named materializer blockers | Complete filesystem metadata, byte-write async parity, or process lifecycle API |
 | Partial time routes | `tempus` | Clock/sleep `ad` routes exist; `vigila` remains deferred because live inbound cursor returns from functions are not available | Source route surface for clocks and one-shot waits | Timer stream / cursor support |
 | Deferred host-effect source shape | `arca`, `caelum`, `caelum/*`, `crypta`, `http`, `nuncius`, `pressura`, `thesaurus` | Public signatures and comments exist; bodies are `mori "norma:... deferred pending Stage 2 dispatch"` | Planned source shape only | Provider support, host gateway support, network/database/crypto/IPC/cache/compression runtime claims |
@@ -51,7 +51,8 @@ matching evidence exists:
 | Promotion | Required evidence |
 | --- | --- |
 | Public source reference | This repo's source policy passes under `./scripta/check-source`; docs name deferred stubs honestly. |
-| Provider coverage claim | Provider manifest export exists for the route family, dispatch coverage is validated, and public contract output is regenerated from that export rather than hand-written. |
+| Local provider-coverage evidence | A repo-local provider packet, such as `host-providers-rs` `fc08be5`, shows manifest/dispatch agreement and local tests for the route family. This permits private-preview evidence wording only. |
+| Public provider coverage claim | Provider manifest export exists for the route family, dispatch coverage is validated, and public contract output is regenerated from that export rather than hand-written. |
 | Runnable example claim | A public example imports the Norma module, runs through the released compiler/package path, and exercises the host route without private setup. |
 | Complete module claim | Every public function in that module is either native/generated and exercised, or has provider evidence; no `mori` deferral remains in the claimed surface. |
 | Cross-host or production claim | At least two host backends or an explicit target matrix pass the same example and negative cases; unsupported routes fail closed. |

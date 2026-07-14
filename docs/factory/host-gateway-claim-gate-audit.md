@@ -72,12 +72,13 @@ yet enough to unblock public product claims by itself:
 | --- | --- | --- |
 | `host-kernel-rs` | README says it owns transport-neutral prefix routing and manifest validation, not OS effects or worker scheduling. Source validates manifest versions, prefixes, duplicate routes, and supported routes. | Needs export/run evidence tied to the released compiler and public contracts. |
 | `host-native-rs` | README says it owns bounded worker scheduling and the `faber::HostDispatch` adapter, not Norma implementations. | Needs integration evidence for package bootstrap and released host dispatch. |
-| `host-providers-rs` | Manifests exist for `aleator`, `consolum`, `processus`, `solum`, and `tempus`; provider source dispatches many manifest routes. | Needs manifest-to-dispatch validation evidence, package/export linkage, and public example run evidence before support claims. |
+| `host-providers-rs` | Commit `fc08be5` records local manifest/dispatch coverage for `aleator` 5 routes, `consolum` 16, `processus` 11, `solum` 45, and `tempus` 4, with no manifest route missing from matching Rust dispatch strings. | Needs package/export linkage, public contract generation, and public example run evidence before support claims. |
 
 Notable gaps relative to public copy:
 
 - `providers.json` in the RC1 packet is still a placeholder.
-- The current site does not publish a provider coverage matrix.
+- The current site does not publish a provider coverage matrix generated from
+  exported manifests.
 - Provider manifests do not cover deferred Norma modules such as `crypta` and
   `nuncius`.
 - Some Norma functions require materializer/cursor work before a public API
@@ -106,4 +107,3 @@ The validation expectation for this artifact is:
 git diff --check
 ./scripta/check-source
 ```
-
