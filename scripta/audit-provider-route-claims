@@ -16,7 +16,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 WORKSPACE = ROOT.parent
 HOST_PROVIDERS = WORKSPACE / "host-providers-rs"
-EXPECTED_HOST_PROVIDERS_REV = "ed34a67"
+EXPECTED_HOST_PROVIDERS_REV = "bed50e5"
 
 PROVIDER_FAMILIES = ("aleator", "consolum", "processus", "solum", "tempus")
 
@@ -367,6 +367,12 @@ def main() -> int:
         help="run internal negative fixtures for missing dispatch, dirty provider evidence, and revision mismatch",
     )
     parser.add_argument(
+        "--host-providers",
+        type=Path,
+        default=HOST_PROVIDERS,
+        help="path to the sibling host-providers-rs evidence checkout",
+    )
+    parser.add_argument(
         "--expected-rev",
         default=EXPECTED_HOST_PROVIDERS_REV,
         help="expected short host-providers-rs git revision for the evidence boundary",
@@ -374,7 +380,7 @@ def main() -> int:
     args = parser.parse_args()
     if args.self_test:
         return self_test()
-    return run_audit(expected_rev=args.expected_rev)
+    return run_audit(host_providers=args.host_providers, expected_rev=args.expected_rev)
 
 
 if __name__ == "__main__":
