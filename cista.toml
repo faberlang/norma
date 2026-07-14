@@ -1,8 +1,10 @@
 # Norma as a cista source package (Phase B).
 #
 # Install maps `interfaces = "src"` into the store as
-# `$CISTAE_HOME/norma/<version>/interfaces/`. Version is independent of the
-# faber crate. Apps do not list norma in faber.toml — platform default.
+# `$CISTAE_HOME/norma/<version>/interfaces/`. Cista copies the interface root as
+# a directory, so Norma keeps `src/` .fab-only and `./scripta/check-source`
+# rejects docs/tests or other non-interface files there. Version is independent
+# of the faber crate. Apps do not list norma in faber.toml — platform default.
 
 [source]
 package = "norma"

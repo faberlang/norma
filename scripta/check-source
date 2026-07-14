@@ -11,6 +11,13 @@ if [[ ! -d "$SRC" ]]; then
 fi
 
 while IFS= read -r -d '' file; do
+  rel="${file#$SRC/}"
+  echo "check-source: non-interface file under src/: $rel" >&2
+  echo "check-source: cista snapshots src/ as the package interface root; move docs/tests outside src/" >&2
+  status=1
+done < <(find "$SRC" -type f ! -name '*.fab' -print0)
+
+while IFS= read -r -d '' file; do
   if grep -nE '^[[:space:]]*//' "$file"; then
     echo "check-source: line-start comments are not allowed in $file" >&2
     status=1

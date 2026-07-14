@@ -15,6 +15,8 @@ has landed with public evidence.
 Allowed today:
 
 - `src/**/*.fab` is the canonical public source-library surface.
+- `src/` is the cista package interface root and is kept `.fab`-only by
+  `./scripta/check-source`.
 - A module may be named as public source shape when the claim is about
   signatures, native Faber bodies, codegen templates, `ad` route intent, or
   explicit `mori` deferral state.

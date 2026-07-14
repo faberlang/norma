@@ -1,6 +1,8 @@
 # Factory documentation (norma)
 
 Open factory tracks for the public **Norma** source library (`src/**/*.fab`).
+The `src/` tree is also the cista package interface root and must remain
+`.fab`-only.
 
 Relocated from private Radix on 2026-07-08.
 
@@ -18,8 +20,9 @@ Recent status/audit packets:
 
 ```text
 norma/
-  src/                 public norma:* modules
-  docs/factory/        this control plane
+  src/                 public norma:* .fab modules and package interface root
+  exempla/             non-interface examples/tests
+  docs/factory/        this control plane and planning notes
   scripta/             source checks
 # siblings
   ../faber             public CLI
