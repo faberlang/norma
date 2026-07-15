@@ -4,13 +4,13 @@
 # For raw TCP/UDP sockets, see caelum.fab.
 #
 # Design notes:
-# - Verb conjugation encodes sync/async:
+# - Verb conjugation encodes sync/async for the client operations:
 # - Future (-et, -abit): async operations
 # - Imperative: sync operations
 # - Client: petet (GET), mittet (POST), ponet (PUT), delet (DELETE), mutabit (PATCH)
-# - Server: exspectabit starts server, handler receives Rogatio, returns Replicatio
-# Server runtime support is deferred beyond the first Rust client slice.
-# - Response builders: replica (full), scribe (text), funde (bytes), json (JSON)
+# - Server: listen/accept/respond/stop are generic target-neutral `ad` wrappers.
+#   Faber packages own request routing and response policy around the handle loop.
+# - Request and response carriers remain target-neutral interfaces below.
 
 
 # =========================================================================
@@ -58,45 +58,31 @@ functio rogabit(textus modus, textus url, tabula<textus, textus> capita, textus 
 }
 
 # =========================================================================
-# HTTP SERVER - Deferred
+# HTTP SERVER - Target-neutral handle-based provider
 # =========================================================================
 
-# Start server on port with handler.
-# Deferred: the first Rust client slice implements client requests only.
-@ futura
-functio exspectabit(numerus portus, (Rogatio) → Replicatio handler) → Servitor {
-    mori "norma:http.exspectabit is deferred pending Stage 2 dispatch"
+# The server provider is a generic pull loop. `args` carries the provider's
+# target-neutral listen options; the returned number is an opaque listener
+# handle. Faber owns routing and response policy around these calls.
+functio listen(lista<valor> args) → numerus {
+    redde ad 'http:listen' (args) ↦ numerus
 }
 
-# =========================================================================
-# RESPONSE BUILDERS - Deferred
-# Deferred with server support. Signatures stay here to preserve the file
-# interface while the first Rust client slice implements client response snapshots.
-# =========================================================================
-
-# Full control: explicit status, headers, body
-functio replica(numerus status, tabula<textus, textus> capita, textus corpus) → Replicatio {
-    mori "norma:http.replica is deferred pending Stage 2 dispatch"
+# Accept one request record from a listener. The returned valor contains the
+# provider request id plus method, path, headers, and body fields.
+functio accept(numerus handle) → valor {
+    redde ad 'http:accept' (handle) ↦ valor
 }
 
-# Text response (Content-Type: text/plain)
-functio scribe(numerus status, textus corpus) → Replicatio {
-    mori "norma:http.scribe is deferred pending Stage 2 dispatch"
+# Send one response using the request id and target-neutral status, headers,
+# and body values carried in `args`.
+functio respond(lista<valor> args) → vacuum {
+    redde ad 'http:respond' (args) ↦ vacuum
 }
 
-# Binary response (Content-Type: application/octet-stream)
-functio funde(numerus status, octeti data) → Replicatio {
-    mori "norma:http.funde is deferred pending Stage 2 dispatch"
-}
-
-# JSON response (Content-Type: application/json, auto-serializes)
-functio json(numerus status, valor data) → Replicatio {
-    mori "norma:http.json is deferred pending Stage 2 dispatch"
-}
-
-# Redirect response (302 + Location header)
-functio redirige(textus url) → Replicatio {
-    mori "norma:http.redirige is deferred pending Stage 2 dispatch"
+# Stop a listener and release its pending request state.
+functio stop(numerus handle) → vacuum {
+    redde ad 'http:stop' (handle) ↦ vacuum
 }
 
 # HTTP Response
@@ -132,11 +118,4 @@ implendum Rogatio {
     functio caput(textus nomen) → textus ∪ nihil
 
     functio param(textus nomen) → textus ∪ nihil
-}
-
-# HTTP Server handle
-implendum Servitor {
-    functio siste() → vacuum
-
-    functio portus() → numerus
 }
