@@ -1,12 +1,12 @@
 # Residual chart: norma deferred stubs — `mori` vs `@ nondum` (SEM017)
 
-**Status:** exact residual inventory (2026-07-14) — **not** bulk-migrated
+**Status:** exact residual inventory (2026-07-17) — **not** bulk-migrated
 **Source:** `./scripta/audit-deferred-mori`
 **Owner:** hunter-1 (norma main spine); radix free-function SEM017 is a **hard gate**
 
 ## Problem
 
-88 Norma public stubs use runtime `mori "norma:... deferred pending Stage N"`
+81 Norma public stubs use runtime `mori "norma:... deferred pending Stage N"`
 bodies. Callers **typecheck green** and only fail when executed.
 
 The compiler already owns a stronger hub:
@@ -28,7 +28,7 @@ Run from the Norma repo root:
 ```
 
 The command scans `src/**/*.fab` for
-`mori "norma:... deferred pending Stage ..."` and currently reports **88**
+`mori "norma:... deferred pending Stage ..."` and currently reports **81**
 matching stubs across **16** source files. All current matches are **Stage 2**.
 
 Current grouping:
@@ -42,11 +42,11 @@ Current grouping:
 | `src/chorda.fab` | 7 |
 | `src/codex.fab` | 10 |
 | `src/crypta.fab` | 9 |
-| `src/http.fab` | 12 |
+| `src/http.fab` | 6 |
 | `src/nuncius.fab` | 5 |
 | `src/pressura.fab` | 4 |
 | `src/processus.fab` | 1 |
-| `src/solum.fab` | 3 |
+| `src/solum.fab` | 2 |
 | `src/tempus.fab` | 1 |
 | `src/thesaurus.fab` | 12 |
 | `src/toml.fab` | 3 |

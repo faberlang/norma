@@ -140,10 +140,11 @@ functio funde(textus via, octeti data) → vacuum {
     redde ad 'solum:funde' (args) ↦ vacuum
 }
 
-# Pour bytes to file, overwrites existing (async route; Faber blocks)
+# Pour bytes to file with async caller materialization.
 @ futura
 functio fundet(textus via, octeti data) → vacuum {
-    mori "norma:solum.fundet is deferred pending Stage 2 dispatch"
+    fixum lista<valor> args ← [via ↦ valor, data ↦ valor]
+    redde ad 'solum:funde' (args) ↦ vacuum
 }
 
 # =========================================================================
