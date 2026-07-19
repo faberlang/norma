@@ -65,5 +65,71 @@ incipit {
     adfirma tempus.dies(leap) ≡ 29
     adfirma expectInvalid()
 
+    # -----------------------------------------------------------------------
+    # structa: invalid month (month=13)
+    # -----------------------------------------------------------------------
+    fac {
+        fixum instans bad ← tempus.structa(2026, 13, 1)
+        adfirma falsum
+    }
+    cape err {
+        adfirma err.longitudo() > 0
+    }
+
+    # -----------------------------------------------------------------------
+    # structa: month=0 (out of range)
+    # -----------------------------------------------------------------------
+    fac {
+        fixum instans bad ← tempus.structa(2026, 0, 1)
+        adfirma falsum
+    }
+    cape err {
+        adfirma err.longitudo() > 0
+    }
+
+    # -----------------------------------------------------------------------
+    # structa_momenti: invalid hour (hour=25)
+    # -----------------------------------------------------------------------
+    fac {
+        fixum instans bad ← tempus.structa_momenti(2026, 1, 1, 25, 0, 0)
+        adfirma falsum
+    }
+    cape err {
+        adfirma err.longitudo() > 0
+    }
+
+    # -----------------------------------------------------------------------
+    # structa_momenti: invalid minute (minute=60)
+    # -----------------------------------------------------------------------
+    fac {
+        fixum instans bad ← tempus.structa_momenti(2026, 1, 1, 0, 60, 0)
+        adfirma falsum
+    }
+    cape err {
+        adfirma err.longitudo() > 0
+    }
+
+    # -----------------------------------------------------------------------
+    # structa_momenti: invalid second (second=61)
+    # -----------------------------------------------------------------------
+    fac {
+        fixum instans bad ← tempus.structa_momenti(2026, 1, 1, 0, 0, 61)
+        adfirma falsum
+    }
+    cape err {
+        adfirma err.longitudo() > 0
+    }
+
+    # -----------------------------------------------------------------------
+    # solve: invalid wire format (non-RFC3339)
+    # -----------------------------------------------------------------------
+    fac {
+        fixum instans bad ← tempus.solve("not-a-date")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
     nota tempus.exprimit(t)
 }
