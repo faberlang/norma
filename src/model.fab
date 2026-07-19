@@ -324,8 +324,7 @@ functio safetensors_summarium(textus alias, textus source, textus local_path, oc
     fixum numerus estimated ← _estimated_tensor_bytes(tensors)
     fixum numerus tensor_count ← tensors.longitudo()
     fixum textus diagnosticum ← "tokenizer/config sibling probe not yet implemented beside " + local_path
-    fixum textus file_path ← "" + local_path
-    fixum lista<textus> files ← [file_path]
+    fixum lista<textus> files ← [local_path]
     fixum lista<Diagnosticum> diagnostics ← [
         Diagnosticum {
             severitas = "warning",
@@ -355,8 +354,7 @@ functio tempta_safetensors_summarium(textus alias, textus source, textus local_p
     }
     cape err {
         fixum textus diagnosticum ← "safetensors metadata error: " + err
-        fixum textus file_path ← "" + local_path
-        fixum lista<textus> files ← [file_path]
+        fixum lista<textus> files ← [local_path]
         fixum lista<Diagnosticum> diagnostics ← [
             Diagnosticum {
                 severitas = "error",
@@ -665,7 +663,7 @@ functio gguf_summarium(textus alias, textus source, textus local_path, textus ro
 
     varia lista<textus> files ← vacua
     si local_path.longitudo() > 0 {
-        files.appende("" + local_path)
+        files.appende(local_path)
     }
     varia lista<Diagnosticum> diagnostics ← vacua
     diagnostics.appende(Diagnosticum {
@@ -743,7 +741,7 @@ functio tempta_gguf_summarium(textus alias, textus source, textus local_path, te
         fixum textus diagnosticum ← "gguf metadata error: " + err
         varia lista<textus> files ← vacua
         si local_path.longitudo() > 0 {
-            files.appende("" + local_path)
+            files.appende(local_path)
         }
         fixum lista<Diagnosticum> diagnostics ← [
             Diagnosticum {
