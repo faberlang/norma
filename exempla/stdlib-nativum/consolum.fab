@@ -1,0 +1,84 @@
++++
+term = "consolum"
+kind = "concept"
+category = "stdlib"
+canonical = false
+summary = "norma:consolum console I/O API contract tests."
+syntax = "norma:consolum — lege | scribe | mone | vide | audit (all ad-routed)"
+related = ["consolum", "stdlib-nativum"]
++++
+
+# stdlib-nativum/consolum — norma:consolum console I/O API contract tests
+#
+# All 17 public functions are ad-routed. This exemplum verifies:
+#   1. Import works
+#   2. Each function can be called (host routes unavailable at test time)
+
+importa ex "norma:consolum" privata consolum
+
+incipit {
+    # -----------------------------------------------------------------------
+    # STDOUT - Text
+    # -----------------------------------------------------------------------
+    fac {
+        consolum.scribe("test-output")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        consolum.dic("partial")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    # -----------------------------------------------------------------------
+    # STDERR - Warning and Debug
+    # -----------------------------------------------------------------------
+    fac {
+        consolum.mone("warn-output")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        consolum.vide("debug-output")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    # -----------------------------------------------------------------------
+    # TTY Detection
+    # -----------------------------------------------------------------------
+    fac {
+        consolum.audit()
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        consolum.loquitur()
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        consolum.admonet()
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+}
