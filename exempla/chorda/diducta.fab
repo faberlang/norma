@@ -23,6 +23,7 @@ functio sampleSkill() → textus {
 }
 
 incipit {
+    # Happy path: well-formed document with delimiter fence
     fac {
         fixum textus doc ← sampleSkill()
         fixum [metadatum, corpus] ← chorda.diducta(doc, "+++")
@@ -37,11 +38,60 @@ incipit {
         mone err
     }
 
+    # Missing opening delimiter: document does not start with delimiter
     fac {
         chorda.diducta("no front block", "+++")
         adfirma falsum
     }
     cape err {
         adfirma err.continet("missing opening delimiter")
+    }
+
+    # Empty delimiter: delimiter string is zero-length
+    fac {
+        chorda.diducta("content", "")
+        adfirma falsum
+    }
+    cape err {
+        adfirma err.continet("empty delimiter")
+    }
+
+    # Document shorter than delimiter: cannot contain the delimiter
+    fac {
+        chorda.diducta("ab", "+++")
+        adfirma falsum
+    }
+    cape err {
+        adfirma err.continet("missing opening delimiter")
+    }
+
+    # Missing closing delimiter: opening fence exists but no closing fence
+    fac {
+        chorda.diducta("+++\nkey = val\n", "+++")
+        adfirma falsum
+    }
+    cape err {
+        adfirma err.continet("missing closing delimiter")
+    }
+
+    # Delimiter-only: document is exactly the delimiter string
+    fac {
+        chorda.diducta("+++", "+++")
+        adfirma falsum
+    }
+    cape err {
+        adfirma err.continet("missing closing delimiter")
+    }
+
+    # Metadata with no trailing newline after opening fence:
+    # opening fence then immediate content then closing fence
+    fac {
+        fixum textus doc ← "+++\nkey = val\n+++"
+        fixum [metadatum, corpus] ← chorda.diducta(doc, "+++")
+        adfirma metadatum.continet("key = val")
+        adfirma corpus.longitudo() ≡ 0
+    }
+    cape err {
+        mone err
     }
 }
