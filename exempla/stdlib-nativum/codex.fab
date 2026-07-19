@@ -1,0 +1,108 @@
++++
+term = "codex"
+kind = "concept"
+category = "stdlib"
+canonical = false
+summary = "norma:codex encoding/decoding API contract tests."
+syntax = "norma:codex — base64 | hex | url (all mori deferred)"
+related = ["codex", "stdlib-nativum"]
++++
+
+# stdlib-nativum/codex — norma:codex encoding/decoding API contract tests
+#
+# All 9 public functions are deferred via mori. This exemplum verifies:
+#   1. Each function can be imported and called
+#   2. Each mori body throws
+
+importa ex "norma:codex" privata codex
+
+incipit {
+    # -----------------------------------------------------------------------
+    # Base64 — mori deferred
+    # -----------------------------------------------------------------------
+    fac {
+        codex.base64(|61 62 63|)
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        codex.deBase64("AQID")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        codex.temptaBase64("AQID")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    # -----------------------------------------------------------------------
+    # Hex — mori deferred
+    # -----------------------------------------------------------------------
+    fac {
+        codex.hex(|61 62 63|)
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        codex.deHex("616263")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        codex.temptaHex("616263")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    # -----------------------------------------------------------------------
+    # URL encoding — mori deferred
+    # -----------------------------------------------------------------------
+    fac {
+        codex.url("hello world")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        codex.deUrl("hello+world")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        codex.urlComponentum("a&b=c")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        codex.deUrlComponentum("a%26b%3Dc")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+}
