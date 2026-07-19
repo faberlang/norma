@@ -33,7 +33,7 @@ incipit {
         expect(crypta.digere("sha256", empty), |e3 b0 c4 42 98 fc 1c 14 9a fb f4 c8 99 6f b9 24 27 ae 41 e4 64 9b 93 4c a4 95 99 1b 78 52 b8 55|, "sha256 empty")
 
         # SHA-384
-        expect(crypta.digere("sha384", abc), |cb 00 75 3f 45 a3 5e 8b b5 a0 3d 69 9a c6 50 07 27 2c 32 ab 0e de d2 16 31 a8 b6 05 a4 3f ff 5b ed 80 86 07 2b a1 e7 cc 23 58 ba ec a1 34 c8 25 a7|, "sha384 abc")
+        expect(crypta.digere("sha384", abc), |cb 00 75 3f 45 a3 5e 8b b5 a0 3d 69 9a c6 50 07 27 2c 32 ab 0e de d1 63 1a 8b 60 5a 43 ff 5b ed 80 86 07 2b a1 e7 cc 23 58 ba ec a1 34 c8 25 a7|, "sha384 abc")
         expect(crypta.digere("sha384", empty), |38 b0 60 a7 51 ac 96 38 4c d9 32 7e b1 b1 e3 6a 21 fd b7 11 14 be 07 43 4c 0c c7 bf 63 f6 e1 da 27 4e de bf e7 6f 65 fb d5 1a d2 f1 48 98 b9 5b|, "sha384 empty")
 
         # SHA-512
