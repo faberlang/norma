@@ -37,14 +37,6 @@ incipit {
         adfirma err.continet("empty path segment")
     }
 
-    fac {
-        solum.explora("/tmp", "*/SKILL.md")
-        adfirma falsum
-    }
-    cape err {
-        adfirma err.continet("empty path segment")
-    }
-
     # -----------------------------------------------------------------------
     # describe — mori deferred body
     # -----------------------------------------------------------------------

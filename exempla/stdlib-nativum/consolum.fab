@@ -18,6 +18,63 @@ importa ex "norma:consolum" privata consolum
 
 incipit {
     # -----------------------------------------------------------------------
+    # STDIN - Bytes
+    # -----------------------------------------------------------------------
+    fac {
+        consolum.hauri(16)
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        consolum.hauriet(16)
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    # -----------------------------------------------------------------------
+    # STDIN - Text
+    # -----------------------------------------------------------------------
+    fac {
+        consolum.lege()
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        consolum.leget()
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    # -----------------------------------------------------------------------
+    # STDOUT - Bytes
+    # -----------------------------------------------------------------------
+    fac {
+        consolum.funde(|01 02 03|)
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        consolum.fundet(|01 02 03|)
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    # -----------------------------------------------------------------------
     # STDOUT - Text
     # -----------------------------------------------------------------------
     fac {
@@ -29,7 +86,23 @@ incipit {
     }
 
     fac {
+        consolum.scribet("test-async")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
         consolum.dic("partial")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        consolum.dicet("partial-async")
         adfirma falsum
     }
     cape err {
@@ -48,7 +121,23 @@ incipit {
     }
 
     fac {
+        consolum.monet("warn-async")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
         consolum.vide("debug-output")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        consolum.videbit("debug-async")
         adfirma falsum
     }
     cape err {

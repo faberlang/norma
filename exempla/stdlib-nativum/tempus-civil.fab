@@ -66,6 +66,17 @@ incipit {
     adfirma expectInvalid()
 
     # -----------------------------------------------------------------------
+    # structa: year=0 (out of range)
+    # -----------------------------------------------------------------------
+    fac {
+        fixum instans bad ← tempus.structa(0, 1, 1)
+        adfirma falsum
+    }
+    cape err {
+        adfirma err.longitudo() > 0
+    }
+
+    # -----------------------------------------------------------------------
     # structa: invalid month (month=13)
     # -----------------------------------------------------------------------
     fac {
@@ -128,7 +139,7 @@ incipit {
         adfirma falsum
     }
     cape err {
-        nota err
+        adfirma err.longitudo() > 0
     }
 
     nota tempus.exprimit(t)

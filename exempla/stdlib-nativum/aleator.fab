@@ -73,4 +73,22 @@ incipit {
     cape err {
         nota "aleator.uuid not available"
     }
+
+    # -----------------------------------------------------------------------
+    # Seeding (for reproducible tests)
+    # -----------------------------------------------------------------------
+    fac {
+        aleator.semina(42)
+    }
+    cape err {
+        nota "aleator.semina not available"
+    }
+
+    # Edge: semina with negative value (should reset to true random)
+    fac {
+        aleator.semina(-1)
+    }
+    cape err {
+        nota "aleator.semina(-1) not available"
+    }
 }
