@@ -1,11 +1,12 @@
 # Campaign: Native Faber Crypta
 
-**Status**: active — Stages 1 and 2 goals READY and lowered; Stage 1 is ready
-for factory execution
+**Status**: active — Stage 1 (modular words) and Stage 2 (native SHA-2)
+delivered; Stage 3 (HMAC) waits on the `clavis` decision
 **Created**: 2026-07-18
 **Control plane repo**: `/Users/ianzepp/work/faberlang/norma`
 **Participating repos**: `radix`, `norma`, `faber`, and `examples`
-**Next stage**: Stage 1 — complete the unsigned modular word family in Radix
+**Next stage**: Stage 3 — native HMAC-SHA-2 (blocked: needs native SHA-2 plus an
+accepted `clavis`/secret-key contract)
 **Release posture**: prepare releases at accepted checkpoints; do not publish
 without separate operator authorization
 
@@ -139,7 +140,7 @@ before a public release claim.
 | --- | --- | --- |
 | `modulus<u32>` baseline | complete and ship-clear | preserve as regression authority |
 | all-width modular family | goal-check READY; delivery saved | run the Radix factory delivery |
-| native SHA-2 | goal-check READY; delivery saved; execution blocked on all-width family | execute after Stage 1 acceptance |
+| native SHA-2 | delivered — `digere` ships native SHA-256/384/512 through the package path | preserve as regression authority; Stage 3 waits on `clavis` |
 | HMAC-SHA-2 | routed, not yet goal-forged | wait for native SHA-2 plus `clavis` decision |
 | AES-GCM / Ed25519 / Argon2id | deferred prerequisites | lower separate goals only after security substrate evidence |
 | irreducible entropy | unselected | retain as narrow host-capability track |
@@ -162,15 +163,20 @@ before a public release claim.
 
 ### Stage 2 — Native Faber SHA-2
 
-- **Status**: goal-check READY; delivery saved; execution blocked
-  on Stage 1 acceptance.
+- **Status**: delivered 2026-07-19. `norma:crypta.digere` ships native Faber
+  SHA-256/384/512; `exempla/crypta-sha2` runs via `faber run` and matches all
+  pinned NIST vectors (empty, `abc`, embedded-zero, and padding-boundary) for
+  all three algorithms through the public `digere` API.
+- **Evidence**: norma commits `41b138c` (engines + dispatch), `a2c8fef`
+  (corrected sha384 vector), `f449b8d` (embedded-zero + padding-boundary
+  vectors). No foreign implementation, provider path, or generated-source edit.
 - **Source**: [`native-sha2 goal`](../native-sha2/goal.md).
 - **Delivery**: [`native-sha2 delivery`](../native-sha2/delivery.md).
 - **Why now**: it is the first complete standard-library consumer and proves
   that the compiler work ships user-visible Faber capability.
 - **Batching**: split on the 32-bit versus shared 64-bit engine boundary.
-- **Gate**: native `digere` passes pinned NIST vectors for SHA-256/384/512 via a
-  normal Faber package, with no foreign implementation or provider path.
+- **Gate** (met): native `digere` passes pinned NIST vectors for SHA-256/384/512
+  via a normal Faber package, with no foreign implementation or provider path.
 - **Overlap rule**: red vector and API-contract work may begin after Stage 1's
   architecture checkpoint, but 64-bit algorithm bodies wait for Stage 1 close.
 - **Lowers to**: delivery, then Norma factory.

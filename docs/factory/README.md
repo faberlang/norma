@@ -8,14 +8,15 @@ Relocated from private Radix on 2026-07-08.
 
 ## Active campaigns
 
-- [Native Faber Crypta](native-faber-crypta/CAMPAIGN.md) — Stages 1 and 2 are
-  goal-check READY and lowered. Stage 1 is ready for Radix factory execution.
+- [Native Faber Crypta](native-faber-crypta/CAMPAIGN.md) — Stage 1 (modular
+  words) and Stage 2 (native SHA-2) delivered; Stage 3 (native HMAC-SHA-2) waits
+  on the `clavis`/secret-key decision.
 
-## Ready goals
+## Delivered goals
 
-- [Native Faber SHA-2](native-sha2/goal.md) — delivery
-  [saved](native-sha2/delivery.md); factory execution waits for acceptance of
-  the complete unsigned modular-word family.
+- [Native Faber SHA-2](native-sha2/goal.md) — delivered
+  ([closeout](native-sha2/delivery.md#closeout)): `norma:crypta.digere` ships
+  native SHA-256/384/512, proven through `exempla/crypta-sha2`.
 
 The Native Faber SHA-2 goal supersedes the former SHA-256-only receipts plan.
 

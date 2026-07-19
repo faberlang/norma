@@ -1,6 +1,6 @@
 # Goal: Native Faber SHA-2 Digests
 
-**Status**: ready for factory — independent goal-check READY 2026-07-18
+**Status**: delivered 2026-07-19 — see [delivery closeout](delivery.md#closeout)
 **Created**: 2026-07-18
 **Target repo**: `/Users/ianzepp/work/faberlang/norma`
 **Factory artifact dir**: `docs/factory/native-sha2/`

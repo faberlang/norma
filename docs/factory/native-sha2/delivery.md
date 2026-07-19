@@ -1,6 +1,6 @@
 # Delivery: Native Faber SHA-2 Digests
 
-**Status**: ready for factory after campaign Stage 1 acceptance
+**Status**: delivered 2026-07-19 (Stages N0–N3 complete)
 **Created**: 2026-07-18
 **Vision source**: [`goal.md`](goal.md)
 **Goal check**: [`goal-check-report.md`](goal-check-report.md) — READY
@@ -12,6 +12,33 @@
 commit on main
 **Checkpoint**: `norma:crypta.digere` ships native SHA-256/384/512 through a
 normal Faber package path
+
+## Closeout
+
+Delivered. `norma/src/crypta.fab` replaces the deferred `digere` stub with a
+failable dispatch over `@ privata` 32-bit SHA-256 and shared 64-bit SHA-512-
+family engines (SHA-384 = same core, distinct IV, 48-byte truncation).
+Compression uses `modulus<u32>` / `modulus<u64>`; no host route, provider,
+RustCrypto, or generated-source edit is involved.
+
+Evidence (norma/main):
+
+- `41b138c` — engines, dispatch, exact error text, 64 MiB boundary.
+- `a2c8fef` — corrected a transcribed sha384 vector (the real cause of the
+  since-closed-invalid Radix DEFER-118, not a codegen gap).
+- `f449b8d` — embedded-zero and padding-boundary vectors.
+
+Proof: `FABER_LIBRARY_HOME=. faber run exempla/crypta-sha2` compiles and prints
+`crypta-sha2: all NIST vectors matched` across empty, `abc`, embedded-zero,
+and padding-boundary inputs for SHA-256/384/512 via the public `digere` API.
+`./scripta/check-source` passes; `digere` carries no `mori`/`ad`/provider path.
+Generated Rust uses only `wrapping_*` ops, so debug and release agree by
+construction (modulus contract).
+
+Follow-on (does not block this delivery): Radix DEFER-117 — interface value-
+construction boxing for real (non-`mori`) implendum-returning bodies. `gemina`
+is a `mori` panic stub, so `crypta-sha2` is unaffected; the gap bites the first
+real interface-returning body (e.g. future D3 key generation).
 
 ## Interpreted Unit
 
