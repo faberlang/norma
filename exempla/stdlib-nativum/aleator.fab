@@ -1,0 +1,76 @@
++++
+term = "aleator"
+kind = "concept"
+category = "stdlib"
+canonical = false
+summary = "norma:aleator entropy API contract tests."
+syntax = "norma:aleator — fractum | sortire | octetos | uuid | semina (all ad-routed)"
+related = ["aleator", "stdlib-nativum"]
++++
+
+# stdlib-nativum/aleator — norma:aleator entropy API contract tests
+#
+# All 5 public functions are ad-routed (require host routes at runtime).
+# This exemplum verifies import and function signature availability.
+
+importa ex "norma:aleator" privata aleator
+
+incipit {
+    # -----------------------------------------------------------------------
+    # Basic generation
+    # -----------------------------------------------------------------------
+    fac {
+        fixum fractus val ← aleator.fractum()
+        adfirma val ≥ 0.0
+        adfirma val < 1.0
+    }
+    cape err {
+        nota "aleator.fractum not available"
+    }
+
+    fac {
+        fixum numerus val ← aleator.sortire(1, 6)
+        adfirma val ≥ 1
+        adfirma val ≤ 6
+    }
+    cape err {
+        nota "aleator.sortire not available"
+    }
+
+    # Edge: min = max should return the single value
+    fac {
+        fixum numerus val ← aleator.sortire(5, 5)
+        adfirma val ≡ 5
+    }
+    cape err {
+        nota "aleator.sortire fixed range not available"
+    }
+
+    # -----------------------------------------------------------------------
+    # Cryptographic generation
+    # -----------------------------------------------------------------------
+    fac {
+        fixum octeti val ← aleator.octetos(16)
+        adfirma val.longitudo() ≡ 16
+    }
+    cape err {
+        nota "aleator.octetos not available"
+    }
+
+    # Edge: n = 0 returns empty bytes
+    fac {
+        fixum octeti val ← aleator.octetos(0)
+        adfirma val.longitudo() ≡ 0
+    }
+    cape err {
+        nota "aleator.octetos(0) not available"
+    }
+
+    fac {
+        fixum textus val ← aleator.uuid()
+        adfirma val.longitudo() ≡ 36
+    }
+    cape err {
+        nota "aleator.uuid not available"
+    }
+}
