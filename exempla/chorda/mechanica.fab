@@ -1,0 +1,87 @@
++++
+term = "chorda"
+kind = "concept"
+category = "stdlib"
+canonical = false
+summary = "Assertion-based tests for chorda UTF-8 mechanical trio: pange, solve, tempta."
+syntax = "pange | solve | tempta"
+related = ["chorda", "textus", "octeti", "stdlib-nativum"]
++++
+
+# chorda/mechanica — UTF-8 mechanical trio contract tests
+#
+# pange: textus → octeti (UTF-8 encode)
+# solve: octeti → textus (UTF-8 decode, throws on invalid)
+# tempta: octeti → textus ∪ nihil (tries decode, returns nihil on invalid)
+#
+# All three are mori-deferred (Stage 2). Tests verify they throw
+# and the mori error can be inspected.
+
+importa ex "norma:chorda" privata chorda
+
+incipit {
+    # -----------------------------------------------------------------------
+    # pange — UTF-8 encode (mori deferred)
+    # -----------------------------------------------------------------------
+    fac {
+        fixum octeti raw ← chorda.pange("Salve")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        fixum octeti raw ← chorda.pange("")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        fixum octeti raw ← chorda.pange("π ≈ 3.14")
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    # -----------------------------------------------------------------------
+    # solve — UTF-8 decode (mori deferred)
+    # -----------------------------------------------------------------------
+    fac {
+        fixum textus decoded ← chorda.solve(|68 65 6c 6c 6f|)
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        fixum textus decoded ← chorda.solve(|ce bb|)
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    # -----------------------------------------------------------------------
+    # tempta — try UTF-8 decode (mori deferred)
+    # -----------------------------------------------------------------------
+    fac {
+        fixum textus ∪ nihil decoded ← chorda.tempta(|68 65 6c 6c 6f|)
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+
+    fac {
+        fixum textus ∪ nihil decoded ← chorda.tempta(|ff fe|)
+        adfirma falsum
+    }
+    cape err {
+        nota err
+    }
+}
