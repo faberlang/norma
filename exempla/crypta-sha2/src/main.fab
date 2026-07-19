@@ -2,16 +2,11 @@ importa ex "norma:crypta" privata crypta
 
 # Native Faber SHA-2 proof package.
 #
-# Exercises the public norma:crypta.digere surface against pinned NIST
-# known-answer vectors for SHA-256, SHA-384, and SHA-512 (empty and "abc").
-# digere is failable (⇥ textus), so every call runs inside a fac/cape handler.
-#
-# NOTE: this package cannot compile until the pre-existing gemina codegen gap
-# is resolved — importing norma:crypta lowers every function in the module,
-# including the still-deferred `gemina -> ParClavium` (implendum return), which
-# Radix renders as an invalid `dyn ParClavium` by-value return. That gap is
-# Radix scope (see commit message) and is unrelated to the SHA-2 engines, which
-# are proven byte-for-byte against NIST vectors.
+# Exercises the public norma:crypta.digere surface against pinned NIST FIPS 180-4
+# known-answer vectors for SHA-256, SHA-384, and SHA-512: empty input, "abc",
+# an embedded-zero input, and SHA-256/SHA-512 padding-boundary inputs that force
+# a second block. digere is failable (⇥ textus), so every call runs inside a
+# fac/cape handler.
 
 functio expect(octeti got, octeti want, textus label) → vacuum ⇥ textus {
     si got.longitudo() ≠ want.longitudo() ergo iace "§: wrong length"(label)
@@ -22,23 +17,38 @@ functio expect(octeti got, octeti want, textus label) → vacuum ⇥ textus {
     }
 }
 
+functio _repete(numerus n, numerus<u8> b) → octeti {
+    varia lista<numerus<u8>> out ← vacua
+    itera ab 0‥n fixum i {
+        out.appende(b)
+    }
+    fixum octeti result ← out
+    redde result
+}
+
 incipit {
     fac {
         fixum octeti abc ← |61 62 63|
         fixum lista<numerus<u8>> empty_bytes ← vacua
         fixum octeti empty ← empty_bytes
+        fixum octeti zeros ← |61 00 62 00 63|
 
         # SHA-256
         expect(crypta.digere("sha256", abc), |ba 78 16 bf 8f 01 cf ea 41 41 40 de 5d ae 22 23 b0 03 61 a3 96 17 7a 9c b4 10 ff 61 f2 00 15 ad|, "sha256 abc")
         expect(crypta.digere("sha256", empty), |e3 b0 c4 42 98 fc 1c 14 9a fb f4 c8 99 6f b9 24 27 ae 41 e4 64 9b 93 4c a4 95 99 1b 78 52 b8 55|, "sha256 empty")
+        expect(crypta.digere("sha256", zeros), |8b ad de 10 c7 60 e9 b7 02 de fb 4b 5e 22 5d e7 9c 51 5b 1d 2a 5c fb 00 0e 14 0f 3c 6f bb 56 29|, "sha256 embedded-zero")
+        expect(crypta.digere("sha256", _repete(55, 0x61 ∷ numerus<u8>)), |9f 43 90 f8 d3 0c 2d d9 2e c9 f0 95 b6 5e 2b 9a e9 b0 a9 25 a5 25 8e 24 1c 9f 1e 91 0f 73 43 18|, "sha256 padding-boundary 55")
 
-        # SHA-384
+        # SHA-384 (shared SHA-512-family engine, distinct IV, 48-byte truncation)
         expect(crypta.digere("sha384", abc), |cb 00 75 3f 45 a3 5e 8b b5 a0 3d 69 9a c6 50 07 27 2c 32 ab 0e de d1 63 1a 8b 60 5a 43 ff 5b ed 80 86 07 2b a1 e7 cc 23 58 ba ec a1 34 c8 25 a7|, "sha384 abc")
         expect(crypta.digere("sha384", empty), |38 b0 60 a7 51 ac 96 38 4c d9 32 7e b1 b1 e3 6a 21 fd b7 11 14 be 07 43 4c 0c c7 bf 63 f6 e1 da 27 4e de bf e7 6f 65 fb d5 1a d2 f1 48 98 b9 5b|, "sha384 empty")
+        expect(crypta.digere("sha384", zeros), |d5 d5 72 a3 12 1f 3d 3b 74 97 32 02 2e 94 bc df bc 54 cb f4 5a 50 e2 73 5a 08 57 69 28 05 d6 bb fd 36 34 91 5b ef cd c5 80 d4 94 ba fc 11 00 ec|, "sha384 embedded-zero")
 
         # SHA-512
         expect(crypta.digere("sha512", abc), |dd af 35 a1 93 61 7a ba cc 41 73 49 ae 20 41 31 12 e6 fa 4e 89 a9 7e a2 0a 9e ee e6 4b 55 d3 9a 21 92 99 2a 27 4f c1 a8 36 ba 3c 23 a3 fe eb bd 45 4d 44 23 64 3c e8 0e 2a 9a c9 4f a5 4c a4 9f|, "sha512 abc")
         expect(crypta.digere("sha512", empty), |cf 83 e1 35 7e ef b8 bd f1 54 28 50 d6 6d 80 07 d6 20 e4 05 0b 57 15 dc 83 f4 a9 21 d3 6c e9 ce 47 d0 d1 3c 5d 85 f2 b0 ff 83 18 d2 87 7e ec 2f 63 b9 31 bd 47 41 7a 81 a5 38 32 7a f9 27 da 3e|, "sha512 empty")
+        expect(crypta.digere("sha512", zeros), |cf d2 52 bb cd e6 28 6a 9b 3f a6 3c 19 3e 29 e5 83 b5 c1 08 a3 9b 6b 52 77 2f c8 64 3d 0b c7 84 3a b6 8f 70 72 a8 d9 06 c6 32 76 1c cb 9e 74 8e bb ee b8 4e ca 02 57 2b 21 af 99 a7 31 a3 42 dc|, "sha512 embedded-zero")
+        expect(crypta.digere("sha512", _repete(111, 0x61 ∷ numerus<u8>)), |fa 91 21 c7 b3 2b 9e 01 73 3d 03 4c fc 78 cb f6 7f 92 6c 7e d8 3e 82 20 0e f8 68 18 19 69 21 76 0b 4b ef f4 84 04 df 81 1b 95 38 28 27 44 61 67 3c 68 d0 4e 29 7b 0e b7 b2 b4 d6 0f c6 b5 66 a2|, "sha512 padding-boundary 111")
 
         nota "crypta-sha2: all NIST vectors matched"
     }
