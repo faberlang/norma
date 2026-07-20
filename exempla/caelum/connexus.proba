@@ -8,7 +8,7 @@ probandum connexus_methods_exist {
     # Verify that Connexus has the expected methods by calling them
     # with appropriate types. In a real test, we'd need a running server
     # to connect to, but the compiler will catch signature errors.
-    
+
     # This is a compile-time check — if any method doesn't exist or has
     # the wrong signature, the compiler will report an error.
     nota "Connexus methods verified by compilation"
