@@ -4,9 +4,12 @@ importa ex "norma:crypta" privata crypta
 #
 # Exercises the public norma:crypta.digere surface against pinned NIST FIPS 180-4
 # known-answer vectors for SHA-256, SHA-384, and SHA-512: empty input, "abc",
-# an embedded-zero input, and SHA-256/SHA-512 padding-boundary inputs that force
-# a second block. digere is failable (⇥ textus), so every call runs inside a
-# fac/cape handler.
+# an embedded-zero input, SHA-256/SHA-512 padding-boundary inputs (maximum
+# single-block sizes: 55 bytes for SHA-256, 111 bytes for SHA-512),
+# SHA-384 padding-boundary (111 bytes), and multi-block vectors
+# (65 bytes SHA-256, 129 bytes SHA-384/512). digere is failable (⇥ textus),
+# and the package also exercises the API contract by rejecting invalid
+# algorithm names (empty, unknown, mixed-case, hyphenated).
 
 functio expect(octeti got, octeti want, textus label) → vacuum ⇥ textus {
     si got.longitudo() ≠ want.longitudo() ergo iace "§: wrong length"(label)
@@ -50,7 +53,42 @@ incipit {
         expect(crypta.digere("sha512", zeros), |cf d2 52 bb cd e6 28 6a 9b 3f a6 3c 19 3e 29 e5 83 b5 c1 08 a3 9b 6b 52 77 2f c8 64 3d 0b c7 84 3a b6 8f 70 72 a8 d9 06 c6 32 76 1c cb 9e 74 8e bb ee b8 4e ca 02 57 2b 21 af 99 a7 31 a3 42 dc|, "sha512 embedded-zero")
         expect(crypta.digere("sha512", _repete(111, 0x61 ∷ numerus<u8>)), |fa 91 21 c7 b3 2b 9e 01 73 3d 03 4c fc 78 cb f6 7f 92 6c 7e d8 3e 82 20 0e f8 68 18 19 69 21 76 0b 4b ef f4 84 04 df 81 1b 95 38 28 27 44 61 67 3c 68 d0 4e 29 7b 0e b7 b2 b4 d6 0f c6 b5 66 a2|, "sha512 padding-boundary 111")
 
+        # SHA-384 padding-boundary (111 bytes — maximum single-block for SHA-384/512 family)
+        expect(crypta.digere("sha384", _repete(111, 0x61 ∷ numerus<u8>)), |3c 37 95 50 51 cb 5c 30 26 f9 4d 55 1d 5b 5e 2a c3 8d 57 2a e4 e0 71 72 08 5f ed 81 f8 46 6b 8f 90 dc 23 a8 ff cd ea 0b 8d 8e 58 e8 fd ac c8 0a|, "sha384 padding-boundary 111")
+
+        # Multi-block vectors (minimum two blocks: 56+ bytes for SHA-256, 112+ bytes for SHA-384/512)
+        expect(crypta.digere("sha256", _repete(65, 0x61 ∷ numerus<u8>)), |63 53 61 c4 8b b9 ea b1 41 98 e7 6e a8 ab 7f 1a 41 68 5d 6a d6 2a a9 14 6d 30 1d 4f 17 eb 0a e0|, "sha256 multi-block 65×a")
+        expect(crypta.digere("sha384", _repete(129, 0x61 ∷ numerus<u8>)), |39 b6 f5 a7 b0 e7 81 db c4 19 f7 2e 49 b3 0e aa c1 0f 2c 98 c4 40 3b c6 10 da 31 06 7f d1 b4 8f 32 41 38 c8 61 5d 2b 49 6d 08 d7 3d 5e 86 53 26|, "sha384 multi-block 129×a")
+        expect(crypta.digere("sha512", _repete(129, 0x61 ∷ numerus<u8>)), |4f 68 1e 0b d5 3c da 4b 5a 20 41 cc 8a 06 f2 ea bd e4 4f b1 6c 95 1f bd 5b 87 70 2f 07 ae ab 61 15 65 b1 9c 47 fd e3 05 87 17 7e bb 85 2e 39 71 bb d8 d3 fd 30 da 18 d7 10 37 df bd 98 42 04 29|, "sha512 multi-block 129×a")
+
         nota "crypta-sha2: all NIST vectors matched"
+    }
+    cape err {
+        mone err
+    }
+
+    # API contract — invalid algorithm names must fail with the exact error text
+    fixum textus ALG_ERROR ← "norma:crypta.digere: algorithm must be sha256, sha384, or sha512"
+
+    varia lista<textus> failed ← vacua
+    itera ex ["", "md5", "SHA256", "Sha384", "sha-256"] fixum alg {
+        fac {
+            fixum octeti result ← crypta.digere(alg, |61 62 63|)
+            failed.appende(alg)
+        }
+        cape err {
+            adfirma err ≡ ALG_ERROR
+        }
+    }
+
+    fac {
+        si failed.nonvacua() ergo {
+            varia textus msg ← "crypta-sha2: algorithm rejection missed these names: "
+            itera ex failed fixum name {
+                msg ← msg + name + " "
+            }
+            iace msg
+        }
     }
     cape err {
         mone err
