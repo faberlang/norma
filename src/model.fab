@@ -163,6 +163,83 @@ functio _productum(lista<numerus> figura) → numerus {
     redde product
 }
 
+# Absolute offset to the data section (header length bytes + 8-byte u64 prefix).
+@ privata
+functio _offsetes_absoluti(octeti data) → numerus ⇥ textus {
+    fixum numerus header_len ← _u64le_primus(data)
+    redde 8 + header_len
+}
+
+# Compute 2^n via repeated multiplication/division.
+# n range: [-127, 128] — matches F32 IEEE 754 exponent span.
+@ privata
+functio _potentia_duorum(numerus n) → fractus {
+    varia fractus result ← 1.0
+    si n ≥ 0 {
+        varia numerus i ← 0
+        dum i < n {
+            result ← result * 2.0
+            i ← i + 1
+        }
+    } secus {
+        varia numerus i ← n
+        dum i < 0 {
+            result ← result / 2.0
+            i ← i + 1
+        }
+    }
+    redde result
+}
+
+# Decode 4 little-endian bytes at `offset` as IEEE 754 binary32 (f32).
+# Uses manual bit-field extraction + _potentia_duorum because `numerus ↦ f32`
+# is a value conversion (Rust `as f64`), not bit reinterpretation.
+@ privata
+functio _f32le_quattuor(octeti data, numerus offset) → f32 {
+    fixum numerus b0 ← _byte_at(data, offset)
+    fixum numerus b1 ← _byte_at(data, offset + 1)
+    fixum numerus b2 ← _byte_at(data, offset + 2)
+    fixum numerus b3 ← _byte_at(data, offset + 3)
+
+    # Little-endian u32 combination
+    fixum numerus raw ← (b3 * 16777216) + (b2 * 65536) + (b1 * 256) + b0
+
+    # IEEE 754 field extraction via integer division/remainder
+    fixum numerus sign_bit ← raw / 2147483648
+    fixum numerus exponent ← (raw / 8388608) % 256
+    fixum numerus mantissa ← raw % 8388608
+
+    varia fractus sign ← 1.0
+    si sign_bit ≠ 0 {
+        sign ← -1.0
+    }
+
+    fixum fractus mantissa_fraction ← (mantissa ↦ fractus) / 8388608.0
+
+    si exponent ≡ 0 {
+        si mantissa ≡ 0 {
+            redde 0.0 ∷ f32
+        }
+        # Subnormal: (-1)^s × 2^(-126) × m / 2^23
+        fixum fractus power ← _potentia_duorum(0 - 126)
+        redde (sign * power * mantissa_fraction) ↦ f32
+    }
+
+    si exponent ≡ 255 {
+        si mantissa ≡ 0 {
+            # Infinity: overflow f32 via large f64 → narrowing
+            fixum fractus power ← _potentia_duorum(128)
+            redde (sign * power * 2.0) ↦ f32
+        }
+        # NaN — v1 fallback
+        redde 0.0 ∷ f32
+    }
+
+    # Normal: (-1)^s × 2^(e-127) × (1 + m / 2^23)
+    fixum fractus power ← _potentia_duorum(exponent - 127)
+    redde (sign * power * (1.0 + mantissa_fraction)) ↦ f32
+}
+
 @ privata
 functio _estimated_tensor_bytes(lista<MetadataTensor> tensors) → numerus {
     varia numerus total ← 0
@@ -775,6 +852,42 @@ functio tempta_gguf_summarium(textus alias, textus source, textus local_path, te
     }
 }
 
+# Decode F32 little-endian tensor payload from a safetensors byte buffer.
+# Validates dtype, data_offsets, payload bounds, and element count.
+functio safetensors_tensor_f32(octeti data, MetadataTensor info) → lista<f32> ⇥ textus {
+    si info.dtype ≠ "F32" ergo iace "unsupported safetensors dtype for tensor decode: " + info.dtype + " (v1 supports F32 only)"
+    si info.data_offsets.longitudo() < 2 ergo iace "missing safetensors data_offsets for tensor: §"(info.nomen)
+
+    fixum numerus data_start ← _offsetes_absoluti(data)
+    fixum numerus tensor_start ← data_start + info.data_offsets[0]
+    fixum numerus tensor_finish ← data_start + info.data_offsets[info.data_offsets.longitudo() - 1]
+    fixum numerus byte_count ← tensor_finish - tensor_start
+
+    si data.longitudo() < tensor_finish ergo iace "safetensors payload truncated: data length §"(data.longitudo()) + " < required §"(tensor_finish) + " for tensor " + info.nomen
+
+    fixum numerus expected_elements ← info.parameter_count
+    fixum numerus actual_elements ← byte_count / 4
+    si actual_elements ≠ expected_elements ergo iace "safetensors element count mismatch for " + info.nomen + ": data_offsets span implies §"(actual_elements) + " elements (§"(byte_count) + " bytes), header declares §"(expected_elements)
+
+    varia lista<f32> result ← vacua
+    varia numerus offset ← tensor_start
+    dum offset < tensor_finish {
+        result.appende(_f32le_quattuor(data, offset))
+        offset ← offset + 4
+    }
+    redde result
+}
+
+# Non-throwing variant: returns ⇥ nihil on error instead of ⇥ throwing.
+functio tempta_safetensors_tensor_f32(octeti data, MetadataTensor info) → lista<f32> ∪ nihil {
+    fac {
+        redde safetensors_tensor_f32(data, info)
+    }
+    cape err {
+        redde nihil
+    }
+}
+
 probandum "model metadata facade" {
     proba "classifies campaign alias formats" {
         adfirma formatum("missing-download", "sentence-transformers/all-MiniLM-L6-v2") ≡ "alias-missing"
@@ -941,6 +1054,108 @@ probandum "model metadata facade" {
         fac {
             fixum ModelSummary summary ← gguf_summarium("fixture", "fixture", "fixture.gguf", "", data, 24)
             adfirma summary.tensor_count ≡ 0
+        }
+        cape err {
+            adfirma falsum
+        }
+    }
+}
+
+probandum "safetensors tensor decode" {
+    proba "decodes F32 safetensors tensor payload" {
+        # safetensors file: one tensor "test" shape [2] F32 values [1.0, 2.0]
+        fixum octeti data ← |39 00 00 00 00 00 00 00 7b 22 74 65 73 74 22 3a 7b 22 64 74 79 70 65 22 3a 22 46 33 32 22 2c 22 73 68 61 70 65 22 3a 5b 32 5d 2c 22 64 61 74 61 5f 6f 66 66 73 65 74 73 22 3a 5b 30 2c 38 5d 7d 7d 00 00 80 3f 00 00 00 40|
+        fac {
+            fixum ModelSummary summary ← safetensors_summarium("fixture", "fixture", "fixture.safetensors", data)
+            fixum lista<MetadataTensor> tensors ← summary.tensors
+            fixum MetadataTensor info ← tensors[0]
+            fixum lista<f32> result ← safetensors_tensor_f32(data, info)
+            adfirma result.longitudo() ≡ 2
+            adfirma (result[0] ↦ fractus) ≡ 1.0
+            adfirma (result[1] ↦ fractus) ≡ 2.0
+        }
+        cape err {
+            adfirma falsum
+        }
+    }
+
+    proba "rejects non-F32 safetensors dtype" {
+        # dtype "I64" instead of "F32"
+        fixum octeti data ← |3a 00 00 00 00 00 00 00 7b 22 74 65 73 74 22 3a 7b 22 64 74 79 70 65 22 3a 22 49 36 34 22 2c 22 73 68 61 70 65 22 3a 5b 32 5d 2c 22 64 61 74 61 5f 6f 66 66 73 65 74 73 22 3a 5b 30 2c 31 36 5d 7d 7d 01 00 00 00 00 00 00 00 02 00 00 00 00 00 00 00|
+        fac {
+            fixum ModelSummary summary ← safetensors_summarium("fixture", "fixture", "fixture.safetensors", data)
+            fixum MetadataTensor info ← summary.tensors[0]
+            fixum lista<f32> _ ← safetensors_tensor_f32(data, info)
+            adfirma falsum
+        }
+        cape err {
+            adfirma err.continet("unsupported safetensors dtype")
+            adfirma err.continet("I64")
+        }
+    }
+
+    proba "rejects data_offsets offset overrun" {
+        # data_offsets [0, 100] claims 100 bytes past data section start but only 8 exist
+        fixum octeti data ← |3b 00 00 00 00 00 00 00 7b 22 74 65 73 74 22 3a 7b 22 64 74 79 70 65 22 3a 22 46 33 32 22 2c 22 73 68 61 70 65 22 3a 5b 32 5d 2c 22 64 61 74 61 5f 6f 66 66 73 65 74 73 22 3a 5b 30 2c 31 30 30 5d 7d 7d 00 00 80 3f 00 00 00 40|
+        fac {
+            fixum ModelSummary summary ← safetensors_summarium("fixture", "fixture", "fixture.safetensors", data)
+            fixum MetadataTensor info ← summary.tensors[0]
+            fixum lista<f32> _ ← safetensors_tensor_f32(data, info)
+            adfirma falsum
+        }
+        cape err {
+            adfirma err.continet("payload truncated")
+        }
+    }
+
+    proba "rejects truncated safetensors payload" {
+        # data_offsets [0, 12] but only 8 bytes of payload exist
+        fixum octeti data ← |3a 00 00 00 00 00 00 00 7b 22 74 65 73 74 22 3a 7b 22 64 74 79 70 65 22 3a 22 46 33 32 22 2c 22 73 68 61 70 65 22 3a 5b 32 5d 2c 22 64 61 74 61 5f 6f 66 66 73 65 74 73 22 3a 5b 30 2c 31 32 5d 7d 7d 00 00 80 3f 00 00 00 40|
+        fac {
+            fixum ModelSummary summary ← safetensors_summarium("fixture", "fixture", "fixture.safetensors", data)
+            fixum MetadataTensor info ← summary.tensors[0]
+            fixum lista<f32> _ ← safetensors_tensor_f32(data, info)
+            adfirma falsum
+        }
+        cape err {
+            adfirma err.continet("payload truncated")
+        }
+    }
+
+    proba "rejects safetensors element count mismatch" {
+        # shape [3] → 3 elements expected, but data_offsets span 8 bytes = 2 elements
+        fixum octeti data ← |39 00 00 00 00 00 00 00 7b 22 74 65 73 74 22 3a 7b 22 64 74 79 70 65 22 3a 22 46 33 32 22 2c 22 73 68 61 70 65 22 3a 5b 33 5d 2c 22 64 61 74 61 5f 6f 66 66 73 65 74 73 22 3a 5b 30 2c 38 5d 7d 7d 00 00 80 3f 00 00 00 40|
+        fac {
+            fixum ModelSummary summary ← safetensors_summarium("fixture", "fixture", "fixture.safetensors", data)
+            fixum MetadataTensor info ← summary.tensors[0]
+            fixum lista<f32> _ ← safetensors_tensor_f32(data, info)
+            adfirma falsum
+        }
+        cape err {
+            adfirma err.continet("element count mismatch")
+        }
+    }
+
+    proba "tempta variant returns nihil on error and value on success" {
+        # Success case: valid F32 tensor
+        fixum octeti valid ← |39 00 00 00 00 00 00 00 7b 22 74 65 73 74 22 3a 7b 22 64 74 79 70 65 22 3a 22 46 33 32 22 2c 22 73 68 61 70 65 22 3a 5b 32 5d 2c 22 64 61 74 61 5f 6f 66 66 73 65 74 73 22 3a 5b 30 2c 38 5d 7d 7d 00 00 80 3f 00 00 00 40|
+        fac {
+            fixum ModelSummary summary ← safetensors_summarium("fixture", "fixture", "fixture.safetensors", valid)
+            fixum MetadataTensor info ← summary.tensors[0]
+            fixum lista<f32> ∪ nihil ok_result ← tempta_safetensors_tensor_f32(valid, info)
+            adfirma ok_result non est nihil
+        }
+        cape err {
+            adfirma falsum
+        }
+
+        # Error case: non-F32 dtype — should return nihil without throwing
+        fixum octeti bad ← |3a 00 00 00 00 00 00 00 7b 22 74 65 73 74 22 3a 7b 22 64 74 79 70 65 22 3a 22 49 36 34 22 2c 22 73 68 61 70 65 22 3a 5b 32 5d 2c 22 64 61 74 61 5f 6f 66 66 73 65 74 73 22 3a 5b 30 2c 31 36 5d 7d 7d 01 00 00 00 00 00 00 00 02 00 00 00 00 00 00 00|
+        fac {
+            fixum ModelSummary bad_summary ← safetensors_summarium("fixture", "fixture", "bad.safetensors", bad)
+            fixum MetadataTensor bad_info ← bad_summary.tensors[0]
+            fixum lista<f32> ∪ nihil fail_result ← tempta_safetensors_tensor_f32(bad, bad_info)
+            adfirma fail_result est nihil
         }
         cape err {
             adfirma falsum
