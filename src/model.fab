@@ -195,7 +195,7 @@ functio _potentia_duorum(numerus n) → fractus {
 # Uses manual bit-field extraction + _potentia_duorum because `numerus ↦ f32`
 # is a value conversion (Rust `as f64`), not bit reinterpretation.
 @ privata
-functio _f32le_quattuor(octeti data, numerus offset) → f32 {
+functio _f32le_quattuor(octeti data, numerus offset) → f32 ⇥ textus {
     fixum numerus b0 ← _byte_at(data, offset)
     fixum numerus b1 ← _byte_at(data, offset + 1)
     fixum numerus b2 ← _byte_at(data, offset + 2)
@@ -231,8 +231,8 @@ functio _f32le_quattuor(octeti data, numerus offset) → f32 {
             fixum fractus power ← _potentia_duorum(128)
             redde (sign * power * 2.0) ↦ f32
         }
-        # NaN — v1 fallback
-        redde 0.0 ∷ f32
+        # NaN — reject fail-closed
+        iace "safetensors NaN value at offset §"(offset)
     }
 
     # Normal: (-1)^s × 2^(e-127) × (1 + m / 2^23)
@@ -1191,5 +1191,39 @@ probandum "safetensors tensor decode" {
 
 
 
+
+    proba "decodes safetensors edge values: 0.0, -1.0, 0.5, 1e30, inf" {
+        # shape [5] tensor with values [0.0, -1.0, 0.5, 1e30, +inf]
+        fixum octeti data ← |3a 00 00 00 00 00 00 00 7b 22 74 65 73 74 22 3a 7b 22 64 74 79 70 65 22 3a 22 46 33 32 22 2c 22 73 68 61 70 65 22 3a 5b 35 5d 2c 22 64 61 74 61 5f 6f 66 66 73 65 74 73 22 3a 5b 30 2c 32 30 5d 7d 7d 00 00 00 00 00 00 80 bf 00 00 00 3f ca f2 49 71 00 00 80 7f|
+        fac {
+            fixum ModelSummary summary ← safetensors_summarium("fixture", "fixture", "fixture.safetensors", data)
+            fixum MetadataTensor info ← summary.tensors[0]
+            fixum lista<f32> result ← safetensors_tensor_f32(data, info)
+            adfirma result.longitudo() ≡ 5
+            adfirma (result[0] ↦ fractus) ≡ 0.0
+            adfirma (result[1] ↦ fractus) ≡ (-1.0)
+            adfirma (result[2] ↦ fractus) ≡ 0.5
+            adfirma (result[3] ↦ fractus) > 1e29
+            adfirma (result[3] ↦ fractus) < 1e31
+            adfirma (result[4] ↦ fractus) > 1e30
+        }
+        cape err {
+            adfirma falsum
+        }
+    }
+
+    proba "rejects safetensors NaN payload" {
+        # shape [1] tensor with quiet NaN bit pattern 0x7fc00000
+        fixum octeti data ← |39 00 00 00 00 00 00 00 7b 22 74 65 73 74 22 3a 7b 22 64 74 79 70 65 22 3a 22 46 33 32 22 2c 22 73 68 61 70 65 22 3a 5b 31 5d 2c 22 64 61 74 61 5f 6f 66 66 73 65 74 73 22 3a 5b 30 2c 34 5d 7d 7d 00 00 c0 7f|
+        fac {
+            fixum ModelSummary summary ← safetensors_summarium("fixture", "fixture", "fixture.safetensors", data)
+            fixum MetadataTensor info ← summary.tensors[0]
+            fixum lista<f32> _ ← safetensors_tensor_f32(data, info)
+            adfirma falsum
+        }
+        cape err {
+            adfirma err.continet("NaN")
+        }
+    }
 
 }
