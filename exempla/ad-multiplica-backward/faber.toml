@@ -8,5 +8,5 @@ source = "src"
 entry = "main.fab"
 
 [build]
-target = "rust"
+target = "llvm-text"
 kind = "bin"
