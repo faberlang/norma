@@ -1,0 +1,21 @@
+# Exemplum: ad-multiplica-backward
+#
+# Same-shape elementwise multiply with AIR lane backward annotation.
+# Compiling this exemplum emits both the primal `multiplica` function
+# and its backward companion (`__faber_grad_v1_multiplica_backward`).
+#
+# The backward function provides the gradient rule for elementwise
+# multiplication, used by the autograd pipeline.
+
+@ radix lane "air"
+@ radix backward "multiplica_backward"
+functio multiplica(tf32[2] a, tf32[2] b) → tf32[2] {
+    redde a.multiplica(b)
+}
+
+incipit {
+    fixum tf32[2] left ← vacua
+    fixum tf32[2] right ← vacua
+    fixum tf32[2] product ← multiplica(left, right)
+    nota product.longitudo()
+}
