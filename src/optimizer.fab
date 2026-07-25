@@ -1,0 +1,24 @@
+# optimizer.fab — minimal SGD optimizer step
+#
+# Public import: importa ex "norma:optimizer" privata optimizer
+#
+# Phase 1: single-tensor SGD update only.
+# SGD update: param -= lr * grad   (same-shape tensors, elementwise).
+# Residual: generalize beyond fractus element type when generic numeric
+# constraints are available.
+
+# -------------------------------------------------------------------------
+# SGD step (single tensor)
+# -------------------------------------------------------------------------
+
+functio sgd_step<magnitudo Figura>(
+    tensor<fractus, Figura> param,
+    tensor<fractus, Figura> grad,
+    fractus lr
+) → tensor<fractus, Figura> {
+    fixum lista<numerus> shape ← param.magnitudines()
+    fixum tensor<fractus, []> seed ← vacua
+    fixum tensor<fractus, Figura> lr_fill ← seed.crea(lr, shape)
+    fixum tensor<fractus, Figura> scaled ← grad.multiplica(lr_fill)
+    redde param.subtrahe(scaled)
+}
