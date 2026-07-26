@@ -8,5 +8,5 @@ source = "src"
 entry = "main.fab"
 
 [build]
-target = "llvm-text"
+target = "fmir-text"
 kind = "bin"
