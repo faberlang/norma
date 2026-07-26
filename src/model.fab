@@ -3,6 +3,8 @@
 # Public import: importa ex "norma:model" privata model
 #
 # Stage 1 facade only. Binary safetensors/GGUF parsing belongs to small parser
+
+importa ex "norma:tensor" privata tensor
 # floors; this module owns the reusable summary records and fail-closed
 # classification helpers used by application packages.
 #
@@ -1182,6 +1184,12 @@ probandum "safetensors tensor decode" {
             adfirma (first ↦ fractus) ≠ 0.0
             fixum f32 last ← flat[16383]
             adfirma (last ↦ fractus) ≠ 0.0
+
+            # Static shape bridge: construct tensor<f32, [128, 128]> from flat lista.
+            fixum tensor<f32, [128, 128]> grid ← tensor.structa<tensor<f32, [128, 128]>>(flat)
+            adfirma grid.magnitudines() ≡ [128, 128]
+            fixum lista<f32> flat_back ← tensor.planata(grid)
+            adfirma flat_back[0] ≡ first
         }
         cape err {
             adfirma falsum
