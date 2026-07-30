@@ -1,18 +1,12 @@
 # json/solve.fab — JSON parse facade
 #
-# The compiler/runtime-owned formal `json` conversio is the single codec
-# authority. This module exists so direct `norma:json/solve` imports share the
-# same path as the top-level `norma:json.solve` facade.
+# Direct `norma:json/solve` facade. The compiler rejects direct
+# `textus ↦ json`; the runtime-backed codec belongs behind this Norma API.
 
 functio solve(textus wire) → json ⇥ textus {
-    redde wire ↦ json
+    iace "norma:json.solve is deferred pending runtime codec dispatch"
 }
 
 functio tempta(textus wire) → json ∪ nihil {
-    fac {
-        redde solve(wire)
-    }
-    cape err {
-        redde nihil
-    }
+    redde nihil
 }

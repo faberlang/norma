@@ -3,8 +3,8 @@
 # Etymology: "JSON" — JavaScript Object Notation (universal, kept as-is).
 #
 # Wire floor only: solve (text → json), pange (json → text), tempta
-# (lenient parse). The compiler/runtime-owned formal `json` conversio is the
-# single codec authority; this module is only a public naming facade.
+# (lenient parse). The compiler rejects direct `textus ↦ json` / `json ↦ textus`
+# conversions; the runtime-backed codec belongs behind this public Norma facade.
 #
 # No valor navigation surface here — that is codec-agnostic and lives in
 # norma:valor.
@@ -16,7 +16,7 @@
 # Why: Composing/fastening data into JSON text representation.
 
 functio pange(json documentum) → textus {
-    redde documentum ↦ textus
+    mori "norma:json.pange is deferred pending runtime codec dispatch"
 }
 
 # =========================================================================
@@ -26,17 +26,12 @@ functio pange(json documentum) → textus {
 # Why: Untangling/extracting data from JSON text.
 
 functio solve(textus wire) → json ⇥ textus {
-    redde wire ↦ json
+    iace "norma:json.solve is deferred pending runtime codec dispatch"
 }
 
 # Verb: tempta from "temptare" (to try, attempt)
 # Why: Attempting to parse, returning null on failure instead of throwing.
 
 functio tempta(textus wire) → json ∪ nihil {
-    fac {
-        redde solve(wire)
-    }
-    cape err {
-        redde nihil
-    }
+    redde nihil
 }
