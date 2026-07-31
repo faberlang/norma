@@ -1,0 +1,21 @@
+# Colocated stdlib test source for mathesis (public catalog).
+# Not importable; discovered only by the faber test path (`include_proba`).
+importa ex "./mathesis" privata mathesis
+
+functio sum_pi(fractus x) → fractus {
+    redde mathesis.addita(mathesis.PI(), x)
+}
+
+probandum "mathesis catalog" {
+    proba "PI is positive" {
+        adfirma mathesis.PI() > 0.0
+    }
+
+    proba "addita composes with PI helper" {
+        adfirma sum_pi(0.0) ≡ mathesis.PI()
+    }
+
+    proba "addita is commutative on unit" {
+        adfirma mathesis.addita(1.0, 2.0) ≡ mathesis.addita(2.0, 1.0)
+    }
+}

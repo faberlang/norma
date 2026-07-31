@@ -10,12 +10,15 @@ if [[ ! -d "$SRC" ]]; then
   exit 1
 fi
 
+# Interface root allows product `*.fab` and test-only `*.proba` (never published
+# as package interface surface — cista install copies `*.fab` only). Any other
+# non-interface file under src/ is rejected so the snapshot stays clean.
 while IFS= read -r -d '' file; do
   rel="${file#$SRC/}"
   echo "check-source: non-interface file under src/: $rel" >&2
-  echo "check-source: cista snapshots src/ as the package interface root; move docs/tests outside src/" >&2
+  echo "check-source: cista snapshots src/ as the package interface root; keep only *.fab (product) and *.proba (test-only)" >&2
   status=1
-done < <(find "$SRC" -type d -name target -prune -o -type f ! -name '*.fab' -print0)
+done < <(find "$SRC" -type d -name target -prune -o -type f ! -name '*.fab' ! -name '*.proba' -print0)
 
 while IFS= read -r -d '' file; do
   if grep -nE '^[[:space:]]*//' "$file"; then
@@ -37,7 +40,7 @@ while IFS= read -r -d '' file; do
     echo "check-source: route calls must use canonical string route syntax in $file" >&2
     status=1
   fi
-done < <(find "$SRC" -name '*.fab' -print0)
+done < <(find "$SRC" \( -name '*.fab' -o -name '*.proba' \) -print0)
 
 "$ROOT/scripta/check-promoted-helper-imports" || status=1
 "$ROOT/scripta/check-generated-output" || status=1

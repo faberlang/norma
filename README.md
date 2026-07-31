@@ -21,9 +21,11 @@ faberlang/
 ```
 
 This repo owns backend-agnostic Faber source. `src/` is the package interface
-root and is intentionally `.fab`-only. `src/**/*.fab` must not use `@ externa`
-or `@ subsidia`; native Faber bodies, codegen templates, `ad` calls, and
-explicit `mori` deferrals are the supported design.
+root for product `*.fab` modules; colocated `*.proba` test sources are allowed
+as test-only (discovered by `faber test`, never importable, not published by
+cista install). `src/**/*.fab` must not use `@ externa` or `@ subsidia`; native
+Faber bodies, codegen templates, `ad` calls, and explicit `mori` deferrals are
+the supported design.
 
 There is no residual Rust `crates/norma` in the private Radix workspace. Generated
 Rust packages depend on sibling **`faber-runtime`** (`use faber::…`), not on a
@@ -51,11 +53,13 @@ cargo run -p cista -- install \
   --store "${CISTAE_HOME:-$HOME/.faber/cistae}"
 ```
 
-That snapshots `src/` to `$CISTAE_HOME/norma/<version>/interfaces/` (interfaces-
-only; no `libnorma.rlib`). Because the interface root is copied as a directory,
-`./scripta/check-source` fails on non-`.fab` files under `src/`; docs, examples,
-and tests live outside the package interface root. Dev still uses
-`FABER_LIBRARY_HOME` until tooling consumes packaged paths.
+That snapshots product `*.fab` under `src/` to
+`$CISTAE_HOME/norma/<version>/interfaces/` (interfaces-only; no `libnorma.rlib`;
+`*.proba` test sources are excluded from the snapshot). `./scripta/check-source`
+allows `*.fab` and test-only `*.proba` under `src/`, and fails on other non-
+interface files; docs and instructional exempla stay outside the package
+interface root. Dev still uses `FABER_LIBRARY_HOME` until tooling consumes
+packaged paths.
 
 ## Checks
 
