@@ -6,6 +6,7 @@ canonical = false
 summary = "norma:vector pending placeholder calls are rejected before runtime."
 syntax = "norma:vector — crea | shuffle rejected until implemented"
 related = ["vector", "stdlib-nativum"]
+locale = "la"
 +++
 
 

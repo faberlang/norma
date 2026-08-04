@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # vector.fab — compiler-owned vector register intrinsics
 #
 # Public import: importa ex "norma:vector" privata vector

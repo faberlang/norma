@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # caelum.fab - Network Socket Device (TCP/UDP)
 #
 # Public import: importa ex "norma:caelum" privata caelum

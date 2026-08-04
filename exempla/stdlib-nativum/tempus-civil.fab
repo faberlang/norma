@@ -6,6 +6,7 @@ canonical = false
 summary = "norma:tempus wire catalog, civil projection, strict structa."
 syntax = "norma:tempus — solve | exprimit | annus | structa"
 related = ["instans", "stdlib-nativum", "tempus"]
+locale = "la"
 +++
 # stdlib-nativum/tempus-civil — norma:tempus wire + civil surface
 #

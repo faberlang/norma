@@ -6,6 +6,7 @@ canonical = false
 summary = "norma:codex encoding/decoding API contract tests."
 syntax = "norma:codex — base64 | hex | url (all mori deferred)"
 related = ["codex", "stdlib-nativum"]
+locale = "la"
 +++
 
 # stdlib-nativum/codex — norma:codex encoding/decoding API contract tests

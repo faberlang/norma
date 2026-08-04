@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # mathesis.fab — native Faber scalar math catalog
 #
 # Public import: importa ex "norma:mathesis" privata mathesis

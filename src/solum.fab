@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # solum.fab - File System Device
 #
 # Etymology: "solum" - ground, floor, base. Local/ground I/O (vs caelum/sky/network).

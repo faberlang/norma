@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # nuncius.fab - Inter-Process Communication Device
 #
 # Etymology: "nuncius" - messenger, envoy. Communication between processes.

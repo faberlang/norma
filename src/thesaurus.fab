@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # thesaurus.fab - Cache and Pub/Sub Device
 #
 # Etymology: "thesaurus" - treasury, storehouse. A cache of values.

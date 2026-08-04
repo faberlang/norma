@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # yaml.fab — YAML wire floor facade
 #
 # Etymology: "YAML" — YAML Ain't Markup Language (universal, kept as-is).

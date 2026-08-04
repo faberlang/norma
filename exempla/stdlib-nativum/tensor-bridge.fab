@@ -6,6 +6,7 @@ canonical = true
 summary = "norma:tensor bridge catalog — planata, structa, creata, productum."
 syntax = "norma:tensor — planata | structa | creata | productum"
 related = ["tensor", "lista"]
+locale = "la"
 +++
 
 

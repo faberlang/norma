@@ -6,6 +6,7 @@ canonical = false
 summary = "Type-only stdlib file import through file namespace binding."
 syntax = "importa ex \"norma:caelum/terminus\" privata terminus"
 related = ["caelum", "stdlib-nativum", "imports"]
+locale = "la"
 +++
 
 

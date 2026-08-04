@@ -6,6 +6,7 @@ canonical = false
 summary = "norma:aleator entropy API contract tests."
 syntax = "norma:aleator — fractum | sortire | octetos | uuid | semina (all ad-routed)"
 related = ["aleator", "stdlib-nativum"]
+locale = "la"
 +++
 
 # stdlib-nativum/aleator — norma:aleator entropy API contract tests

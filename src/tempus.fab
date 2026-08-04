@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # tempus.fab — public Faber datetime library (native Faber catalog)
 #
 # Public import: importa ex "norma:tempus" privata tempus

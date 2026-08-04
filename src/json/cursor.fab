@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # json/cursor.fab — parser cursor type
 #
 # Position-threading genus for the recursive-descent parser in solve.fab.

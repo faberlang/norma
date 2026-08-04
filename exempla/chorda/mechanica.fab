@@ -6,6 +6,7 @@ canonical = false
 summary = "Assertion-based tests for chorda UTF-8 mechanical trio: pange, solve, tempta."
 syntax = "pange | solve | tempta"
 related = ["chorda", "textus", "octeti", "stdlib-nativum"]
+locale = "la"
 +++
 
 # chorda/mechanica — UTF-8 mechanical trio contract tests

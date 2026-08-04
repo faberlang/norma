@@ -6,6 +6,7 @@ canonical = false
 summary = "norma:solum filesystem API contract tests."
 syntax = "norma:solum — explora (native) | describe (mori) | path api"
 related = ["solum", "stdlib-nativum"]
+locale = "la"
 +++
 
 # stdlib-nativum/solum — norma:solum filesystem API contract tests

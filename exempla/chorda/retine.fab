@@ -6,6 +6,7 @@ canonical = false
 summary = "Predicate and interval cord filtering."
 syntax = "retenta_iudicio(<cord>, <predicate>) | retenta(<cord>, <lo>, <hi>) | expurgata(<cord>, <lo>, <hi>)"
 related = ["chorda", "textus"]
+locale = "la"
 +++
 # chorda/retenta — predicate and interval cord filtering
 #

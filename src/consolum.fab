@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # consolum.fab - Console Device (stdin/stdout/stderr)
 #
 # Etymology: "consolum" from "con-" (together) + "solum" (base/ground)

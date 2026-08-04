@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # valor.fab — codec-agnostic valor tree navigation
 #
 # Shared surface for the tree-shaped codecs under the flat codec modules (json, toml, yaml).

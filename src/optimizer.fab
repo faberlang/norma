@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # optimizer.fab — minimal SGD optimizer step
 #
 # Public import: importa ex "norma:optimizer" privata optimizer

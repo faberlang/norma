@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # model.fab — model metadata facade
 #
 # Public import: importa ex "norma:model" privata model

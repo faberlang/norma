@@ -6,6 +6,7 @@ canonical = false
 summary = "norma:consolum console I/O API contract tests."
 syntax = "norma:consolum — lege | scribe | mone | vide | audit (all ad-routed)"
 related = ["consolum", "stdlib-nativum"]
+locale = "la"
 +++
 
 # stdlib-nativum/consolum — norma:consolum console I/O API contract tests

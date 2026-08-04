@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # chorda.fab — public Faber text library (cord operations + mechanical verbs)
 #
 # Public import: importa ex "norma:chorda" privata chorda

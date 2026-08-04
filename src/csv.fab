@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # csv.fab — naive comma / Faber-literal-\n CSV wire helpers (native Faber leaf)
 #
 # Public import: importa ex "norma:csv" privata csv

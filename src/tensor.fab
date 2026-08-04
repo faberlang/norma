@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # tensor.fab — native Faber tensor bridge and recipe module
 #
 # Public import: importa ex "norma:tensor" privata tensor

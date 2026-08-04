@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # solum/path.fab — pure pathname operations
 #
 # Etymology: "path" is conventional English loanword for filesystem path

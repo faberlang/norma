@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # toml.fab — TOML wire floor facade
 #
 # Etymology: "TOML" — Tom's Obvious Minimal Language (universal, kept as-is).

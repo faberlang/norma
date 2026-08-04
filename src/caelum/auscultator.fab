@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # caelum/auscultator.fab — TCP listener
 #
 # Public import: importa ex "norma:caelum/auscultator" privata auscultator

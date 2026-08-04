@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # json.fab — JSON wire floor facade
 #
 # Etymology: "JSON" — JavaScript Object Notation (universal, kept as-is).

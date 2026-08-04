@@ -6,6 +6,7 @@ canonical = false
 summary = "Native stdlib chorda v1 subset: cord and UTF-8 mechanical trio."
 syntax = "norma:chorda — pange | solve | tempta"
 related = ["chorda", "stdlib-nativum", "textus"]
+locale = "la"
 +++
 
 

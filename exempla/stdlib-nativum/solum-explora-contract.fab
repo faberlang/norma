@@ -6,6 +6,7 @@ canonical = false
 summary = "Shallow glob contract on norma:solum."
 syntax = "solum.explora"
 related = ["solum", "stdlib-nativum", "DEFER-067"]
+locale = "la"
 +++
 
 # stdlib-nativum/solum-explora-contract — explora import smoke

@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # aleator.fab - Entropy Device (random number generation)
 #
 # Etymology: "aleator" - dice player, gambler. Games of chance.

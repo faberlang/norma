@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # json/pange.fab — JSON serialization facade
 #
 # The compiler/runtime-owned formal `json` conversio is the single codec

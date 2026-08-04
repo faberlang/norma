@@ -6,6 +6,7 @@ canonical = false
 summary = "Delimiter-leading document split into opaque metadata and corpus wires."
 syntax = "diducta(<documentum>, <delimiter>)"
 related = ["chorda", "toml", "textus"]
+locale = "la"
 +++
 # chorda/diducta — front-block document split
 #

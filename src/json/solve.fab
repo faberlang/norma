@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # json/solve.fab — JSON parse facade
 #
 # Direct `norma:json/solve` facade. The compiler rejects direct

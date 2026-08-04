@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # arca.fab — Database device (`norma:arca`)
 #
 # Etymology: arca — chest, strongbox, treasury. Where data is stored.

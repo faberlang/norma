@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # copula/fila.fab — double-ended queue (deque)
 #
 # Etymology: "fila" — thread, string, strand. A sequence drawn from either end.

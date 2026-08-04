@@ -1,3 +1,7 @@
++++
+locale = "la"
++++
+
 # caelum/connexus.fab — TCP socket (connected byte stream)
 #
 # Public import: importa ex "norma:caelum/connexus" privata connexus
