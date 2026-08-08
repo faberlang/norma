@@ -1190,9 +1190,10 @@ probandum "safetensors tensor decode" {
             adfirma (last ↦ fractus) ≠ 0.0
 
             # Static shape bridge: construct tensor<f32, [128, 128]> from flat lista.
-            fixum tensor<f32, [128, 128]> grid ← tensor.structa<tensor<f32, [128, 128]>>(flat)
+            fixum tf32[] seed ← vacua
+            fixum tensor<f32, [128, 128]> grid ← seed.strue(flat, [128, 128])
             adfirma grid.magnitudines() ≡ [128, 128]
-            fixum lista<f32> flat_back ← tensor.planata(grid)
+            fixum lista<f32> flat_back ← grid.planata()
             adfirma flat_back[0] ≡ first
         }
         cape err {
