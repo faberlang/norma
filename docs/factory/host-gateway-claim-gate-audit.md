@@ -72,7 +72,7 @@ yet enough to unblock public product claims by itself:
 | --- | --- | --- |
 | `host-kernel-rs` | README says it owns transport-neutral prefix routing and manifest validation, not OS effects or worker scheduling. Source validates manifest versions, prefixes, duplicate routes, and supported routes. | Needs export/run evidence tied to the released compiler and public contracts. |
 | `host-native-rs` | README says it owns bounded worker scheduling and the `faber::HostDispatch` adapter, not Norma implementations. | Needs integration evidence for package bootstrap and released host dispatch. |
-| `host-providers-rs` | Commit `bed50e5` records local manifest/dispatch coverage for `aleator` 5 routes, `consolum` 16, `processus` 9 provider-covered routes, `solum` 45, and `tempus` 4. `./scripta/audit-provider-route-claims` now verifies the same sibling-workspace route contract at the expected provider revision and requires the sibling checkout/index to be clean before accepting that pinned evidence: Norma source `ad` routes match provider manifests, and every manifest route appears in the matching Rust dispatch table. The script accepts a documented `--host-providers` override so the pinned claim can be checked against a separate clean evidence checkout when the live sibling tree is temporarily dirty. `processus:exi` is intentionally unmanifested and rejected until host exit has a protocol-visible terminal response. | Needs package/export linkage, public contract generation, and public example run evidence before support claims. |
+| `faberlang/hosts` (formerly `host-providers-rs`, relocated) | Commit `e066ee0` records local manifest/dispatch coverage for `aleator` 5 routes, `consolum` 16, `processus` 9 provider-covered routes, `solum` 45, and `tempus` 4. `faber script scripta/audit-provider-route-claims.fab` now verifies the same sibling-workspace route contract at the expected provider revision and requires the sibling checkout/index to be clean before accepting that pinned evidence: Norma source `ad` routes match provider manifests, and every manifest route appears in the matching Rust dispatch table. The script accepts a documented `--host-providers` override so the pinned claim can be checked against a separate clean evidence checkout when the live sibling tree is temporarily dirty. `processus:exi` is intentionally unmanifested and rejected until host exit has a protocol-visible terminal response. | Needs package/export linkage, public contract generation, and public example run evidence before support claims. |
 
 Notable gaps relative to public copy:
 
@@ -108,7 +108,6 @@ The validation expectation for this artifact is:
 ```sh
 git diff --check
 ./scripta/check-source
-./scripta/audit-provider-route-claims
-./scripta/audit-provider-route-claims --self-test
-python3 -m py_compile scripta/audit-provider-route-claims
+faber script scripta/audit-provider-route-claims.fab
+faber script scripta/audit-provider-route-claims.fab -- --self-test
 ```
