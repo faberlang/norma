@@ -67,8 +67,8 @@ incipit {
 
     fixum textus tick ← "\`".sectio(1, 2)
 
-    fixum lista<textus> promoted ← ["csv", "json", "json/pange", "json/solve", "json/cursor", "json/lexica", "model", "tensor", "valor", "vector", "chorda", "tempus", "solum/path"]
-    fixum lista<textus> parked ← ["fila", "ordinata", "mathesis"]
+    fixum lista<textus> promoted ← ["csv", "json", "json/solve", "json/cursor", "json/lexica", "model", "tensor", "valor", "vector", "chorda", "tempus", "solum/path"]
+    fixum lista<textus> parked ← ["fila", "ordinata", "mathesis", "json/pange"]
 
     itera ex promoted fixum module {
         si not (promoted_row.continet(tick + module + tick)) {
