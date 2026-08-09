@@ -1,0 +1,35 @@
++++
+locale = "en"
++++
+
+# check-generated-output — reject tracked `target/` output paths
+#
+# Native-Faber conversion of scripta/check-generated-output (bash):
+# runs `git ls-files` via captura, filters paths, and rejects committed
+# `target/` entries with the same exit semantics as the shell version
+# (exit 1 if any tracked path matches `target/*` or `*/target/*`, else 0).
+
+importa ex "faber:processus" privata processus
+importa ex "faber:consolum" privata consolum
+
+incipit {
+    fixum textus root ← processus.sedes() ↦ textus
+    fixum tabula<textus, valor> result ← processus.captura(["git", "-C", root, "ls-files"]) ↦ tabula<textus, valor>
+    fixum textus tracked ← result["stdout"] ↦ textus
+
+    varia numerus status ← 0
+    varia numerus pos ← 0
+    dum pos < tracked.longitudo() {
+        varia numerus end ← pos
+        dum end < tracked.longitudo() et tracked.sectio(end, end + 1) ≠ "\n" {
+            end ← end + 1
+        }
+        fixum textus file ← tracked.sectio(pos, end)
+        si file.initium("target/") aut file.continet("/target/") {
+            consolum.mone("check-generated-output: tracked generated output is not allowed: " + file)
+            status ← 1
+        }
+        pos ← end + 1
+    }
+    processus.exi(status)
+}

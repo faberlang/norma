@@ -3,6 +3,7 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SRC="$ROOT/src"
+FABER="${FABER:-$ROOT/../faber/target/debug/faber}"
 status=0
 
 if [[ ! -d "$SRC" ]]; then
@@ -42,7 +43,7 @@ while IFS= read -r -d '' file; do
   fi
 done < <(find "$SRC" \( -name '*.fab' -o -name '*.proba' \) -print0)
 
-"$ROOT/scripta/check-promoted-helper-imports" || status=1
-"$ROOT/scripta/check-generated-output" || status=1
+(cd "$ROOT" && "$FABER" script "$ROOT/scripta/check-promoted-helper-imports.fab") || status=1
+(cd "$ROOT" && "$FABER" script "$ROOT/scripta/check-generated-output.fab") || status=1
 
 exit "$status"

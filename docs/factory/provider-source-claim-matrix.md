@@ -37,7 +37,7 @@ Blocked today:
 | Claim family | Modules / routes | Current evidence | Allowed claim | Blocked claim |
 | --- | --- | --- | --- | --- |
 | Public source shape | all `src/**/*.fab` modules | Canonical Norma source repo; `README.md` and `AGENTS.md` define the rules | Norma is a public source library with backend-agnostic Faber modules | Runnable standard library, packaged provider support, or installable app examples |
-| Compile/import-evidenced native helpers | `csv`, `json`, `json/pange`, `json/solve`, `json/cursor`, `json/lexica`, `model`, `tensor`, `valor`, `vector`, `solum/path`; native portions of `chorda` and `tempus` | `./scripta/check-promoted-helper-imports` runs `faber check` import smoke for each listed `norma:*` module using this repo as `FABER_LIBRARY_HOME` | These helper surfaces have local compile/import evidence as source modules | Runtime product behavior, complete module behavior, or public run claims without focused run evidence |
+| Compile/import-evidenced native helpers | `csv`, `json`, `json/pange`, `json/solve`, `json/cursor`, `json/lexica`, `model`, `tensor`, `valor`, `vector`, `solum/path`; native portions of `chorda` and `tempus` | `faber script scripta/check-promoted-helper-imports.fab` runs `faber check` import smoke for each listed `norma:*` module using this repo as `FABER_LIBRARY_HOME` | These helper surfaces have local compile/import evidence as source modules | Runtime product behavior, complete module behavior, or public run claims without focused run evidence |
 | Parked target-form helper surfaces | `fila`, `ordinata` | Module headers self-declare target form. `fila` waits on generic genus construction; `ordinata` waits on generic genus construction plus ordered-key bounds and a planned `tabula.claves()` intrinsic. These modules are intentionally not included in promoted import smoke. | Parked public source shape only; surface is available for review as target-form design | Compile/import-evidenced helper, runnable collection API, complete collection helper, or public example claim |
 | Compile-gap native helper surfaces | `mathesis` | Native source exists, but current import smoke fails before this packet's promotion threshold; keep out of promoted rows until a focused compiler/source fix lands and `check-promoted-helper-imports` covers it. | Source shape and local audit only | Compile/import-evidenced helper or runtime behavior claim |
 | Host-provider route evidence, not public support | `aleator:*`, `consolum:*`, `processus:*`, `solum:*`, `tempus:*` | `host-providers-rs` commit `bed50e5` records local manifest/dispatch coverage with no manifest route missing from Rust dispatch strings: `aleator` 5 routes, `consolum` 16, `processus` 9 provider-covered routes, `solum` 45, `tempus` 4. Norma source has matching `ad` route families for the overlapping surfaces, and `./scripta/audit-provider-route-claims` verifies source/manifest parity plus manifest-to-dispatch route-string coverage against that expected sibling provider revision only when the sibling checkout/index is clean. `processus:exi` is explicitly source-only/deferred and not provider-covered. | Local route intent plus provider manifest/dispatch coverage evidence for manifested routes; `processus:exi` may be named only as a source-level never-returning exit intent excluded from provider coverage | Public support matrix, runnable examples, package/install support, or parity claims before export/run evidence; provider coverage for `processus:exi` |
@@ -56,7 +56,7 @@ matching evidence exists:
 | Promotion | Required evidence |
 | --- | --- |
 | Public source reference | This repo's source policy passes under `./scripta/check-source`; docs name deferred stubs honestly. |
-| Compile/import-evidenced native helper | Add the module to `scripta/check-promoted-helper-imports` and keep the matrix row in sync with the script. Promoted helper rows must be backed by a passing `faber check` import smoke. |
+| Compile/import-evidenced native helper | Add the module to `scripta/check-promoted-helper-imports.fab` and keep the matrix row in sync with the script. Promoted helper rows must be backed by a passing `faber check` import smoke. |
 | Local provider-coverage evidence | A repo-local provider packet, such as `host-providers-rs` `bed50e5`, shows manifest/dispatch agreement and local tests for the route family. Norma's route audit must also pass against a clean sibling provider workspace at the expected revision, including its missing-dispatch, dirty-provider-evidence, and revision-mismatch negative self-tests. This permits private-preview evidence wording only. |
 | Public provider coverage claim | Provider manifest export exists for the route family, dispatch coverage is validated, and public contract output is regenerated from that export rather than hand-written. |
 | Runnable example claim | A public example imports the Norma module, runs through the released compiler/package path, and exercises the host route without private setup. |
@@ -71,7 +71,7 @@ For this docs-only matrix:
 ```bash
 git diff --check
 ./scripta/check-source
-./scripta/check-promoted-helper-imports
+faber script scripta/check-promoted-helper-imports.fab
 ./scripta/audit-deferred-mori
 ./scripta/audit-provider-route-claims
 ./scripta/audit-provider-route-claims --self-test
