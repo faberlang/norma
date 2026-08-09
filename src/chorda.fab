@@ -27,8 +27,6 @@ functio retorta(textus s) → textus {
     varia numerus i ← s.longitudo()
     varia textus out ← ""
 
-    # Walk backward through scalar positions and copy each segment into the
-    # output cord.
     dum i > 0 {
         i ← i - 1
         out ← out + s.sectio(i, i + 1)
@@ -47,8 +45,6 @@ functio nexa(lista<textus> partes, textus vinculum) → textus {
     varia textus out ← ""
     varia numerus index ← 0
 
-    # The first segment is copied directly; later segments receive the bond
-    # before their content.
     itera ex partes fixum pars {
         si index > 0 {
             out ← out + vinculum
@@ -110,7 +106,6 @@ functio scala(textus s) → lista<textus> {
     varia lista<textus> out ← vacua
     varia numerus i ← 0
 
-    # Each rung is represented as a one-scalar textus value.
     dum i < s.longitudo() {
         out.appende(s.sectio(i, i + 1))
         i ← i + 1
@@ -128,8 +123,6 @@ functio retenta_iudicio(textus s, (textus) → bivalens pred) → textus {
     varia lista<textus> kept ← vacua
     varia numerus i ← 0
 
-    # Retain only the scalar segments accepted by the predicate, then rejoin
-    # without introducing separators.
     dum i < s.longitudo() {
         fixum textus c ← s.sectio(i, i + 1)
         si pred(c) {
@@ -183,7 +176,6 @@ functio expurgata_iudicio(textus s, (textus) → bivalens pred) → textus {
     varia lista<textus> kept ← vacua
     varia numerus i ← 0
 
-    # Preserve only scalars that the predicate does not mark for removal.
     dum i < s.longitudo() {
         fixum textus c ← s.sectio(i, i + 1)
         si pred(c) ≡ falsum {
@@ -260,13 +252,10 @@ functio _finis_delimitris(textus documentum, textus delimiter, numerus search_fr
     fixum textus newline ← _newline()
     varia numerus pos ← search_from
 
-    # Scan for a newline that begins a possible delimiter line.
     dum pos < documentum.longitudo() {
         si documentum.sectio(pos, pos + 1) ≡ newline {
             fixum numerus line_start ← pos + 1
 
-            # A candidate delimiter line must contain the whole delimiter
-            # before it can be accepted as the closing fence.
             si line_start + delim_len ≤ documentum.longitudo() {
                 si documentum.sectio(line_start, line_start + delim_len) ≡ delimiter {
                     fixum numerus line_end ← line_start + delim_len
@@ -321,8 +310,6 @@ functio diducta(textus documentum, textus delimiter) → lista<textus> ⇥ textu
     varia numerus meta_start ← delim_len
     fixum textus newline ← _newline()
 
-    # Metadata begins after the optional newline that follows the opening
-    # delimiter line.
     si meta_start < documentum.longitudo() et documentum.sectio(meta_start, meta_start + 1) ≡ newline {
         meta_start ← meta_start + 1
     }
@@ -334,8 +321,6 @@ functio diducta(textus documentum, textus delimiter) → lista<textus> ⇥ textu
     fixum textus metadatum ← _amputa_postremam_newline(documentum.sectio(meta_start, close_line))
     varia numerus corpus_start ← (close_line + 1) + delim_len
 
-    # Corpus begins after the optional newline that follows the closing
-    # delimiter line.
     si corpus_start < documentum.longitudo() et documentum.sectio(corpus_start, corpus_start + 1) ≡ newline {
         corpus_start ← corpus_start + 1
     }
