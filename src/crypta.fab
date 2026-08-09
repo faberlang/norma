@@ -6,10 +6,11 @@ locale = "la"
 #
 # Etymology: "crypta" - vault, crypt, hidden chamber. Secret operations.
 #
-# Part of the host effect surface (gateway-dispatched `crypta:*` routes).
+# Part of the host effect surface (gateway-dispatched `crypta:*` routes),
+# except the SHA-2 digests, which are native Faber bodies in this file.
 #
 # Design notes:
-# - digere: hash (digerere = to digest)
+# - digere: hash (digerere = to digest) - native body below
 # - authenfica: HMAC (authenticare = to authenticate)
 # - cela/revela: encrypt/decrypt (celare/revelare = to hide/reveal)
 # - signa/verifica: asymmetric signatures
