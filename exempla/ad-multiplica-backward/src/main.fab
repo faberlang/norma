@@ -9,13 +9,13 @@
 
 @ radix lane "air"
 @ radix backward "multiplica_backward"
-functio multiplica(tf32[2] a, tf32[2] b) → tf32[2] {
+functio multiplica(tensor<f32, [2]> a, tensor<f32, [2]> b) → tensor<f32, [2]> {
     redde a.multiplica(b)
 }
 
 incipit {
-    fixum tf32[2] left ← vacua
-    fixum tf32[2] right ← vacua
-    fixum tf32[2] product ← multiplica(left, right)
+    fixum tensor<f32, [2]> left ← vacua
+    fixum tensor<f32, [2]> right ← vacua
+    fixum tensor<f32, [2]> product ← multiplica(left, right)
     nota product.longitudo()
 }
