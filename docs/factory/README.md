@@ -18,12 +18,12 @@ in [`docs/archived/`](../archived/README.md).
 
 ## Summary
 
-- goals scanned: 6
+- goals scanned: 5
 - active: 1
 - planned: 2
-- done: 1
+- done: 0
 - unknown: 2
-- archived (moved to `docs/archived/`): 0
+- archived (moved to `docs/archived/`): 1
 
 ## Open and in progress
 
@@ -40,9 +40,7 @@ in [`docs/archived/`](../archived/README.md).
 
 ## Archived
 
-| Goal | Status | Done | goal | campaign | delivery | ledger | council | evidence | other |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| [native-sha2](native-sha2/goal.md) | done | 100% | 1 | 0 | 1 | 0 | 0 | 0 | 1 |
+_none_
 
 ## Unknown
 
