@@ -6,76 +6,19 @@ locale = "la"
 #
 # Public import: importa ex "norma:optimizer" privata optimizer
 #
-# Stage E1 smoke: single-tensor SGD update for concrete [4] shape.
-# Stage E2: added [2,2] and [1,2] overloads for linear+MSE training exemplum.
-# Stage E5: added sgd_step_0d scalar [] overload for rung-4 regression.
+# One shape-generic SGD step covering tensor<f32, [4]>, [2,2], [1,2], and []
+# shapes (previously four concrete overloads; the magnitudo Figura param
+# makes them one function).
 #
 # SGD update: param -= lr * grad   (same-shape tensors, elementwise).
 # Element type is f32 (reverse-AD AIR lane requires f32/tf32 tensors).
-# Shape generics (magnitudo Figura) blocked by radix tip (8ed5c1434).
-# Generalize when generic tensor shape resolution lands.
-# Concrete shapes: [4], [2,2], [1,2], [].
 
 # -------------------------------------------------------------------------
-# SGD step (tensor<f32, [4]>, Stage E1 smoke shape)
+# SGD step (shape-generic: magnitudo Figura binds implicitly at call sites)
 # -------------------------------------------------------------------------
 
-functio sgd_step(
-    tensor<f32, [4]> param,
-    tensor<f32, [4]> grad,
-    f32 lr
-) → tensor<f32, [4]> {
-    fixum lista<numerus> shape ← param.magnitudines()
-    fixum tensor<f32, []> seed ← vacua
-    fixum tensor<f32, [4]> lr_fill ← seed.crea(lr, shape)
-    fixum tensor<f32, [4]> scaled ← grad.multiplica(lr_fill)
-    redde param.subtrahe(scaled)
-}
-
-# -------------------------------------------------------------------------
-# SGD step (tensor<f32, [2,2]>, Stage E2 linear weight shape)
-# -------------------------------------------------------------------------
-
-functio sgd_step_2x2(
-    tensor<f32, [2,2]> param,
-    tensor<f32, [2,2]> grad,
-    f32 lr
-) → tensor<f32, [2,2]> {
-    fixum lista<numerus> shape ← param.magnitudines()
-    fixum tensor<f32, []> seed ← vacua
-    fixum tensor<f32, [2,2]> lr_fill ← seed.crea(lr, shape)
-    fixum tensor<f32, [2,2]> scaled ← grad.multiplica(lr_fill)
-    redde param.subtrahe(scaled)
-}
-
-# -------------------------------------------------------------------------
-# SGD step (tensor<f32, [1,2]>, Stage E2 linear bias shape)
-# -------------------------------------------------------------------------
-
-functio sgd_step_1x2(
-    tensor<f32, [1,2]> param,
-    tensor<f32, [1,2]> grad,
-    f32 lr
-) → tensor<f32, [1,2]> {
-    fixum lista<numerus> shape ← param.magnitudines()
-    fixum tensor<f32, []> seed ← vacua
-    fixum tensor<f32, [1,2]> lr_fill ← seed.crea(lr, shape)
-    fixum tensor<f32, [1,2]> scaled ← grad.multiplica(lr_fill)
-    redde param.subtrahe(scaled)
-}
-
-# -------------------------------------------------------------------------
-# SGD step (tensor<f32, []>, Stage E5 scalar shape for rung-4)
-# -------------------------------------------------------------------------
-
-functio sgd_step_0d(
-    tensor<f32, []> param,
-    tensor<f32, []> grad,
-    f32 lr
-) → tensor<f32, []> {
-    fixum lista<numerus> shape ← param.magnitudines()
-    fixum tensor<f32, []> seed ← vacua
-    fixum tensor<f32, []> lr_fill ← seed.crea(lr, shape)
-    fixum tensor<f32, []> scaled ← grad.multiplica(lr_fill)
+functio sgd_step<magnitudo Figura>(tensor<f32, Figura> param, tensor<f32, Figura> grad, f32 lr) → tensor<f32, Figura> {
+    fixum tensor<f32, Figura> lr_fill ← param.reple(lr)
+    fixum tensor<f32, Figura> scaled ← grad.multiplica(lr_fill)
     redde param.subtrahe(scaled)
 }
