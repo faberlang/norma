@@ -49,12 +49,14 @@ genus SolumStatus {
 # Maps to: fs.readFileSync(path, 'utf8') / fs.readFile(path, 'utf8')
 
 # Read entire file as text (sync)
+@ publica
 @ radix typus T in textus lista<textus> octeti
 functio lege<T>(textus via) → T {
     redde ad 'solum:lege' (via) ↦ T
 }
 
 # Read entire file as text with async caller materialization.
+@ publica
 @ radix typus T in textus lista<textus> octeti
 @ futura
 functio leget<T>(textus via) → T {

@@ -147,6 +147,7 @@ functio activum() → numerus {
 # This is the one-shot timer pattern: ad + materialize, host delays.
 
 # Sleep for `ms` milliseconds with async caller materialization.
+@ publica
 @ futura
 functio dormiet(numerus ms) → vacuum {
     redde ad 'tempus:dormiet' (ms) ↦ vacuum
@@ -155,6 +156,7 @@ functio dormiet(numerus ms) → vacuum {
 # Sleep (block) for `ms` milliseconds. Sync one-shot timer: blocks the
 # calling thread on the host response. Same route as dormiet; the
 # difference is sync vs async posture, mirroring the lege/leget split.
+@ publica
 functio expectet(numerus ms) → vacuum {
     redde ad 'tempus:dormiet' (ms) ↦ vacuum
 }
