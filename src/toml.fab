@@ -27,6 +27,7 @@ functio pange(valor valor) → textus {
 # =========================================================================
 # PARSING (wire floor)
 # =========================================================================
+@ publica
 functio solve(textus toml) → valor {
     mori "norma:toml.solve is deferred pending Stage 2 dispatch"
 }

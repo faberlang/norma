@@ -23,6 +23,7 @@ locale = "la"
 # Why: Provide a cord-level reverse operation without making textus itself
 # carry every derived helper.
 # Edge: v1 walks the compiler-owned sectio index space.
+@ publica
 functio retorta(textus s) → textus {
     varia numerus i ← s.longitudo()
     varia textus out ← ""
@@ -41,6 +42,7 @@ functio retorta(textus s) → textus {
 # Why: Join cord segments with an arbitrary bond string, avoiding separate
 # join helpers for every naming convention.
 # Edge: An empty partes list returns the empty cord.
+@ publica
 functio nexa(lista<textus> partes, textus vinculum) → textus {
     varia textus out ← ""
     varia numerus index ← 0
@@ -119,6 +121,7 @@ functio scala(textus s) → lista<textus> {
 # scalars that have been retained.
 # Why: Predicate form for caller-defined retention logic.
 # Edge: The predicate receives one scalar textus segment at a time.
+@ publica
 functio retenta_iudicio(textus s, (textus) → bivalens pred) → textus {
     varia lista<textus> kept ← vacua
     varia numerus i ← 0
@@ -141,6 +144,7 @@ functio retenta_iudicio(textus s, (textus) → bivalens pred) → textus {
 # Why: Inclusive scalar-order filtering.
 # Edge: sponte bounds are open ends; nihil infimum means no lower bound,
 # nihil supremum means no upper bound.
+@ publica
 functio retenta(textus s, textus infimum sponte, textus supremum sponte) → textus {
     varia lista<textus> kept ← vacua
     varia numerus i ← 0
@@ -194,6 +198,7 @@ functio expurgata_iudicio(textus s, (textus) → bivalens pred) → textus {
 # Why: Remove scalars inside inclusive bounds and keep scalars outside them.
 # Edge: sponte bounds are open ends; with both bounds absent, every scalar is
 # inside the open interval and is therefore purged.
+@ publica
 functio expurgata(textus s, textus infimum sponte, textus supremum sponte) → textus {
     varia lista<textus> kept ← vacua
     varia numerus i ← 0
@@ -298,6 +303,7 @@ functio _amputa_postremam_newline(textus s) → textus {
 # not parsed here — callers run `toml.tempta` / other parsers on the wire.
 # Edge: Missing or empty fences throw textus errors through the alternate
 # exit channel instead of returning partial data.
+@ publica
 functio diducta(textus documentum, textus delimiter) → lista<textus> ⇥ textus {
     fixum numerus delim_len ← delimiter.longitudo()
 
@@ -368,6 +374,7 @@ functio temptat(textus s) → ascii ∪ nihil {
 # after it has been cut into pieces.
 # Why: Split s by separator into at most limitem segments.
 # Edge: Unbounded split remains on textus.divide; this is the limited form.
+@ publica
 functio discissa(textus s, textus separator, numerus limitem) → lista<textus> {
     mori "norma:chorda.discissa is deferred pending Stage 2 dispatch"
 }
@@ -379,6 +386,7 @@ functio discissa(textus s, textus separator, numerus limitem) → lista<textus> 
 # Name: pange from pangere, "to fasten" or "to compose."
 # Morphologia: Imperativus mechanical verb shared with structured codecs.
 # Why: Materialize textus as UTF-8 octeti for outward or storable byte form.
+@ publica
 functio pange(textus s) → octeti {
     mori "norma:chorda.pange is deferred pending Stage 2 dispatch"
 }
@@ -387,6 +395,7 @@ functio pange(textus s) → octeti {
 # Morphologia: Imperativus mechanical verb paired with pange.
 # Why: Interpret UTF-8 octeti as textus.
 # Edge: Invalid UTF-8 throws through the backing runtime.
+@ publica
 functio solve(octeti data) → textus {
     mori "norma:chorda.solve is deferred pending Stage 2 dispatch"
 }

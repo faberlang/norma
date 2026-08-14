@@ -102,6 +102,7 @@ functio inveni(textus via, textus exemplar, numerus initium, numerus longitudo) 
 # Maps to: readline interface or line-by-line file reading
 
 # Pluck lines from file (sync)
+@ publica
 functio carpe(textus via) → lista<textus> {
     redde ad 'solum:carpe' (via) ↦ lista<textus>
 }
@@ -139,12 +140,14 @@ functio scribet(textus via, textus data) → vacuum {
 # Maps to: fs.writeFileSync(path, buffer) / fs.writeFile(path, buffer)
 
 # Pour bytes to file, overwrites existing (sync)
+@ publica
 functio funde(textus via, octeti data) → vacuum {
     fixum lista<valor> args ← [via ↦ valor, data ↦ valor]
     redde ad 'solum:funde' (args) ↦ vacuum
 }
 
 # Pour bytes to file with async caller materialization.
+@ publica
 @ futura
 functio fundet(textus via, octeti data) → vacuum {
     fixum lista<valor> args ← [via ↦ valor, data ↦ valor]
@@ -176,6 +179,7 @@ functio apponet(textus via, textus data) → vacuum {
 # Maps to: fs.existsSync(path) / fs.access(path)
 
 # Check if path exists (sync)
+@ publica
 functio exstat(textus via) → bivalens {
     redde ad 'solum:exstat' (via) ↦ bivalens
 }
@@ -187,11 +191,13 @@ functio exstabit(textus via) → bivalens {
 }
 
 # True when path metadata says directory.
+@ publica
 functio directoriumne(textus via) → bivalens {
     redde ad 'solum:directoriumne' (via) ↦ bivalens
 }
 
 # True when path metadata says regular file.
+@ publica
 functio regularene(textus via) → bivalens {
     redde ad 'solum:regularene' (via) ↦ bivalens
 }
@@ -202,6 +208,7 @@ functio legibilene(textus via) → bivalens {
 }
 
 # True when path itself is a symbolic link.
+@ publica
 functio vinculumne(textus via) → bivalens {
     redde ad 'solum:vinculumne' (via) ↦ bivalens
 }
@@ -213,6 +220,7 @@ functio mensura(textus via) → numerus {
 }
 
 # Permission/mode bits as a numeric value.
+@ publica
 functio modus(textus via) → numerus {
     redde ad 'solum:modus' (via) ↦ numerus
 }
@@ -248,6 +256,7 @@ functio describet(textus via) → SolumStatus {
 # Maps to: fs.readlinkSync(path) / fs.readlink(path)
 
 # Follow symlink to get target path (sync)
+@ publica
 functio sequere(textus via) → textus {
     redde ad 'solum:sequere' (via) ↦ textus
 }
@@ -259,6 +268,7 @@ functio sequetur(textus via) → textus {
 }
 
 # Create a symbolic link pointing from destinatio to fons.
+@ publica
 functio vincula(textus fons, textus destinatio) → vacuum {
     redde ad 'solum:vincula' ([fons, destinatio]) ↦ vacuum
 }
@@ -271,6 +281,7 @@ functio vincula(textus fons, textus destinatio) → vacuum {
 # Maps to: fs.unlinkSync(path) / fs.unlink(path)
 
 # Delete file (sync)
+@ publica
 functio dele(textus via) → vacuum {
     redde ad 'solum:dele' (via) ↦ vacuum
 }
@@ -288,6 +299,7 @@ functio delet(textus via) → vacuum {
 # Maps to: fs.copyFileSync(src, dest) / fs.copyFile(src, dest)
 
 # Copy file (sync)
+@ publica
 functio exscribe(textus fons, textus destinatio) → vacuum {
     redde ad 'solum:exscribe' ([fons, destinatio]) ↦ vacuum
 }
@@ -306,6 +318,7 @@ functio exscribet(textus fons, textus destinatio) → vacuum {
 # Maps to: fs.renameSync(src, dest) / fs.rename(src, dest)
 
 # Rename or move file (sync)
+@ publica
 functio renomina(textus fons, textus destinatio) → vacuum {
     redde ad 'solum:renomina' ([fons, destinatio]) ↦ vacuum
 }
@@ -323,6 +336,7 @@ functio renominabit(textus fons, textus destinatio) → vacuum {
 # Maps to: touch behavior (utimes or create empty file)
 
 # Touch file - create or update mtime (sync)
+@ publica
 functio tange(textus via) → vacuum {
     redde ad 'solum:tange' (via) ↦ vacuum
 }
@@ -334,6 +348,7 @@ functio tanget(textus via) → vacuum {
 }
 
 # Set permission/mode bits.
+@ publica
 functio modum(textus via, numerus modus) → vacuum {
     fixum lista<valor> args ← [via ↦ valor, modus ↦ valor]
     redde ad 'solum:modum' (args) ↦ vacuum
@@ -347,6 +362,7 @@ functio modum(textus via, numerus modus) → vacuum {
 # Maps to: fs.mkdirSync(path, {recursive: true}) / fs.mkdir(...)
 
 # Create directory (sync)
+@ publica
 functio crea(textus via) → vacuum {
     redde ad 'solum:crea' (via) ↦ vacuum
 }
@@ -383,6 +399,7 @@ functio enumerabit(textus via) → lista<textus> {
 # Maps to: fs.rmSync(path, {recursive: true}) / fs.rm(...)
 
 # Prune directory tree (sync)
+@ publica
 functio amputa(textus via) → vacuum {
     redde ad 'solum:amputa' (via) ↦ vacuum
 }
@@ -403,11 +420,13 @@ functio amputabit(textus via) → vacuum {
 # prefer the norma:solum/path import; these remain for surface compatibility.
 
 # Join path segments
+@ publica
 functio iunge(lista<textus> partes) → textus {
     redde ad 'solum:iunge' (partes) ↦ textus
 }
 
 # Parent path segment (directory part)
+@ publica
 functio parens(textus via) → textus {
     redde ad 'solum:parens' (via) ↦ textus
 }

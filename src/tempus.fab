@@ -121,6 +121,7 @@ functio structa_momenti(numerus annus, numerus mensis, numerus dies, numerus hor
 # =========================================================================
 
 # Current epoch time in nanoseconds (canonical wall clock; downconvert at use site)
+@ publica
 functio nunc() → instans<ns> {
     redde ad 'tempus:nunc' ↦ instans<ns>
 }
@@ -129,10 +130,12 @@ functio nunc() → instans<ns> {
 # MONOTONIC CLOCK (never decreases)
 # =========================================================================
 
+@ publica
 functio monotonicum() → numerus {
     redde ad 'tempus:monotonicum' ↦ numerus
 }
 
+@ publica
 functio activum() → numerus {
     redde ad 'tempus:activum' ↦ numerus
 }
@@ -190,6 +193,7 @@ functio vigila(numerus ms) → cursor<instans> {
 # =========================================================================
 # Why: trivial native Faber bodies; no host route needed.
 
+@ publica
 functio MILLISECUNDUM() → numerus {
     redde 1
 }

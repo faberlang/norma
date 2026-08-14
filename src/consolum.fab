@@ -30,11 +30,13 @@ locale = "la"
 # Maps to: fs.readSync(0, buffer) / async stdin read
 
 # Draw bytes from stdin (sync)
+@ publica
 functio hauri(numerus mensura) → octeti {
     redde ad 'consolum:hauri' (mensura) ↦ octeti
 }
 
 # Draw bytes from stdin (async route; Faber blocks on the frame)
+@ publica
 functio hauriet(numerus mensura) → octeti {
     redde ad 'consolum:hauriet' (mensura) ↦ octeti
 }
@@ -47,11 +49,13 @@ functio hauriet(numerus mensura) → octeti {
 # Maps to: readline or character-by-character until newline
 
 # Read line from stdin (sync, blocks until newline)
+@ publica
 functio lege() → textus {
     redde ad 'consolum:lege' ↦ textus
 }
 
 # Read line from stdin (async route; Faber blocks on the frame)
+@ publica
 functio leget() → textus {
     redde ad 'consolum:leget' ↦ textus
 }
@@ -65,11 +69,13 @@ functio leget() → textus {
 
 # Pour bytes to stdout (sync)
 # Opener must be valor (SEM010); cast octeti → valor like solum.funde.
+@ publica
 functio funde(octeti data) → vacuum {
     redde ad 'consolum:funde' (data ↦ valor) ↦ vacuum
 }
 
 # Pour bytes to stdout (async route; Faber blocks)
+@ publica
 @ futura
 functio fundet(octeti data) → vacuum {
     redde ad 'consolum:funde' (data ↦ valor) ↦ vacuum
@@ -84,11 +90,13 @@ functio fundet(octeti data) → vacuum {
 # Maps to: console.log / process.stdout.write + "\n"
 
 # Write line to stdout with newline (sync)
+@ publica
 functio scribe(textus msg) → vacuum {
     redde ad 'consolum:scribe' (msg) ↦ vacuum
 }
 
 # Write line to stdout with newline (async route; Faber blocks)
+@ publica
 functio scribet(textus msg) → vacuum {
     redde ad 'consolum:scribet' (msg) ↦ vacuum
 }
@@ -102,11 +110,13 @@ functio scribet(textus msg) → vacuum {
 # Maps to: process.stdout.write (no newline)
 
 # Say text to stdout without newline (sync)
+@ publica
 functio dic(textus msg) → vacuum {
     redde ad 'consolum:dic' (msg) ↦ vacuum
 }
 
 # Say text to stdout without newline (async route; Faber blocks)
+@ publica
 functio dicet(textus msg) → vacuum {
     redde ad 'consolum:dicet' (msg) ↦ vacuum
 }
@@ -120,11 +130,13 @@ functio dicet(textus msg) → vacuum {
 # Maps to: console.warn / process.stderr.write + "\n"
 
 # Warn line to stderr with newline (sync)
+@ publica
 functio mone(textus msg) → vacuum {
     redde ad 'consolum:mone' (msg) ↦ vacuum
 }
 
 # Warn line to stderr with newline (async route; Faber blocks)
+@ publica
 functio monet(textus msg) → vacuum {
     redde ad 'consolum:monet' (msg) ↦ vacuum
 }
@@ -138,11 +150,13 @@ functio monet(textus msg) → vacuum {
 # Maps to: console.debug / conditional stderr write
 
 # Debug line with newline (sync)
+@ publica
 functio vide(textus msg) → vacuum {
     redde ad 'consolum:vide' (msg) ↦ vacuum
 }
 
 # Debug line with newline (async route; Faber blocks)
+@ publica
 functio videbit(textus msg) → vacuum {
     redde ad 'consolum:videbit' (msg) ↦ vacuum
 }
@@ -154,16 +168,19 @@ functio videbit(textus msg) → vacuum {
 # Maps to: tty.isatty(fd)
 
 # Can stdin hear an interactive user?
+@ publica
 functio audit() → bivalens {
     redde ad 'consolum:audit' ↦ bivalens
 }
 
 # Does stdout speak to an interactive user?
+@ publica
 functio loquitur() → bivalens {
     redde ad 'consolum:loquitur' ↦ bivalens
 }
 
 # Does stderr admonish an interactive user?
+@ publica
 functio admonet() → bivalens {
     redde ad 'consolum:admonet' ↦ bivalens
 }

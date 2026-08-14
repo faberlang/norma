@@ -7,6 +7,7 @@ locale = "la"
 # Direct `norma:json/solve` facade. The compiler rejects direct
 # `textus ↦ json`; the runtime-backed codec belongs behind this Norma API.
 
+@ publica
 functio solve(textus wire) → json ⇥ textus {
     iace "norma:json.solve is deferred pending runtime codec dispatch"
 }

@@ -6,6 +6,7 @@ locale = "la"
 #
 # Public import: importa ex "norma:caelum/terminus" privata terminus
 
+@ publica
 genus Terminus {
     textus hospes
     numerus portus

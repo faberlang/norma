@@ -55,6 +55,7 @@ functio parens(textus via) → textus {
 
 # Final path segment (the filename). Returns "" for paths ending in "..".
 # Maps to: Rust Path::file_name, Go path.Base, Node path.basename.
+@ publica
 functio nomen(textus via) → textus {
     redde ad 'solum:nomen' (via) ↦ textus
 }

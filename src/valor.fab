@@ -18,7 +18,7 @@ locale = "la"
 # error-catch clause), so internal callers use the private `_cape` helper while
 # the public `cape` export preserves the external namespace surface.
 
-importa ex "norma:chorda" privata chorda
+importa ex "norma:chorda" chorda
 
 # =========================================================================
 # SHAPE PREDICATES (est variant checks — all 8 Valor variants)
@@ -78,6 +78,7 @@ functio _cape(valor v, textus clavis) → valor {
     redde got
 }
 
+@ publica
 functio cape(valor v, textus clavis) → valor {
     redde _cape(v, clavis)
 }
@@ -133,6 +134,7 @@ functio inveni_partem(valor current, textus part) → valor {
 # =========================================================================
 
 # Require a textus child at clavis; throw on missing or non-textus.
+@ publica
 functio exige(valor v, textus clavis) → textus ⇥ textus {
     fixum valor child ← _cape(v, clavis)
     si child est nihil ergo iace "missing key: §"(clavis)
@@ -142,6 +144,7 @@ functio exige(valor v, textus clavis) → textus ⇥ textus {
 
 # Require multiple textus children; throws on the first missing or
 # non-textus key. Used by codec callers that validate a schema shape.
+@ publica
 functio exige_claves(valor v, lista<textus> claves) → vacuum ⇥ textus {
     itera ex claves fixum clavis {
         fixum valor child ← _cape(v, clavis)

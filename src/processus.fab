@@ -48,6 +48,7 @@ genus Subprocessus {
 # instans, and lista<T>. The param name `argumenta` is also a reserved
 # keyword (TokenKind::Argumenta, used for CLI argument binding), so a
 # native body would need to rename it.
+@ publica
 functio genera(lista<textus> argumenta, textus directorium sponte, tabula<textus, textus> ambitus sponte) → Subprocessus {
     mori "norma:processus.genera is deferred pending Stage 2 dispatch"
 }
@@ -85,6 +86,7 @@ functio captura(lista<textus> args) → valor {
 # Maps to: sh -c "cmd" via Bun.spawnSync / Bun.spawn
 
 # Execute shell command, block until complete, return stdout (sync)
+@ publica
 functio exsequi(textus imperium) → textus {
     redde ad 'processus:exsequi' (imperium) ↦ textus
 }
@@ -103,6 +105,7 @@ functio exsequetur(textus imperium) → textus {
 # Maps to: Bun.env[name] / process.env[name]
 
 # Read environment variable (Imperativus: fails when unset; set-to-empty → "")
+@ publica
 functio lege(textus nomen) → textus {
     redde ad 'processus:lege' (nomen) ↦ textus
 }

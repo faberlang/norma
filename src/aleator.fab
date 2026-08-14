@@ -19,11 +19,13 @@ locale = "la"
 # =========================================================================
 
 # Random float in [0, 1)
+@ publica
 functio fractum() → fractus {
     redde ad 'aleator:fractum' ↦ fractus
 }
 
 # Random integer in [min, max] inclusive (draw by lot)
+@ publica
 functio sortire(numerus min, numerus max) → numerus {
     redde ad 'aleator:sortire' ([min, max]) ↦ numerus
 }
@@ -33,11 +35,13 @@ functio sortire(numerus min, numerus max) → numerus {
 # =========================================================================
 
 # Random bytes (crypto-secure)
+@ publica
 functio octetos(numerus n) → octeti {
     redde ad 'aleator:octetos' (n) ↦ octeti
 }
 
 # UUID v4 string (crypto-secure)
+@ publica
 functio uuid() → textus {
     redde ad 'aleator:uuid' ↦ textus
 }
@@ -48,6 +52,7 @@ functio uuid() → textus {
 
 # Seed the RNG. Only affects non-crypto functions.
 # Pass 0 or negative to reset to true random.
+@ publica
 functio semina(numerus n) → vacuum {
     redde ad 'aleator:semina' (n) ↦ vacuum
 }

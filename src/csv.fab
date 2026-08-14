@@ -8,7 +8,7 @@ locale = "la"
 # Method ledger: docs/stdlib/csv-methods.md
 # Internal dependency: norma:chorda (discissa + nexa)
 
-importa ex "norma:chorda" privata chorda
+importa ex "norma:chorda" chorda
 
 # Why: Strip a single trailing CR when rows arrive CRLF-split (v1 LF contract).
 @ privata
@@ -23,6 +23,7 @@ functio _normaliza_row(textus row) → textus {
 
 # Verb: solve from "solvere" (to loosen, untangle)
 # Why: Parse naive comma/LF wire into rows of fields (see csv-methods.md for limits).
+@ publica
 functio solve(textus wire) → lista<lista<textus>> {
     si wire.longitudo() ≡ 0 ergo redde vacua
 
@@ -37,6 +38,7 @@ functio solve(textus wire) → lista<lista<textus>> {
 
 # Verb: pange from "pangere" (to fasten, compose)
 # Why: Compose rows of fields into comma-separated, LF-joined wire text.
+@ publica
 functio pange(lista<lista<textus>> tabula) → textus {
     varia lista<textus> rows ← vacua
     itera ex tabula fixum fields {

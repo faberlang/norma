@@ -18,6 +18,7 @@ locale = "la"
 # Verb: pange from "pangere" (to fasten, compose)
 
 # Serialize value to YAML string
+@ publica
 functio pange(valor valor) → textus {
     mori "norma:yaml.pange is deferred pending Stage 2 dispatch"
 }
@@ -36,6 +37,7 @@ functio necto(lista<valor> documenta) → textus {
 # Verb: solve from "solvere" (to loosen, untangle)
 
 # Parse YAML string to value (throws on error)
+@ publica
 functio solve(textus yaml) → valor {
     mori "norma:yaml.solve is deferred pending Stage 2 dispatch"
 }
