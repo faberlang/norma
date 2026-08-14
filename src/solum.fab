@@ -80,6 +80,7 @@ functio hauriet(textus via) → octeti {
 }
 
 # Draw a bounded byte range from a file.
+@ publica
 functio partem(textus via, numerus initium, numerus longitudo) → octeti {
     fixum lista<valor> args ← [via ↦ valor, initium ↦ valor, longitudo ↦ valor]
     redde ad 'solum:partem' (args) ↦ octeti
@@ -203,6 +204,7 @@ functio vinculumne(textus via) → bivalens {
 }
 
 # File size in bytes.
+@ publica
 functio mensura(textus via) → numerus {
     redde ad 'solum:mensura' (via) ↦ numerus
 }
