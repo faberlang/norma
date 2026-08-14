@@ -118,6 +118,7 @@ functio carpiet(textus via) → lista<textus> {
 # Maps to: fs.writeFileSync(path, data, 'utf8') / fs.writeFile(...)
 
 # Write text to file, overwrites existing (sync)
+@ publica
 functio scribe(textus via, textus data) → vacuum {
     redde ad 'solum:scribe' ([via, data]) ↦ vacuum
 }
