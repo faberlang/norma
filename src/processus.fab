@@ -167,6 +167,7 @@ functio identitas() → numerus {
 # Maps to: Bun.argv.slice(2) / process.argv.slice(2)
 
 # Get command line arguments (excludes runtime and script path)
+@ publica
 functio argumenta() → lista<textus> {
     redde ad 'processus:argumenta' ↦ lista<textus>
 }
