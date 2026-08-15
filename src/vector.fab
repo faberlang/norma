@@ -1,35 +1,35 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # vector.fab — compiler-owned vector register intrinsics
 #
 # Public import: importa ex "norma:vector" privata vector
 
-functio addita<elem, magnitudo N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
-    redde a.addita(b)
+fn addita<elem, size N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
+    return a.added(b)
 }
 
-functio subtrahe<elem, magnitudo N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
-    redde a.subtrahe(b)
+fn subtrahe<elem, size N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
+    return a.subtract(b)
 }
 
-functio multiplica<elem, magnitudo N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
-    redde a.multiplica(b)
+fn multiplica<elem, size N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
+    return a.multiply(b)
 }
 
-functio divida<elem, magnitudo N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
-    redde a.divida(b)
+fn divida<elem, size N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
+    return a.divide(b)
 }
 
-functio productum<elem, magnitudo N>(vector<elem, N> a, vector<elem, N> b) → elem {
-    redde a.productum(b)
+fn productum<elem, size N>(vector<elem, N> a, vector<elem, N> b) → elem {
+    return a.dot(b)
 }
 
-functio transversum<elem>(vector<elem, 3> a, vector<elem, 3> b) → vector<elem, 3> {
-    redde a.transversum(b)
+fn transversum<elem>(vector<elem, 3> a, vector<elem, 3> b) → vector<elem, 3> {
+    return a.cross(b)
 }
 
-functio swizzle<elem, magnitudo N>(vector<elem, N> v, textus exemplar) → vector<elem, N> {
-    redde v.swizzle(exemplar)
+fn swizzle<elem, size N>(vector<elem, N> v, string exemplar) → vector<elem, N> {
+    return v.swizzle(exemplar)
 }

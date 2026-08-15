@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # json/pange.fab — JSON serialization facade
@@ -8,6 +8,6 @@ locale = "la"
 # authority. This module exists so direct `norma:json/pange` imports share the
 # same path as the top-level `norma:json.pange` facade.
 
-functio pange(json documentum) → textus {
-    redde documentum ↦ textus
+fn pange(json documentum) → string {
+    return documentum ↦ string
 }

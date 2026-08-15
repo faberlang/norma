@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # json/lexica.fab — shared lexical floor for the JSON wire library
@@ -15,22 +15,22 @@ locale = "la"
 # WHITESPACE
 # =========================================================================
 
-functio _est_sponte(textus c) → bivalens {
-    redde c ≡ " " aut c ≡ "\t" aut c ≡ "\n" aut c ≡ "\r"
+fn _est_sponte(string c) → bool {
+    return c ≡ " " or c ≡ "\t" or c ≡ "\n" or c ≡ "\r"
 }
 
 # Advance over whitespace; returns the next non-whitespace index.
-functio _salta_sponte(textus s, numerus i) → numerus {
-    varia numerus pos ← i
-    dum pos < s.longitudo() {
-        si _est_sponte(s.sectio(pos, pos + 1)) {
+fn _salta_sponte(string s, int i) → int {
+    var int pos ← i
+    while pos < s.length() {
+        if _est_sponte(s.slice(pos, pos + 1)) {
             pos ← pos + 1
         }
-        secus {
-            redde pos
+        else {
+            return pos
         }
     }
-    redde pos
+    return pos
 }
 
 # =========================================================================
@@ -39,13 +39,13 @@ functio _salta_sponte(textus s, numerus i) → numerus {
 # Faber has no char ordering (textus < is rejected as non-numeric), so digit
 # classification uses membership against a literal digit string.
 
-functio _est_digita(textus c) → bivalens {
-    redde "0123456789".continet(c)
+fn _est_digita(string c) → bool {
+    return "0123456789".contains(c)
 }
 
 # A value terminator: the chars that legally end a scanned token.
-functio _est_finitura(textus c) → bivalens {
-    redde c ≡ "," aut c ≡ "}" aut c ≡ "]" aut _est_sponte(c)
+fn _est_finitura(string c) → bool {
+    return c ≡ "," or c ≡ "}" or c ≡ "]" or _est_sponte(c)
 }
 
 # =========================================================================
@@ -54,15 +54,15 @@ functio _est_finitura(textus c) → bivalens {
 # _transeant_liber maps a single literal char to its backslash escape.
 # Returns nihil when the char needs no escaping (caller emits it raw).
 
-functio _transeant_liber(textus c) → textus ∪ nihil {
-    si c ≡ "\"" ergo redde "\\\""
-    si c ≡ "\\" ergo redde "\\\\"
-    si c ≡ "\n" ergo redde "\\n"
-    si c ≡ "\r" ergo redde "\\r"
-    si c ≡ "\t" ergo redde "\\t"
-    si c ≡ "\u{08}" ergo redde "\\b"
-    si c ≡ "\u{0C}" ergo redde "\\f"
-    redde nihil
+fn _transeant_liber(string c) → string ∪ null {
+    if c ≡ "\"" then return "\\\""
+    if c ≡ "\\" then return "\\\\"
+    if c ≡ "\n" then return "\\n"
+    if c ≡ "\r" then return "\\r"
+    if c ≡ "\t" then return "\\t"
+    if c ≡ "\u{08}" then return "\\b"
+    if c ≡ "\u{0C}" then return "\\f"
+    return null
 }
 
 # Does this char require backslash-escaping? The structural " and \ always
@@ -71,10 +71,10 @@ functio _transeant_liber(textus c) → textus ∪ nihil {
 # intrinsic, so unnamed control chars (0x00-0x1F outside the named five)
 # are not escaped — real JSON rarely carries them, but full RFC 8259
 # compliance would require a \u00XX path and a codepoint intrinsic.
-functio _postulat_transeum(textus c) → bivalens {
-    si c ≡ "\"" aut c ≡ "\\" ergo redde verum
-    si _transeant_liber(c) non est nihil ergo redde verum
-    redde falsum
+fn _postulat_transeum(string c) → bool {
+    if c ≡ "\"" or c ≡ "\\" then return true
+    if _transeant_liber(c) not is null then return true
+    return false
 }
 
 # =========================================================================
@@ -84,16 +84,16 @@ functio _postulat_transeum(textus c) → bivalens {
 # to the literal it represents. Returns nihil for unknown letters (caller
 # signals a syntax error) and treats "u" as a sentinel for \uXXXX handling.
 
-functio _destruat_liber(textus s) → textus ∪ nihil {
-    si s ≡ "\"" ergo redde "\""
-    si s ≡ "\\" ergo redde "\\"
-    si s ≡ "/" ergo redde "/"
-    si s ≡ "n" ergo redde "\n"
-    si s ≡ "r" ergo redde "\r"
-    si s ≡ "t" ergo redde "\t"
-    si s ≡ "b" ergo redde "\u{08}"
-    si s ≡ "f" ergo redde "\u{0C}"
-    redde nihil
+fn _destruat_liber(string s) → string ∪ null {
+    if s ≡ "\"" then return "\""
+    if s ≡ "\\" then return "\\"
+    if s ≡ "/" then return "/"
+    if s ≡ "n" then return "\n"
+    if s ≡ "r" then return "\r"
+    if s ≡ "t" then return "\t"
+    if s ≡ "b" then return "\u{08}"
+    if s ≡ "f" then return "\u{0C}"
+    return null
 }
 
 # =========================================================================
@@ -102,22 +102,22 @@ functio _destruat_liber(textus s) → textus ∪ nihil {
 # Single-hex-digit → numeric value. Returns nihil for non-hex chars.
 # Plain lookup table: Faber has no ord intrinsic, so we enumerate.
 
-functio _valor_hexadecimalis(textus c) → numerus ∪ nihil {
-    si c ≡ "0" ergo redde 0
-    si c ≡ "1" ergo redde 1
-    si c ≡ "2" ergo redde 2
-    si c ≡ "3" ergo redde 3
-    si c ≡ "4" ergo redde 4
-    si c ≡ "5" ergo redde 5
-    si c ≡ "6" ergo redde 6
-    si c ≡ "7" ergo redde 7
-    si c ≡ "8" ergo redde 8
-    si c ≡ "9" ergo redde 9
-    si c ≡ "a" aut c ≡ "A" ergo redde 10
-    si c ≡ "b" aut c ≡ "B" ergo redde 11
-    si c ≡ "c" aut c ≡ "C" ergo redde 12
-    si c ≡ "d" aut c ≡ "D" ergo redde 13
-    si c ≡ "e" aut c ≡ "E" ergo redde 14
-    si c ≡ "f" aut c ≡ "F" ergo redde 15
-    redde nihil
+fn _valor_hexadecimalis(string c) → int ∪ null {
+    if c ≡ "0" then return 0
+    if c ≡ "1" then return 1
+    if c ≡ "2" then return 2
+    if c ≡ "3" then return 3
+    if c ≡ "4" then return 4
+    if c ≡ "5" then return 5
+    if c ≡ "6" then return 6
+    if c ≡ "7" then return 7
+    if c ≡ "8" then return 8
+    if c ≡ "9" then return 9
+    if c ≡ "a" or c ≡ "A" then return 10
+    if c ≡ "b" or c ≡ "B" then return 11
+    if c ≡ "c" or c ≡ "C" then return 12
+    if c ≡ "d" or c ≡ "D" then return 13
+    if c ≡ "e" or c ≡ "E" then return 14
+    if c ≡ "f" or c ≡ "F" then return 15
+    return null
 }

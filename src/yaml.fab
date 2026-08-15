@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # yaml.fab — YAML wire floor facade
@@ -18,17 +18,17 @@ locale = "la"
 # Verb: pange from "pangere" (to fasten, compose)
 
 # Serialize value to YAML string
-@ publica
-functio pange(valor valor) → textus {
-    mori "norma:yaml.pange is deferred pending Stage 2 dispatch"
+@ public
+fn pange(value value) → string {
+    panic "norma:yaml.pange is deferred pending Stage 2 dispatch"
 }
 
 # Verb: necto from "nectere" (to bind, tie together)
 # Why: Binding multiple documents into a single YAML stream.
 
 # Bind multiple documents into multi-doc YAML string
-functio necto(lista<valor> documenta) → textus {
-    mori "norma:yaml.necto is deferred pending Stage 2 dispatch"
+fn necto(list<value> documenta) → string {
+    panic "norma:yaml.necto is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -37,22 +37,22 @@ functio necto(lista<valor> documenta) → textus {
 # Verb: solve from "solvere" (to loosen, untangle)
 
 # Parse YAML string to value (throws on error)
-@ publica
-functio solve(textus yaml) → valor {
-    mori "norma:yaml.solve is deferred pending Stage 2 dispatch"
+@ public
+fn solve(string yaml) → value {
+    panic "norma:yaml.solve is deferred pending Stage 2 dispatch"
 }
 
 # Verb: tempta from "temptare" (to try, attempt)
 
 # Attempt to parse YAML string (returns null on error)
-functio tempta(textus yaml) → valor ∪ nihil {
-    mori "norma:yaml.tempta is deferred pending Stage 2 dispatch"
+fn tempta(string yaml) → value ∪ null {
+    panic "norma:yaml.tempta is deferred pending Stage 2 dispatch"
 }
 
 # Verb: collige from "colligere" (to collect, gather)
 # Why: Gathering all documents from a multi-doc YAML stream.
 
 # Gather all documents from multi-doc YAML string
-functio collige(textus yaml) → lista<valor> {
-    mori "norma:yaml.collige is deferred pending Stage 2 dispatch"
+fn collige(string yaml) → list<value> {
+    panic "norma:yaml.collige is deferred pending Stage 2 dispatch"
 }

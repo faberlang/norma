@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # nuncius.fab - Inter-Process Communication Device
@@ -22,8 +22,8 @@ locale = "la"
 # =========================================================================
 
 # Allocate shared memory buffer
-functio alloca(numerus mensura) → octeti {
-    mori "norma:nuncius.alloca is deferred pending Stage 2 dispatch"
+fn alloca(int mensura) → bytes {
+    panic "norma:nuncius.alloca is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -33,8 +33,8 @@ functio alloca(numerus mensura) → octeti {
 # Why: Opening a communication channel between endpoints.
 
 # Open a connected message port pair
-functio aperi() → ParPortarum {
-    mori "norma:nuncius.aperi is deferred pending Stage 2 dispatch"
+fn aperi() → ParPortarum {
+    panic "norma:nuncius.aperi is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -50,81 +50,81 @@ functio aperi() → ParPortarum {
 # Why: Threads keep watch at a condition variable.
 
 # Restrict access via mutex backed by shared memory
-functio restringe(octeti memoria, numerus offset) → Mutex {
-    mori "norma:nuncius.restringe is deferred pending Stage 2 dispatch"
+fn restringe(bytes memoria, int offset) → Mutex {
+    panic "norma:nuncius.restringe is deferred pending Stage 2 dispatch"
 }
 
 # Count permits via semaphore backed by shared memory
-functio numera(octeti memoria, numerus offset, numerus valor) → Semaphorum {
-    mori "norma:nuncius.numera is deferred pending Stage 2 dispatch"
+fn numera(bytes memoria, int offset, int value) → Semaphorum {
+    panic "norma:nuncius.numera is deferred pending Stage 2 dispatch"
 }
 
 # Keep watch via condition variable backed by shared memory
-functio vigila(octeti memoria, numerus offset) → Conditio {
-    mori "norma:nuncius.vigila is deferred pending Stage 2 dispatch"
+fn vigila(bytes memoria, int offset) → Conditio {
+    panic "norma:nuncius.vigila is deferred pending Stage 2 dispatch"
 }
 
 # Message port pair
-implendum ParPortarum {
-    functio a() → Porta
+interface ParPortarum {
+    fn a() → Porta
 
-    functio b() → Porta
+    fn b() → Porta
 }
 
 # Message port (one end of a channel)
-implendum Porta {
+interface Porta {
     # Send message
-    functio mitte(valor nuntius) → vacuum
+    fn mitte(value nuntius) → void
 
     # Receive message (async, blocks until available)
-    @ futura
-    functio recipiet() → valor
+    @ future
+    fn recipiet() → value
 
     # Check if message available
-    functio paratum() → bivalens
+    fn paratum() → bool
 
     # Close port
-    functio claude() → vacuum
+    fn claude() → void
 }
 
 # Mutual exclusion lock
-implendum Mutex {
+interface Mutex {
     # Acquire lock (blocks until available)
-    functio obstringe() → vacuum
+    fn obstringe() → void
 
     # Try to acquire without blocking
-    functio tempta() → bivalens
+    fn tempta() → bool
 
     # Release lock
-    functio solve() → vacuum
+    fn solve() → void
 }
 
 # Counting semaphore
-implendum Semaphorum {
+interface Semaphorum {
     # Wait (decrement, blocks if zero)
-    functio exspecta() → vacuum
+    fn exspecta() → void
 
     # Try to decrement without blocking
-    functio tempta() → bivalens
+    fn tempta() → bool
 
     # Post (increment, wakes one waiter)
-    functio signa() → vacuum
+    fn signa() → void
 
     # Read current value
-    functio lege() → numerus
+    fn read() → int
 }
 
 # Condition variable
-implendum Conditio {
+interface Conditio {
     # Wait for signal (must hold mutex)
-    functio exspecta(Mutex mutex) → vacuum
+    fn exspecta(Mutex mutex) → void
 
     # Wait with timeout, returns false if timed out
-    functio morare(Mutex mutex, numerus ms) → bivalens
+    fn morare(Mutex mutex, int ms) → bool
 
     # Wake one waiting thread
-    functio signa() → vacuum
+    fn signa() → void
 
     # Wake all waiting threads
-    functio diffunde() → vacuum
+    fn diffunde() → void
 }

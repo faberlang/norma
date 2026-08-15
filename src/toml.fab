@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # toml.fab — TOML wire floor facade
@@ -20,17 +20,17 @@ locale = "la"
 # =========================================================================
 # SERIALIZATION (wire floor)
 # =========================================================================
-functio pange(valor valor) → textus {
-    mori "norma:toml.pange is deferred pending Stage 2 dispatch"
+fn pange(value value) → string {
+    panic "norma:toml.pange is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
 # PARSING (wire floor)
 # =========================================================================
-@ publica
-functio solve(textus toml) → valor {
-    mori "norma:toml.solve is deferred pending Stage 2 dispatch"
+@ public
+fn solve(string toml) → value {
+    panic "norma:toml.solve is deferred pending Stage 2 dispatch"
 }
-functio tempta(textus toml) → valor ∪ nihil {
-    mori "norma:toml.tempta is deferred pending Stage 2 dispatch"
+fn tempta(string toml) → value ∪ null {
+    panic "norma:toml.tempta is deferred pending Stage 2 dispatch"
 }

@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # solum.fab - File System Device
@@ -25,21 +25,21 @@ locale = "la"
 
 # Full file status returned by describe/describet
 # Maps to: stat(), lstat()
-genus SolumStatus {
-    numerus modus
+class SolumStatus {
+    int modus
     # permission bits (e.g., 0o755)
-    numerus nexus
+    int nexus
     # hard link count
-    numerus possessor
+    int possessor
     # owner uid
-    numerus grex
+    int grex
     # group gid
-    numerus mensura
+    int mensura
     # size in bytes
-    numerus modificatum
+    int modificatum
     # mtime (ms since epoch)
-    bivalens directoriumne
-    bivalens vinculumne
+    bool directoriumne
+    bool vinculumne
 }
 
 # =========================================================================
@@ -49,18 +49,18 @@ genus SolumStatus {
 # Maps to: fs.readFileSync(path, 'utf8') / fs.readFile(path, 'utf8')
 
 # Read entire file as text (sync)
-@ publica
-@ radix typus T in textus lista<textus> octeti
-functio lege<T>(textus via) → T {
-    redde ad 'solum:lege' (via) ↦ T
+@ public
+@ radix type T mut string list<string> bytes
+fn read<T>(string via) → T {
+    return call 'solum:lege' (via) ↦ T
 }
 
 # Read entire file as text with async caller materialization.
-@ publica
-@ radix typus T in textus lista<textus> octeti
-@ futura
-functio leget<T>(textus via) → T {
-    redde ad 'solum:lege' (via) ↦ T
+@ public
+@ radix type T mut string list<string> bytes
+@ future
+fn leget<T>(string via) → T {
+    return call 'solum:lege' (via) ↦ T
 }
 
 # =========================================================================
@@ -71,27 +71,27 @@ functio leget<T>(textus via) → T {
 # Maps to: fs.readFileSync(path) / fs.readFile(path) returning Buffer
 
 # Draw entire file as bytes (sync)
-functio hauri(textus via) → octeti {
-    redde ad 'solum:hauri' (via) ↦ octeti
+fn hauri(string via) → bytes {
+    return call 'solum:hauri' (via) ↦ bytes
 }
 
 # Draw entire file as bytes (async route; Faber blocks on the frame)
-@ futura
-functio hauriet(textus via) → octeti {
-    redde ad 'solum:hauriet' (via) ↦ octeti
+@ future
+fn hauriet(string via) → bytes {
+    return call 'solum:hauriet' (via) ↦ bytes
 }
 
 # Draw a bounded byte range from a file.
-@ publica
-functio partem(textus via, numerus initium, numerus longitudo) → octeti {
-    fixum lista<valor> args ← [via ↦ valor, initium ↦ valor, longitudo ↦ valor]
-    redde ad 'solum:partem' (args) ↦ octeti
+@ public
+fn partem(string via, int initium, int longitudo) → bytes {
+    const list<value> args ← [via ↦ value, initium ↦ value, longitudo ↦ value]
+    return call 'solum:partem' (args) ↦ bytes
 }
 
 # Find a text byte pattern within a bounded file range, or -1 when absent.
-functio inveni(textus via, textus exemplar, numerus initium, numerus longitudo) → numerus {
-    fixum lista<valor> args ← [via ↦ valor, exemplar ↦ valor, initium ↦ valor, longitudo ↦ valor]
-    redde ad 'solum:inveni' (args) ↦ numerus
+fn inveni(string via, string exemplar, int initium, int longitudo) → int {
+    const list<value> args ← [via ↦ value, exemplar ↦ value, initium ↦ value, longitudo ↦ value]
+    return call 'solum:inveni' (args) ↦ int
 }
 
 # =========================================================================
@@ -102,15 +102,15 @@ functio inveni(textus via, textus exemplar, numerus initium, numerus longitudo) 
 # Maps to: readline interface or line-by-line file reading
 
 # Pluck lines from file (sync)
-@ publica
-functio carpe(textus via) → lista<textus> {
-    redde ad 'solum:carpe' (via) ↦ lista<textus>
+@ public
+fn carpe(string via) → list<string> {
+    return call 'solum:carpe' (via) ↦ list<string>
 }
 
 # Pluck lines from file (async route; Faber blocks on the frame)
-@ futura
-functio carpiet(textus via) → lista<textus> {
-    redde ad 'solum:carpiet' (via) ↦ lista<textus>
+@ future
+fn carpiet(string via) → list<string> {
+    return call 'solum:carpiet' (via) ↦ list<string>
 }
 
 # =========================================================================
@@ -121,15 +121,15 @@ functio carpiet(textus via) → lista<textus> {
 # Maps to: fs.writeFileSync(path, data, 'utf8') / fs.writeFile(...)
 
 # Write text to file, overwrites existing (sync)
-@ publica
-functio scribe(textus via, textus data) → vacuum {
-    redde ad 'solum:scribe' ([via, data]) ↦ vacuum
+@ public
+fn write(string via, string data) → void {
+    return call 'solum:scribe' ([via, data]) ↦ void
 }
 
 # Write text to file, overwrites existing (async route; Faber blocks)
-@ futura
-functio scribet(textus via, textus data) → vacuum {
-    redde ad 'solum:scribet' ([via, data]) ↦ vacuum
+@ future
+fn scribet(string via, string data) → void {
+    return call 'solum:scribet' ([via, data]) ↦ void
 }
 
 # =========================================================================
@@ -140,18 +140,18 @@ functio scribet(textus via, textus data) → vacuum {
 # Maps to: fs.writeFileSync(path, buffer) / fs.writeFile(path, buffer)
 
 # Pour bytes to file, overwrites existing (sync)
-@ publica
-functio funde(textus via, octeti data) → vacuum {
-    fixum lista<valor> args ← [via ↦ valor, data ↦ valor]
-    redde ad 'solum:funde' (args) ↦ vacuum
+@ public
+fn funde(string via, bytes data) → void {
+    const list<value> args ← [via ↦ value, data ↦ value]
+    return call 'solum:funde' (args) ↦ void
 }
 
 # Pour bytes to file with async caller materialization.
-@ publica
-@ futura
-functio fundet(textus via, octeti data) → vacuum {
-    fixum lista<valor> args ← [via ↦ valor, data ↦ valor]
-    redde ad 'solum:funde' (args) ↦ vacuum
+@ public
+@ future
+fn fundet(string via, bytes data) → void {
+    const list<value> args ← [via ↦ value, data ↦ value]
+    return call 'solum:funde' (args) ↦ void
 }
 
 # =========================================================================
@@ -162,14 +162,14 @@ functio fundet(textus via, octeti data) → vacuum {
 # Maps to: fs.appendFileSync(path, data) / fs.appendFile(path, data)
 
 # Append text to file (sync)
-functio appone(textus via, textus data) → vacuum {
-    redde ad 'solum:appone' ([via, data]) ↦ vacuum
+fn appone(string via, string data) → void {
+    return call 'solum:appone' ([via, data]) ↦ void
 }
 
 # Append text to file (async route; Faber blocks)
-@ futura
-functio apponet(textus via, textus data) → vacuum {
-    redde ad 'solum:apponet' ([via, data]) ↦ vacuum
+@ future
+fn apponet(string via, string data) → void {
+    return call 'solum:apponet' ([via, data]) ↦ void
 }
 
 # =========================================================================
@@ -179,50 +179,50 @@ functio apponet(textus via, textus data) → vacuum {
 # Maps to: fs.existsSync(path) / fs.access(path)
 
 # Check if path exists (sync)
-@ publica
-functio exstat(textus via) → bivalens {
-    redde ad 'solum:exstat' (via) ↦ bivalens
+@ public
+fn exstat(string via) → bool {
+    return call 'solum:exstat' (via) ↦ bool
 }
 
 # Check if path exists (async route; Faber blocks)
-@ futura
-functio exstabit(textus via) → bivalens {
-    redde ad 'solum:exstabit' (via) ↦ bivalens
+@ future
+fn exstabit(string via) → bool {
+    return call 'solum:exstabit' (via) ↦ bool
 }
 
 # True when path metadata says directory.
-@ publica
-functio directoriumne(textus via) → bivalens {
-    redde ad 'solum:directoriumne' (via) ↦ bivalens
+@ public
+fn directoriumne(string via) → bool {
+    return call 'solum:directoriumne' (via) ↦ bool
 }
 
 # True when path metadata says regular file.
-@ publica
-functio regularene(textus via) → bivalens {
-    redde ad 'solum:regularene' (via) ↦ bivalens
+@ public
+fn regularene(string via) → bool {
+    return call 'solum:regularene' (via) ↦ bool
 }
 
 # True when path is a regular file and can be opened for reading.
-functio legibilene(textus via) → bivalens {
-    redde ad 'solum:legibilene' (via) ↦ bivalens
+fn legibilene(string via) → bool {
+    return call 'solum:legibilene' (via) ↦ bool
 }
 
 # True when path itself is a symbolic link.
-@ publica
-functio vinculumne(textus via) → bivalens {
-    redde ad 'solum:vinculumne' (via) ↦ bivalens
+@ public
+fn vinculumne(string via) → bool {
+    return call 'solum:vinculumne' (via) ↦ bool
 }
 
 # File size in bytes.
-@ publica
-functio mensura(textus via) → numerus {
-    redde ad 'solum:mensura' (via) ↦ numerus
+@ public
+fn mensura(string via) → int {
+    return call 'solum:mensura' (via) ↦ int
 }
 
 # Permission/mode bits as a numeric value.
-@ publica
-functio modus(textus via) → numerus {
-    redde ad 'solum:modus' (via) ↦ numerus
+@ public
+fn modus(string via) → int {
+    return call 'solum:modus' (via) ↦ int
 }
 
 # =========================================================================
@@ -239,14 +239,14 @@ functio modus(textus via) → numerus {
 # `ad` requires extending the materializer's conversio-valor genus table
 # to lower SolumStatus as a Tabula walk. The host gateway work is the
 # right moment to land that.
-functio describe(textus via) → SolumStatus {
-    mori "norma:solum.describe is deferred pending Stage 2 dispatch"
+fn describe(string via) → SolumStatus {
+    panic "norma:solum.describe is deferred pending Stage 2 dispatch"
 }
 
 # Get file details (async — same materializer blocker as describe)
-@ futura
-functio describet(textus via) → SolumStatus {
-    mori "norma:solum.describet is deferred pending Stage 2 dispatch"
+@ future
+fn describet(string via) → SolumStatus {
+    panic "norma:solum.describet is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -256,21 +256,21 @@ functio describet(textus via) → SolumStatus {
 # Maps to: fs.readlinkSync(path) / fs.readlink(path)
 
 # Follow symlink to get target path (sync)
-@ publica
-functio sequere(textus via) → textus {
-    redde ad 'solum:sequere' (via) ↦ textus
+@ public
+fn sequere(string via) → string {
+    return call 'solum:sequere' (via) ↦ string
 }
 
 # Follow symlink to get target path (async route; Faber blocks)
-@ futura
-functio sequetur(textus via) → textus {
-    redde ad 'solum:sequetur' (via) ↦ textus
+@ future
+fn sequetur(string via) → string {
+    return call 'solum:sequetur' (via) ↦ string
 }
 
 # Create a symbolic link pointing from destinatio to fons.
-@ publica
-functio vincula(textus fons, textus destinatio) → vacuum {
-    redde ad 'solum:vincula' ([fons, destinatio]) ↦ vacuum
+@ public
+fn vincula(string fons, string destinatio) → void {
+    return call 'solum:vincula' ([fons, destinatio]) ↦ void
 }
 
 # =========================================================================
@@ -281,15 +281,15 @@ functio vincula(textus fons, textus destinatio) → vacuum {
 # Maps to: fs.unlinkSync(path) / fs.unlink(path)
 
 # Delete file (sync)
-@ publica
-functio dele(textus via) → vacuum {
-    redde ad 'solum:dele' (via) ↦ vacuum
+@ public
+fn dele(string via) → void {
+    return call 'solum:dele' (via) ↦ void
 }
 
 # Delete file (async route; Faber blocks)
-@ futura
-functio delet(textus via) → vacuum {
-    redde ad 'solum:delet' (via) ↦ vacuum
+@ future
+fn delet(string via) → void {
+    return call 'solum:delet' (via) ↦ void
 }
 
 # =========================================================================
@@ -299,15 +299,15 @@ functio delet(textus via) → vacuum {
 # Maps to: fs.copyFileSync(src, dest) / fs.copyFile(src, dest)
 
 # Copy file (sync)
-@ publica
-functio exscribe(textus fons, textus destinatio) → vacuum {
-    redde ad 'solum:exscribe' ([fons, destinatio]) ↦ vacuum
+@ public
+fn exscribe(string fons, string destinatio) → void {
+    return call 'solum:exscribe' ([fons, destinatio]) ↦ void
 }
 
 # Copy file (async route; Faber blocks)
-@ futura
-functio exscribet(textus fons, textus destinatio) → vacuum {
-    redde ad 'solum:exscribet' ([fons, destinatio]) ↦ vacuum
+@ future
+fn exscribet(string fons, string destinatio) → void {
+    return call 'solum:exscribet' ([fons, destinatio]) ↦ void
 }
 
 # =========================================================================
@@ -318,15 +318,15 @@ functio exscribet(textus fons, textus destinatio) → vacuum {
 # Maps to: fs.renameSync(src, dest) / fs.rename(src, dest)
 
 # Rename or move file (sync)
-@ publica
-functio renomina(textus fons, textus destinatio) → vacuum {
-    redde ad 'solum:renomina' ([fons, destinatio]) ↦ vacuum
+@ public
+fn renomina(string fons, string destinatio) → void {
+    return call 'solum:renomina' ([fons, destinatio]) ↦ void
 }
 
 # Rename or move file (async route; Faber blocks)
-@ futura
-functio renominabit(textus fons, textus destinatio) → vacuum {
-    redde ad 'solum:renominabit' ([fons, destinatio]) ↦ vacuum
+@ future
+fn renominabit(string fons, string destinatio) → void {
+    return call 'solum:renominabit' ([fons, destinatio]) ↦ void
 }
 
 # =========================================================================
@@ -336,22 +336,22 @@ functio renominabit(textus fons, textus destinatio) → vacuum {
 # Maps to: touch behavior (utimes or create empty file)
 
 # Touch file - create or update mtime (sync)
-@ publica
-functio tange(textus via) → vacuum {
-    redde ad 'solum:tange' (via) ↦ vacuum
+@ public
+fn tange(string via) → void {
+    return call 'solum:tange' (via) ↦ void
 }
 
 # Touch file - create or update mtime (async route; Faber blocks)
-@ futura
-functio tanget(textus via) → vacuum {
-    redde ad 'solum:tanget' (via) ↦ vacuum
+@ future
+fn tanget(string via) → void {
+    return call 'solum:tanget' (via) ↦ void
 }
 
 # Set permission/mode bits.
-@ publica
-functio modum(textus via, numerus modus) → vacuum {
-    fixum lista<valor> args ← [via ↦ valor, modus ↦ valor]
-    redde ad 'solum:modum' (args) ↦ vacuum
+@ public
+fn modum(string via, int modus) → void {
+    const list<value> args ← [via ↦ value, modus ↦ value]
+    return call 'solum:modum' (args) ↦ void
 }
 
 # =========================================================================
@@ -362,15 +362,15 @@ functio modum(textus via, numerus modus) → vacuum {
 # Maps to: fs.mkdirSync(path, {recursive: true}) / fs.mkdir(...)
 
 # Create directory (sync)
-@ publica
-functio crea(textus via) → vacuum {
-    redde ad 'solum:crea' (via) ↦ vacuum
+@ public
+fn crea(string via) → void {
+    return call 'solum:crea' (via) ↦ void
 }
 
 # Create directory (async route; Faber blocks)
-@ futura
-functio creabit(textus via) → vacuum {
-    redde ad 'solum:creabit' (via) ↦ vacuum
+@ future
+fn creabit(string via) → void {
+    return call 'solum:creabit' (via) ↦ void
 }
 
 # =========================================================================
@@ -380,14 +380,14 @@ functio creabit(textus via) → vacuum {
 # Maps to: fs.readdirSync(path) / fs.readdir(path)
 
 # List directory contents (sync)
-functio enumera(textus via) → lista<textus> {
-    redde ad 'solum:enumera' (via) ↦ lista<textus>
+fn enumera(string via) → list<string> {
+    return call 'solum:enumera' (via) ↦ list<string>
 }
 
 # List directory contents (async route; Faber blocks)
-@ futura
-functio enumerabit(textus via) → lista<textus> {
-    redde ad 'solum:enumerabit' (via) ↦ lista<textus>
+@ future
+fn enumerabit(string via) → list<string> {
+    return call 'solum:enumerabit' (via) ↦ list<string>
 }
 
 # =========================================================================
@@ -399,15 +399,15 @@ functio enumerabit(textus via) → lista<textus> {
 # Maps to: fs.rmSync(path, {recursive: true}) / fs.rm(...)
 
 # Prune directory tree (sync)
-@ publica
-functio amputa(textus via) → vacuum {
-    redde ad 'solum:amputa' (via) ↦ vacuum
+@ public
+fn amputa(string via) → void {
+    return call 'solum:amputa' (via) ↦ void
 }
 
 # Prune directory tree (async route; Faber blocks)
-@ futura
-functio amputabit(textus via) → vacuum {
-    redde ad 'solum:amputabit' (via) ↦ vacuum
+@ future
+fn amputabit(string via) → void {
+    return call 'solum:amputabit' (via) ↦ void
 }
 
 # =========================================================================
@@ -420,48 +420,48 @@ functio amputabit(textus via) → vacuum {
 # prefer the norma:solum/path import; these remain for surface compatibility.
 
 # Join path segments
-@ publica
-functio iunge(lista<textus> partes) → textus {
-    redde ad 'solum:iunge' (partes) ↦ textus
+@ public
+fn iunge(list<string> partes) → string {
+    return call 'solum:iunge' (partes) ↦ string
 }
 
 # Parent path segment (directory part)
-@ publica
-functio parens(textus via) → textus {
-    redde ad 'solum:parens' (via) ↦ textus
+@ public
+fn parens(string via) → string {
+    return call 'solum:parens' (via) ↦ string
 }
 
 # Final path segment (filename)
-functio nomen(textus via) → textus {
-    redde ad 'solum:nomen' (via) ↦ textus
+fn nomen(string via) → string {
+    return call 'solum:nomen' (via) ↦ string
 }
 
 # File extension (includes dot)
-functio suffixum(textus via) → textus {
-    redde ad 'solum:suffixum' (via) ↦ textus
+fn suffixum(string via) → string {
+    return call 'solum:suffixum' (via) ↦ string
 }
 
 # Resolve to absolute path
-functio absolve(textus via) → textus {
-    redde ad 'solum:absolve' (via) ↦ textus
+fn absolve(string via) → string {
+    return call 'solum:absolve' (via) ↦ string
 }
 
 # Get user's home directory
-functio domus() → textus {
-    redde ad 'solum:domus' ↦ textus
+fn domus() → string {
+    return call 'solum:domus' ↦ string
 }
 
 # Get system temp directory
-functio temporarium() → textus {
-    redde ad 'solum:temporarium' ↦ textus
+fn temporarium() → string {
+    return call 'solum:temporarium' ↦ string
 }
 
-@ privata
-functio _iunge_duo(textus base, textus segmentum) → textus {
-    si base.finis("/") {
-        redde "§§"(base, segmentum)
+@ private
+fn _iunge_duo(string base, string segmentum) → string {
+    if base.ends_with("/") {
+        return "§§"(base, segmentum)
     }
-    redde "§/§"(base, segmentum)
+    return "§/§"(base, segmentum)
 }
 
 # =========================================================================
@@ -471,30 +471,30 @@ functio _iunge_duo(textus base, textus segmentum) → textus {
 # Contract: explora(radix, exemplar) → lista<textus> ⇥ textus
 # v1: * matches exactly one path segment (e.g. "*/SKILL.md").
 #
-functio explora(textus radix, textus exemplar) → lista<textus> ⇥ textus {
-    fixum lista<textus> segmenta ← exemplar.divide("/")
-    varia lista<textus> candidatos ← [radix]
-    varia numerus index ← 0
-    dum index < segmenta.longitudo() {
-        fixum textus segmentum ← segmenta.accipe(index) vel ""
-        si segmentum ≡ "" {
-            iace "empty path segment in solum.explora exemplar"
+fn explora(string radix, string exemplar) → list<string> ⇥ string {
+    const list<string> segmenta ← exemplar.split("/")
+    var list<string> candidatos ← [radix]
+    var int index ← 0
+    while index < segmenta.length() {
+        const string segmentum ← segmenta.get(index) coalesce ""
+        if segmentum ≡ "" {
+            throw "empty path segment in solum.explora exemplar"
         }
 
-        varia lista<textus> proximos ← vacua
-        si segmentum ≡ "*" {
-            itera ex candidatos fixum base {
-                fixum lista<textus> nomina ← enumera(base)
-                itera ex nomina fixum nomen {
-                    proximos.appende(_iunge_duo(base, nomen))
+        var list<string> proximos ← vacua
+        if segmentum ≡ "*" {
+            for from candidatos const base {
+                const list<string> nomina ← enumera(base)
+                for from nomina const nomen {
+                    proximos.append(_iunge_duo(base, nomen))
                 }
             }
         }
-        secus {
-            itera ex candidatos fixum base {
-                fixum textus via ← _iunge_duo(base, segmentum)
-                si exstat(via) {
-                    proximos.appende(via)
+        else {
+            for from candidatos const base {
+                const string via ← _iunge_duo(base, segmentum)
+                if exstat(via) {
+                    proximos.append(via)
                 }
             }
         }
@@ -502,5 +502,5 @@ functio explora(textus radix, textus exemplar) → lista<textus> ⇥ textus {
         candidatos ← proximos
         index ← index + 1
     }
-    redde candidatos
+    return candidatos
 }

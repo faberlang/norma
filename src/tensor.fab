@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # tensor.fab — native Faber tensor bridge and recipe module
@@ -14,14 +14,14 @@ locale = "la"
 
 # Verb: planata from "planare" (to flatten) — Perfectum
 # Why: Flatten grid to lista<T> via default conversio (row-major layout).
-functio planata<T, magnitudo Figura>(tensor<T, Figura> grid) → lista<T> {
-    redde grid ↦ lista<T>
+fn planata<T, size Figura>(tensor<T, Figura> grid) → list<T> {
+    return grid ↦ list<T>
 }
 
 # Verb: structa from "struere" (to build) — 1-d bridge
 # Why: Promote lista<T> to 1-d tensor via default conversio.
-functio structa<T, magnitudo Figura>(lista<T> data) → tensor<T, Figura> {
-    redde data ↦ tensor<T, Figura>
+fn structa<T, size Figura>(list<T> data) → tensor<T, Figura> {
+    return data ↦ tensor<T, Figura>
 }
 
 # =========================================================================
@@ -36,12 +36,12 @@ functio structa<T, magnitudo Figura>(lista<T> data) → tensor<T, Figura> {
 #   seed.strue(data, shape)
 
 # Why: Product of dimension sizes; empty shape → 1 (scalar degenerate).
-functio productum(lista<numerus> shape) → numerus {
-    varia numerus product ← 1
-    itera ex shape fixum dim {
+fn productum(list<int> shape) → int {
+    var int product ← 1
+    for from shape const dim {
         product ← product * dim
     }
-    redde product
+    return product
 }
 
 # =========================================================================
@@ -50,15 +50,15 @@ functio productum(lista<numerus> shape) → numerus {
 
 # Verb: applicata from "applicare" (to apply) — Perfectum
 # Why: Map f over every element preserving shape (flatten → walk → reshape).
-functio applicata<T, magnitudo Figura>(tensor<T, Figura> grid, (T) → T f) → tensor<T, Figura> {
-    fixum lista<numerus> shape ← grid.magnitudines()
-    fixum lista<T> flat ← grid ↦ lista<T>
-    varia lista<T> mapped ← vacua
-    itera ex flat fixum elem {
-        mapped.appende(f(elem))
+fn applicata<T, size Figura>(tensor<T, Figura> grid, (T) → T f) → tensor<T, Figura> {
+    const list<int> shape ← grid.shape()
+    const list<T> flat ← grid ↦ list<T>
+    var list<T> mapped ← vacua
+    for from flat const elem {
+        mapped.append(f(elem))
     }
-    fixum tensor<T, []> seed ← vacua
-    redde seed.strue(mapped, shape)
+    const tensor<T, []> seed ← vacua
+    return seed.from_flat(mapped, shape)
 }
 
 # =========================================================================
@@ -66,11 +66,11 @@ functio applicata<T, magnitudo Figura>(tensor<T, Figura> grid, (T) → T f) → 
 # =========================================================================
 
 # Why: Total sum of integer tensor elements — delegates to grid.summa().
-functio summa<magnitudo Figura>(tensor<numerus, Figura> grid) → numerus {
-    redde grid.summa()
+fn summa<size Figura>(tensor<int, Figura> grid) → int {
+    return grid.sum()
 }
 
 # Why: Total sum of f32 fractus tensor elements — delegates to grid.summa().
-functio summa_fractus<magnitudo Figura>(tensor<fractus<f32>, Figura> grid) → fractus<f32> {
-    redde grid.summa()
+fn summa_fractus<size Figura>(tensor<float<f32>, Figura> grid) → float<f32> {
+    return grid.sum()
 }

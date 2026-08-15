@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # copula/fila.fab — double-ended queue (deque)
@@ -41,11 +41,11 @@ locale = "la"
 # =============================================================================
 
 # Double-ended queue over T. See module header for the two-lista scheme.
-genus Fila<T> {
+class Fila<T> {
     # caput plays the role of "the ante buffer" (head-side storage). `ante`
     # itself is a reserved keyword and cannot be a field name.
-    lista<T> caput = vacua
-    lista<T> post = vacua
+    list<T> caput = vacua
+    list<T> post = vacua
 
     # =========================================================================
     # STATE (nominal / present predicate)
@@ -53,14 +53,14 @@ genus Fila<T> {
 
     # Total element count across both halves. Nominal projection, matches
     # lista.longitudo() and tabula.longitudo().
-    functio longitudo() → numerus {
-        redde ego.caput.longitudo() + ego.post.longitudo()
+    fn longitudo() → int {
+        return self.caput.length() + self.post.length()
     }
 
     # Whether the queue holds no elements. Present predicate; matches
     # lista.vacua() and tabula.vacua() — returns bivalens from a bare adjective.
-    functio vacua() → bivalens {
-        redde ego.caput.vacua() et ego.post.vacua()
+    fn vacua() → bool {
+        return self.caput.is_empty() and self.post.is_empty()
     }
 
     # =========================================================================
@@ -71,46 +71,46 @@ genus Fila<T> {
     # learning surface transfers between lista and fila.
 
     # Push to the tail of the queue. Reuses the lista tail-push stem.
-    functio appende(T v) → vacuum {
-        ego.post.appende(v)
+    fn appende(T v) → void {
+        self.post.append(v)
     }
 
     # Push to the head of the queue. lista has no head-push intrinsic, so
     # fila names it with `praepone` (to place in front). Distinct stem from
     # `appende` because the operation is structurally different at the
     # builtin level.
-    functio praepone(T v) → vacuum {
-        ego.caput.appende(v)
+    fn praepone(T v) → void {
+        self.caput.append(v)
     }
 
     # Pop from the tail of the queue. Returns nihil if empty.
     # Reuses the lista tail-pop stem.
-    functio detrahe() → T ∪ nihil {
-        si non ego.post.vacua() ergo redde ego.post.detrahe()
-        si non ego.caput.vacua() {
+    fn detrahe() → T ∪ null {
+        if not self.post.is_empty() then return self.post.remove_last()
+        if not self.caput.is_empty() {
             # Rebalance: reverse caput into post so the head-side elements
             # become accessible from the tail end.
-            dum non ego.caput.vacua() {
-                ego.post.appende(ego.caput.detrahe())
+            while not self.caput.is_empty() {
+                self.post.append(self.caput.remove_last())
             }
-            redde ego.post.detrahe()
+            return self.post.remove_last()
         }
-        redde nihil
+        return null
     }
 
     # Pop from the head of the queue. Returns nihil if empty.
     # Reuses the lista head-pop stem.
-    functio decapita() → T ∪ nihil {
-        si non ego.caput.vacua() ergo redde ego.caput.detrahe()
-        si non ego.post.vacua() {
+    fn decapita() → T ∪ null {
+        if not self.caput.is_empty() then return self.caput.remove_last()
+        if not self.post.is_empty() {
             # Rebalance: reverse post into caput so the tail-side elements
             # become accessible from the head end.
-            dum non ego.post.vacua() {
-                ego.caput.appende(ego.post.detrahe())
+            while not self.post.is_empty() {
+                self.caput.append(self.post.remove_last())
             }
-            redde ego.caput.detrahe()
+            return self.caput.remove_last()
         }
-        redde nihil
+        return null
     }
 
     # =========================================================================
@@ -119,17 +119,17 @@ genus Fila<T> {
 
     # Read the head element without removing it. Returns nihil if empty.
     # `caput` stores the head-side reversed, so its tail is the queue head.
-    functio primus() → T ∪ nihil {
-        si non ego.caput.vacua() ergo redde ego.caput.ultimus()
-        si non ego.post.vacua() ergo redde ego.post.primus()
-        redde nihil
+    fn primus() → T ∪ null {
+        if not self.caput.is_empty() then return self.caput.last()
+        if not self.post.is_empty() then return self.post.first()
+        return null
     }
 
     # Read the tail element without removing it. Returns nihil if empty.
-    functio ultimus() → T ∪ nihil {
-        si non ego.post.vacua() ergo redde ego.post.ultimus()
-        si non ego.caput.vacua() ergo redde ego.caput.primus()
-        redde nihil
+    fn ultimus() → T ∪ null {
+        if not self.post.is_empty() then return self.post.last()
+        if not self.caput.is_empty() then return self.caput.first()
+        return null
     }
 
     # =========================================================================
@@ -139,19 +139,19 @@ genus Fila<T> {
     # Materialize the queue as a lista in head-to-tail order. Does not
     # consume the queue. Perfectum stem `collecta` (gathered) — the natural
     # Latin participle for "the elements, gathered into a list."
-    functio collecta() → lista<T> {
-        varia lista<T> out ← vacua
+    fn collecta() → list<T> {
+        var list<T> out ← vacua
         # caput is stored reversed (its tail is the queue head), so walk it
         # tail-first to emit in head order.
-        varia numerus i ← ego.caput.longitudo()
-        dum i > 0 {
+        var int i ← self.caput.length()
+        while i > 0 {
             i ← i - 1
-            out.appende(ego.caput.accipe(i))
+            out.append(self.caput.get(i))
         }
-        itera ex ego.post fixum v {
-            out.appende(v)
+        for from self.post const v {
+            out.append(v)
         }
-        redde out
+        return out
     }
 }
 
@@ -165,12 +165,12 @@ genus Fila<T> {
 # predicate above.
 
 # Empty queue constructor.
-functio creata() → Fila<T> {
-    redde Fila<T> { }
+fn creata() → Fila<T> {
+    return Fila<T> { }
 }
 
 # Build a queue from a lista, preserving order. The first element of the
 # source becomes the head of the queue.
-functio creata_ex(lista<T> res) → Fila<T> {
-    redde Fila<T> { post = res }
+fn creata_ex(list<T> res) → Fila<T> {
+    return Fila<T> { post = res }
 }

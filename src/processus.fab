@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # processus.fab - Process Device
@@ -30,8 +30,8 @@ locale = "la"
 
 # Spawned subprocess handle for attached processes
 # Maps to: Bun.spawn() result
-genus Subprocessus {
-    numerus pid
+class Subprocessus {
+    int pid
 }
 
 # =========================================================================
@@ -48,9 +48,9 @@ genus Subprocessus {
 # instans, and lista<T>. The param name `argumenta` is also a reserved
 # keyword (TokenKind::Argumenta, used for CLI argument binding), so a
 # native body would need to rename it.
-@ publica
-functio genera(lista<textus> argumenta, textus directorium sponte, tabula<textus, textus> ambitus sponte) → Subprocessus {
-    mori "norma:processus.genera is deferred pending Stage 2 dispatch"
+@ public
+fn genera(list<string> args, string directorium optional, map<string, string> ambitus optional) → Subprocessus {
+    panic "norma:processus.genera is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -66,15 +66,15 @@ functio genera(lista<textus> argumenta, textus directorium sponte, tabula<textus
 # WHY: param renamed from `argumenta` (reserved keyword, TokenKind::Argumenta
 # used for CLI argument binding) to `args`. The sponte defaults for
 # directorium and ambitus lower correctly to None at the handler call.
-functio dimitte(lista<textus> args, textus directorium sponte, tabula<textus, textus> ambitus sponte) → numerus {
-    redde ad 'processus:dimitte' (args) ↦ numerus
+fn dimitte(list<string> args, string directorium optional, map<string, string> ambitus optional) → int {
+    return call 'processus:dimitte' (args) ↦ int
 }
 
 # Execute an argv vector directly and capture status, stdout, and stderr.
 # No shell is involved; args[0] is the executable and the remaining elements
 # are passed as literal argv entries.
-functio captura(lista<textus> args) → valor {
-    redde ad 'processus:captura' (args) ↦ valor
+fn captura(list<string> args) → value {
+    return call 'processus:captura' (args) ↦ value
 }
 
 # =========================================================================
@@ -86,14 +86,14 @@ functio captura(lista<textus> args) → valor {
 # Maps to: sh -c "cmd" via Bun.spawnSync / Bun.spawn
 
 # Execute shell command, block until complete, return stdout (sync)
-@ publica
-functio exsequi(textus imperium) → textus {
-    redde ad 'processus:exsequi' (imperium) ↦ textus
+@ public
+fn exsequi(string command) → string {
+    return call 'processus:exsequi' (command) ↦ string
 }
 
 # Execute shell command, return stdout when complete (async route; Faber blocks)
-functio exsequetur(textus imperium) → textus {
-    redde ad 'processus:exsequetur' (imperium) ↦ textus
+fn exsequetur(string command) → string {
+    return call 'processus:exsequetur' (command) ↦ string
 }
 
 # =========================================================================
@@ -105,9 +105,9 @@ functio exsequetur(textus imperium) → textus {
 # Maps to: Bun.env[name] / process.env[name]
 
 # Read environment variable (Imperativus: fails when unset; set-to-empty → "")
-@ publica
-functio lege(textus nomen) → textus {
-    redde ad 'processus:lege' (nomen) ↦ textus
+@ public
+fn read(string nomen) → string {
+    return call 'processus:lege' (nomen) ↦ string
 }
 
 # =========================================================================
@@ -119,8 +119,8 @@ functio lege(textus nomen) → textus {
 # Maps to: Bun.env[name] = value / process.env[name] = value
 
 # Write environment variable
-functio scribe(textus nomen, textus valor) → vacuum {
-    redde ad 'processus:scribe' ([nomen, valor]) ↦ vacuum
+fn write(string nomen, string value) → void {
+    return call 'processus:scribe' ([nomen, value]) ↦ void
 }
 
 # =========================================================================
@@ -133,8 +133,8 @@ functio scribe(textus nomen, textus valor) → vacuum {
 # Maps to: process.cwd()
 
 # Get current working directory (where the process dwells)
-functio sedes() → textus {
-    redde ad 'processus:sedes' ↦ textus
+fn sedes() → string {
+    return call 'processus:sedes' ↦ string
 }
 
 # =========================================================================
@@ -146,8 +146,8 @@ functio sedes() → textus {
 # Maps to: process.chdir(path)
 
 # Change current working directory
-functio muta(textus via) → vacuum {
-    redde ad 'processus:muta' (via) ↦ vacuum
+fn muta(string via) → void {
+    return call 'processus:muta' (via) ↦ void
 }
 
 # =========================================================================
@@ -158,8 +158,8 @@ functio muta(textus via) → vacuum {
 # Maps to: process.pid
 
 # Get process ID
-functio identitas() → numerus {
-    redde ad 'processus:identitas' ↦ numerus
+fn identitas() → int {
+    return call 'processus:identitas' ↦ int
 }
 
 # =========================================================================
@@ -170,9 +170,9 @@ functio identitas() → numerus {
 # Maps to: Bun.argv.slice(2) / process.argv.slice(2)
 
 # Get command line arguments (excludes runtime and script path)
-@ publica
-functio argumenta() → lista<textus> {
-    redde ad 'processus:argumenta' ↦ lista<textus>
+@ public
+fn args() → list<string> {
+    return call 'processus:argumenta' ↦ list<string>
 }
 
 # =========================================================================
@@ -184,7 +184,7 @@ functio argumenta() → lista<textus> {
 # Maps to: process.exit(code)
 
 # Exit process with code (never returns)
-functio exi(numerus code) → numquam {
-    fixum vacuum _ ← ad 'processus:exi' (code) ↦ vacuum
-    mori "process exit returned unexpectedly"
+fn exi(int code) → never {
+    const void _ ← call 'processus:exi' (code) ↦ void
+    panic "process exit returned unexpectedly"
 }

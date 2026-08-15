@@ -6,7 +6,7 @@ canonical = false
 summary = "Native norma:mathesis catalog — constants, clamp, transcendentals."
 syntax = "norma:mathesis"
 related = ["mathesis", "stdlib-nativum"]
-locale = "la"
+locale = "en"
 +++
 
 
@@ -18,54 +18,54 @@ locale = "la"
 #   0.0
 #   verum
 
-importa ex "norma:mathesis" privata mathesis
+import from "norma:mathesis" mathesis
 
-incipit {
-    fixum fractus pi ← mathesis.PI()
-    fixum fractus s ← mathesis.sinus(0.0)
-    fixum fractus c ← mathesis.cosinus(0.0)
-    fixum fractus r ← mathesis.radix(4.0)
-    fixum fractus clamped ← mathesis.constringens(5.0, 0.0, 3.0)
-    fixum fractus t ← mathesis.tangens(0.0)
-    fixum fractus exp1 ← mathesis.exponens(1.0)
-    fixum fractus ln_e ← mathesis.logarithmus(mathesis.E())
-    fixum fractus ln10 ← mathesis.logarithmus10(100.0)
-    fixum fractus neg_sqrt ← mathesis.radix(-1.0)
-    fixum fractus neg_log ← mathesis.logarithmus(-1.0)
-    fixum fractus pole_tan ← mathesis.tangens(mathesis.PI() / 2.0)
-    fixum fractus pow_cat ← mathesis.potentia(2.0, 3.0)
-    fixum fractus b ← 2.0
-    fixum fractus pow_recv ← b.potentia(3.0)
-    fixum fractus neg_b ← -2.0
-    fixum fractus neg_pow_recv ← neg_b.potentia(2.0)
-    nota pi
-    nota s
-    nota c
-    nota r
-    nota clamped
-    nota t
-    nota exp1
-    nota ln_e
-    nota ln10
-    nota neg_sqrt
-    nota neg_log
-    nota pole_tan
-    nota pow_cat
-    nota pow_recv
-    nota neg_pow_recv
-    adfirma s ≈ 0.0
-    adfirma c ≈ 1.0
-    adfirma r ≈ 2.0
-    adfirma clamped ≡ 3.0
-    adfirma t ≈ 0.0
-    adfirma exp1.approximata(mathesis.E(), 0.000001)
-    adfirma ln_e.approximata(1.0, 0.000001)
-    adfirma ln10.approximata(2.0, 0.000001)
-    adfirma neg_sqrt ≡ 0.0
-    adfirma neg_log ≡ 0.0
-    adfirma pole_tan ≡ 0.0
-    adfirma pow_cat.approximata(8.0, 0.000001)
-    adfirma pow_recv ≡ pow_cat
-    adfirma neg_pow_recv ≡ 0.0
-    adfirma mathesis.potentia(-2.0, 2.0) ≡ 0.0
+main {
+    const float pi ← mathesis.PI()
+    const float s ← mathesis.sinus(0.0)
+    const float c ← mathesis.cosinus(0.0)
+    const float r ← mathesis.radix(4.0)
+    const float clamped ← mathesis.constringens(5.0, 0.0, 3.0)
+    const float t ← mathesis.tangens(0.0)
+    const float exp1 ← mathesis.exponens(1.0)
+    const float ln_e ← mathesis.logarithmus(mathesis.E())
+    const float ln10 ← mathesis.logarithmus10(100.0)
+    const float neg_sqrt ← mathesis.radix(-1.0)
+    const float neg_log ← mathesis.logarithmus(-1.0)
+    const float pole_tan ← mathesis.tangens(mathesis.PI() / 2.0)
+    const float pow_cat ← mathesis.power(2.0, 3.0)
+    const float b ← 2.0
+    const float pow_recv ← b.power(3.0)
+    const float neg_b ← -2.0
+    const float neg_pow_recv ← neg_b.power(2.0)
+    print pi
+    print s
+    print c
+    print r
+    print clamped
+    print t
+    print exp1
+    print ln_e
+    print ln10
+    print neg_sqrt
+    print neg_log
+    print pole_tan
+    print pow_cat
+    print pow_recv
+    print neg_pow_recv
+    assert s ≈ 0.0
+    assert c ≈ 1.0
+    assert r ≈ 2.0
+    assert clamped ≡ 3.0
+    assert t ≈ 0.0
+    assert exp1.approx(mathesis.E(), 0.000001)
+    assert ln_e.approx(1.0, 0.000001)
+    assert ln10.approx(2.0, 0.000001)
+    assert neg_sqrt ≡ 0.0
+    assert neg_log ≡ 0.0
+    assert pole_tan ≡ 0.0
+    assert pow_cat.approx(8.0, 0.000001)
+    assert pow_recv ≡ pow_cat
+    assert neg_pow_recv ≡ 0.0
+    assert mathesis.power(-2.0, 2.0) ≡ 0.0
 }

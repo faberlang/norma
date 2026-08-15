@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # csv.fab — naive comma / Faber-literal-\n CSV wire helpers (native Faber leaf)
@@ -8,41 +8,41 @@ locale = "la"
 # Method ledger: docs/stdlib/csv-methods.md
 # Internal dependency: norma:chorda (discissa + nexa)
 
-importa ex "norma:chorda" chorda
+import from "norma:chorda" chorda
 
 # Why: Strip a single trailing CR when rows arrive CRLF-split (v1 LF contract).
-@ privata
-functio _normaliza_row(textus row) → textus {
-    si row.longitudo() ≡ 0 ergo redde row
+@ private
+fn _normaliza_row(string row) → string {
+    if row.length() ≡ 0 then return row
 
-    fixum textus last ← row.sectio(row.longitudo() - 1, row.longitudo())
-    si last ≡ "\r" ergo redde row.sectio(0, row.longitudo() - 1)
+    const string last ← row.slice(row.length() - 1, row.length())
+    if last ≡ "\r" then return row.slice(0, row.length() - 1)
 
-    redde row
+    return row
 }
 
 # Verb: solve from "solvere" (to loosen, untangle)
 # Why: Parse naive comma/LF wire into rows of fields (see csv-methods.md for limits).
-@ publica
-functio solve(textus wire) → lista<lista<textus>> {
-    si wire.longitudo() ≡ 0 ergo redde vacua
+@ public
+fn solve(string wire) → list<list<string>> {
+    if wire.length() ≡ 0 then return vacua
 
-    fixum lista<textus> rows ← chorda.discissa(wire, "\n", wire.longitudo() + 1)
-    varia lista<lista<textus>> tabula ← vacua
-    itera ex rows fixum row {
-        fixum textus normalized ← _normaliza_row(row)
-        tabula.appende(chorda.discissa(normalized, ",", normalized.longitudo() + 1))
+    const list<string> rows ← chorda.discissa(wire, "\n", wire.length() + 1)
+    var list<list<string>> map ← vacua
+    for from rows const row {
+        const string normalized ← _normaliza_row(row)
+        map.append(chorda.discissa(normalized, ",", normalized.length() + 1))
     }
-    redde tabula
+    return map
 }
 
 # Verb: pange from "pangere" (to fasten, compose)
 # Why: Compose rows of fields into comma-separated, LF-joined wire text.
-@ publica
-functio pange(lista<lista<textus>> tabula) → textus {
-    varia lista<textus> rows ← vacua
-    itera ex tabula fixum fields {
-        rows.appende(chorda.nexa(fields, ","))
+@ public
+fn pange(list<list<string>> map) → string {
+    var list<string> rows ← vacua
+    for from map const fields {
+        rows.append(chorda.nexa(fields, ","))
     }
-    redde chorda.nexa(rows, "\n")
+    return chorda.nexa(rows, "\n")
 }

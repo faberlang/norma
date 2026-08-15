@@ -6,7 +6,7 @@ canonical = false
 summary = "norma:aleator entropy API contract tests."
 syntax = "norma:aleator — fractum | sortire | octetos | uuid | semina (all ad-routed)"
 related = ["aleator", "stdlib-nativum"]
-locale = "la"
+locale = "en"
 +++
 
 # stdlib-nativum/aleator — norma:aleator entropy API contract tests
@@ -14,82 +14,82 @@ locale = "la"
 # All 5 public functions are ad-routed (require host routes at runtime).
 # This exemplum verifies import and function signature availability.
 
-importa ex "norma:aleator" privata aleator
+import from "norma:aleator" aleator
 
-incipit {
+main {
     # -----------------------------------------------------------------------
     # Basic generation
     # -----------------------------------------------------------------------
-    fac {
-        fixum fractus val ← aleator.fractum()
-        adfirma val ≥ 0.0
-        adfirma val < 1.0
+    do {
+        const float val ← aleator.fractum()
+        assert val ≥ 0.0
+        assert val < 1.0
     }
-    cape err {
-        nota "aleator.fractum not available"
+    catch err {
+        print "aleator.fractum not available"
     }
 
-    fac {
-        fixum numerus val ← aleator.sortire(1, 6)
-        adfirma val ≥ 1
-        adfirma val ≤ 6
+    do {
+        const int val ← aleator.sortire(1, 6)
+        assert val ≥ 1
+        assert val ≤ 6
     }
-    cape err {
-        nota "aleator.sortire not available"
+    catch err {
+        print "aleator.sortire not available"
     }
 
     # Edge: min = max should return the single value
-    fac {
-        fixum numerus val ← aleator.sortire(5, 5)
-        adfirma val ≡ 5
+    do {
+        const int val ← aleator.sortire(5, 5)
+        assert val ≡ 5
     }
-    cape err {
-        nota "aleator.sortire fixed range not available"
+    catch err {
+        print "aleator.sortire fixed range not available"
     }
 
     # -----------------------------------------------------------------------
     # Cryptographic generation
     # -----------------------------------------------------------------------
-    fac {
-        fixum octeti val ← aleator.octetos(16)
-        adfirma val.longitudo() ≡ 16
+    do {
+        const bytes val ← aleator.octetos(16)
+        assert val.length() ≡ 16
     }
-    cape err {
-        nota "aleator.octetos not available"
+    catch err {
+        print "aleator.octetos not available"
     }
 
     # Edge: n = 0 returns empty bytes
-    fac {
-        fixum octeti val ← aleator.octetos(0)
-        adfirma val.longitudo() ≡ 0
+    do {
+        const bytes val ← aleator.octetos(0)
+        assert val.length() ≡ 0
     }
-    cape err {
-        nota "aleator.octetos(0) not available"
+    catch err {
+        print "aleator.octetos(0) not available"
     }
 
-    fac {
-        fixum textus val ← aleator.uuid()
-        adfirma val.longitudo() ≡ 36
+    do {
+        const string val ← aleator.uuid()
+        assert val.length() ≡ 36
     }
-    cape err {
-        nota "aleator.uuid not available"
+    catch err {
+        print "aleator.uuid not available"
     }
 
     # -----------------------------------------------------------------------
     # Seeding (for reproducible tests)
     # -----------------------------------------------------------------------
-    fac {
+    do {
         aleator.semina(42)
     }
-    cape err {
-        nota "aleator.semina not available"
+    catch err {
+        print "aleator.semina not available"
     }
 
     # Edge: semina with negative value (should reset to true random)
-    fac {
+    do {
         aleator.semina(-1)
     }
-    cape err {
-        nota "aleator.semina(-1) not available"
+    catch err {
+        print "aleator.semina(-1) not available"
     }
 }

@@ -6,7 +6,7 @@ canonical = true
 summary = "First native stdlib body wired through norma:chorda."
 syntax = "retorta(<cord>)"
 related = ["chorda", "stdlib-nativum"]
-locale = "la"
+locale = "en"
 +++
 
 
@@ -15,9 +15,9 @@ locale = "la"
 # EXPECTED OUTPUT:
 #   amor
 
-importa ex "norma:chorda" privata chorda
+import from "norma:chorda" chorda
 
-incipit {
-    fixum textus reversed ← chorda.retorta("roma")
-    nota reversed
+main {
+    const string reversed ← chorda.reverse("roma")
+    print reversed
 }

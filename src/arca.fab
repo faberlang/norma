@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # arca.fab — Database device (`norma:arca`)
@@ -63,89 +63,89 @@ locale = "la"
 
 # Stem connect- · cell: future singular (async finite)
 # Driver inferred from URL scheme.
-@ futura
-functio connectet(textus url) → Connexio {
-    mori "norma:arca.connectet is deferred pending Stage 2 dispatch"
+@ future
+fn connectet(string url) → Connexio {
+    panic "norma:arca.connectet is deferred pending Stage 2 dispatch"
 }
 
 # Database connection handle
-implendum Connexio {
+interface Connexio {
     # -----------------------------------------------------------------
     # QUERIES — stem quaer- (quaerere) + stem capi- (capere)
     # -----------------------------------------------------------------
 
     # Stem quaer- · cell: future singular (async finite package)
-    @ futura
-    functio quaeret(textus sql, lista<valor> params) → lista<series>
+    @ future
+    fn quaeret(string sql, list<value> params) → list<series>
 
     # Stem capi- · cell: future singular (async first row or nihil)
-    @ futura
-    functio capiet(textus sql, lista<valor> params) → series ∪ nihil
+    @ future
+    fn capiet(string sql, list<value> params) → series ∪ null
 
     # Stem quaer- · cell: future plural (async stream)
-    @ futura
+    @ future
     @ cursor
-    functio quaerent(textus sql, lista<valor> params) → cursor<series>
+    fn quaerent(string sql, list<value> params) → cursor<series>
 
     # -----------------------------------------------------------------
     # MUTATIONS — stems exsequ- / inser-
     # -----------------------------------------------------------------
 
     # Stem exsequ- · cell: future singular (async rows-affected)
-    @ futura
-    functio exsequetur(textus sql, lista<valor> params) → numerus
+    @ future
+    fn exsequetur(string sql, list<value> params) → int
 
     # Stem inser- · cell: future singular (async last insert id)
-    @ futura
-    functio inseret(textus sql, lista<valor> params) → numerus
+    @ future
+    fn inseret(string sql, list<value> params) → int
 
     # -----------------------------------------------------------------
     # TRANSACTIONS — stem incip-
     # -----------------------------------------------------------------
 
     # Stem incip- · cell: future singular
-    @ futura
-    functio incipiet() → Transactio
+    @ future
+    fn async_main() → Transactio
 
     # -----------------------------------------------------------------
     # LIFECYCLE
     # -----------------------------------------------------------------
 
     # Stem claud- · cell: imperative (sync command)
-    functio claude() → vacuum
+    fn claude() → void
 
     # State · adjectival
-    functio aperta() → bivalens
+    fn aperta() → bool
 }
 
 # Database transaction handle (same query/mutation stems as Connexio)
-implendum Transactio {
+interface Transactio {
     # Stem quaer- · future singular
-    @ futura
-    functio quaeret(textus sql, lista<valor> params) → lista<series>
+    @ future
+    fn quaeret(string sql, list<value> params) → list<series>
 
     # Stem capi- · future singular
-    @ futura
-    functio capiet(textus sql, lista<valor> params) → series ∪ nihil
+    @ future
+    fn capiet(string sql, list<value> params) → series ∪ null
 
     # Stem quaer- · future plural
-    @ futura
+    @ future
     @ cursor
-    functio quaerent(textus sql, lista<valor> params) → cursor<series>
+    fn quaerent(string sql, list<value> params) → cursor<series>
 
     # Stem exsequ- · future singular
-    @ futura
-    functio exsequetur(textus sql, lista<valor> params) → numerus
+    @ future
+    fn exsequetur(string sql, list<value> params) → int
 
     # Stem inser- · future singular (parity with Connexio)
-    @ futura
-    functio inseret(textus sql, lista<valor> params) → numerus
+    @ future
+    fn inseret(string sql, list<value> params) → int
 
     # Stem commit- · future singular
-    @ futura
-    functio committet() → vacuum
+    @ future
+    fn committet() → void
 
     # Stem revert- · future singular
-    @ futura
-    functio revertet() → vacuum
+    @ future
+    fn revertet() → void
 }

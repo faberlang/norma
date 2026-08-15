@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # solum/path.fab — pure pathname operations
@@ -39,8 +39,8 @@ locale = "la"
 # Join path segments into a single path string.
 # Maps to: Rust PathBuf::push, Go path.Join, Node path.join.
 # Imperativus — produces a joined path from parts.
-functio iunge(lista<textus> partes) → textus {
-    redde ad 'solum:iunge' (partes) ↦ textus
+fn iunge(list<string> partes) → string {
+    return call 'solum:iunge' (partes) ↦ string
 }
 
 # =============================================================================
@@ -49,22 +49,22 @@ functio iunge(lista<textus> partes) → textus {
 
 # Parent directory of a path. Returns "" for paths with no parent.
 # Maps to: Rust Path::parent, Go path.Dir, Node path.dirname.
-functio parens(textus via) → textus {
-    redde ad 'solum:parens' (via) ↦ textus
+fn parens(string via) → string {
+    return call 'solum:parens' (via) ↦ string
 }
 
 # Final path segment (the filename). Returns "" for paths ending in "..".
 # Maps to: Rust Path::file_name, Go path.Base, Node path.basename.
-@ publica
-functio nomen(textus via) → textus {
-    redde ad 'solum:nomen' (via) ↦ textus
+@ public
+fn nomen(string via) → string {
+    return call 'solum:nomen' (via) ↦ string
 }
 
 # File extension, including the leading dot (e.g. ".txt"). Returns "" if
 # there is no extension.
 # Maps to: Rust Path::extension, Go path.Ext, Node path.extname.
-functio suffixum(textus via) → textus {
-    redde ad 'solum:suffixum' (via) ↦ textus
+fn suffixum(string via) → string {
+    return call 'solum:suffixum' (via) ↦ string
 }
 
 # =============================================================================
@@ -77,8 +77,8 @@ functio suffixum(textus via) → textus {
 # WHY: this one does touch the filesystem (canonicalize) — it lives here
 # because it is path resolution, but it can fail on non-existent paths and
 # falls back to cwd-join rather than throwing.
-functio absolve(textus via) → textus {
-    redde ad 'solum:absolve' (via) ↦ textus
+fn absolve(string via) → string {
+    return call 'solum:absolve' (via) ↦ string
 }
 
 # =============================================================================
@@ -87,12 +87,12 @@ functio absolve(textus via) → textus {
 
 # User's home directory. Reads $HOME on Unix; falls back to "/" if unset.
 # Maps to: Rust env::var("HOME"), Go os.UserHomeDir, Node os.homedir.
-functio domus() → textus {
-    redde ad 'solum:domus' ↦ textus
+fn domus() → string {
+    return call 'solum:domus' ↦ string
 }
 
 # System temporary directory.
 # Maps to: Rust env::temp_dir, Go os.TempDir, Node os.tmpdir.
-functio temporarium() → textus {
-    redde ad 'solum:temporarium' ↦ textus
+fn temporarium() → string {
+    return call 'solum:temporarium' ↦ string
 }

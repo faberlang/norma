@@ -6,7 +6,7 @@ canonical = false
 summary = "norma:codex encoding/decoding API contract tests."
 syntax = "norma:codex — base64 | hex | url (all mori deferred)"
 related = ["codex", "stdlib-nativum"]
-locale = "la"
+locale = "en"
 +++
 
 # stdlib-nativum/codex — norma:codex encoding/decoding API contract tests
@@ -15,95 +15,95 @@ locale = "la"
 #   1. Each function can be imported and called
 #   2. Each mori body throws
 
-importa ex "norma:codex" privata codex
+import from "norma:codex" codex
 
-incipit {
+main {
     # -----------------------------------------------------------------------
     # Base64 — mori deferred
     # -----------------------------------------------------------------------
-    fac {
+    do {
         codex.base64(|61 62 63|)
-        adfirma falsum
+        assert false
     }
-    cape err {
-        nota err
+    catch err {
+        print err
     }
 
-    fac {
+    do {
         codex.deBase64("AQID")
-        adfirma falsum
+        assert false
     }
-    cape err {
-        nota err
+    catch err {
+        print err
     }
 
-    fac {
+    do {
         codex.temptaBase64("AQID")
-        adfirma falsum
+        assert false
     }
-    cape err {
-        nota err
+    catch err {
+        print err
     }
 
     # -----------------------------------------------------------------------
     # Hex — mori deferred
     # -----------------------------------------------------------------------
-    fac {
+    do {
         codex.hex(|61 62 63|)
-        adfirma falsum
+        assert false
     }
-    cape err {
-        nota err
+    catch err {
+        print err
     }
 
-    fac {
+    do {
         codex.deHex("616263")
-        adfirma falsum
+        assert false
     }
-    cape err {
-        nota err
+    catch err {
+        print err
     }
 
-    fac {
+    do {
         codex.temptaHex("616263")
-        adfirma falsum
+        assert false
     }
-    cape err {
-        nota err
+    catch err {
+        print err
     }
 
     # -----------------------------------------------------------------------
     # URL encoding — mori deferred
     # -----------------------------------------------------------------------
-    fac {
+    do {
         codex.url("hello world")
-        adfirma falsum
+        assert false
     }
-    cape err {
-        nota err
+    catch err {
+        print err
     }
 
-    fac {
+    do {
         codex.deUrl("hello+world")
-        adfirma falsum
+        assert false
     }
-    cape err {
-        nota err
+    catch err {
+        print err
     }
 
-    fac {
+    do {
         codex.urlComponentum("a&b=c")
-        adfirma falsum
+        assert false
     }
-    cape err {
-        nota err
+    catch err {
+        print err
     }
 
-    fac {
+    do {
         codex.deUrlComponentum("a%26b%3Dc")
-        adfirma falsum
+        assert false
     }
-    cape err {
-        nota err
+    catch err {
+        print err
     }
 }

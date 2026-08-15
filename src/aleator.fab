@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # aleator.fab - Entropy Device (random number generation)
@@ -19,15 +19,15 @@ locale = "la"
 # =========================================================================
 
 # Random float in [0, 1)
-@ publica
-functio fractum() → fractus {
-    redde ad 'aleator:fractum' ↦ fractus
+@ public
+fn fractum() → float {
+    return call 'aleator:fractum' ↦ float
 }
 
 # Random integer in [min, max] inclusive (draw by lot)
-@ publica
-functio sortire(numerus min, numerus max) → numerus {
-    redde ad 'aleator:sortire' ([min, max]) ↦ numerus
+@ public
+fn sortire(int min, int max) → int {
+    return call 'aleator:sortire' ([min, max]) ↦ int
 }
 
 # =========================================================================
@@ -35,15 +35,15 @@ functio sortire(numerus min, numerus max) → numerus {
 # =========================================================================
 
 # Random bytes (crypto-secure)
-@ publica
-functio octetos(numerus n) → octeti {
-    redde ad 'aleator:octetos' (n) ↦ octeti
+@ public
+fn octetos(int n) → bytes {
+    return call 'aleator:octetos' (n) ↦ bytes
 }
 
 # UUID v4 string (crypto-secure)
-@ publica
-functio uuid() → textus {
-    redde ad 'aleator:uuid' ↦ textus
+@ public
+fn uuid() → string {
+    return call 'aleator:uuid' ↦ string
 }
 
 # =========================================================================
@@ -52,7 +52,7 @@ functio uuid() → textus {
 
 # Seed the RNG. Only affects non-crypto functions.
 # Pass 0 or negative to reset to true random.
-@ publica
-functio semina(numerus n) → vacuum {
-    redde ad 'aleator:semina' (n) ↦ vacuum
+@ public
+fn semina(int n) → void {
+    return call 'aleator:semina' (n) ↦ void
 }

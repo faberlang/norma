@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # optimizer.fab — minimal SGD optimizer step
@@ -17,8 +17,8 @@ locale = "la"
 # SGD step (shape-generic: magnitudo Figura binds implicitly at call sites)
 # -------------------------------------------------------------------------
 
-functio sgd_step<magnitudo Figura>(tensor<f32, Figura> param, tensor<f32, Figura> grad, f32 lr) → tensor<f32, Figura> {
-    fixum tensor<f32, Figura> lr_fill ← param.reple(lr)
-    fixum tensor<f32, Figura> scaled ← grad.multiplica(lr_fill)
-    redde param.subtrahe(scaled)
+fn sgd_step<size Figura>(tensor<f32, Figura> param, tensor<f32, Figura> grad, f32 lr) → tensor<f32, Figura> {
+    const tensor<f32, Figura> lr_fill ← param.fill(lr)
+    const tensor<f32, Figura> scaled ← grad.multiply(lr_fill)
+    return param.subtract(scaled)
 }

@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # http.fab - HTTP Client/Server
@@ -22,34 +22,34 @@ locale = "la"
 # =========================================================================
 
 # GET request
-@ publica
-@ futura
-functio petet(textus url) → Replicatio {
-    mori "norma:http.petet is deferred pending Stage 2 dispatch"
+@ public
+@ future
+fn petet(string url) → Replicatio {
+    panic "norma:http.petet is deferred pending Stage 2 dispatch"
 }
 
 # POST request with body
-@ futura
-functio mittet(textus url, textus corpus) → Replicatio {
-    mori "norma:http.mittet is deferred pending Stage 2 dispatch"
+@ future
+fn mittet(string url, string corpus) → Replicatio {
+    panic "norma:http.mittet is deferred pending Stage 2 dispatch"
 }
 
 # PUT request with body
-@ futura
-functio ponet(textus url, textus corpus) → Replicatio {
-    mori "norma:http.ponet is deferred pending Stage 2 dispatch"
+@ future
+fn ponet(string url, string corpus) → Replicatio {
+    panic "norma:http.ponet is deferred pending Stage 2 dispatch"
 }
 
 # DELETE request
-@ futura
-functio delet(textus url) → Replicatio {
-    mori "norma:http.delet is deferred pending Stage 2 dispatch"
+@ future
+fn delet(string url) → Replicatio {
+    panic "norma:http.delet is deferred pending Stage 2 dispatch"
 }
 
 # PATCH request with body
-@ futura
-functio mutabit(textus url, textus corpus) → Replicatio {
-    mori "norma:http.mutabit is deferred pending Stage 2 dispatch"
+@ future
+fn mutabit(string url, string corpus) → Replicatio {
+    panic "norma:http.mutabit is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -57,9 +57,9 @@ functio mutabit(textus url, textus corpus) → Replicatio {
 # =========================================================================
 
 # Generic request with full control
-@ futura
-functio rogabit(textus modus, textus url, tabula<textus, textus> capita, textus corpus) → Replicatio {
-    mori "norma:http.rogabit is deferred pending Stage 2 dispatch"
+@ future
+fn rogabit(string modus, string url, map<string, string> capita, string corpus) → Replicatio {
+    panic "norma:http.rogabit is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -69,58 +69,58 @@ functio rogabit(textus modus, textus url, tabula<textus, textus> capita, textus 
 # The server provider is a generic pull loop. `args` carries the provider's
 # target-neutral listen options; the returned number is an opaque listener
 # handle. Faber owns routing and response policy around these calls.
-functio listen(lista<valor> args) → numerus {
-    redde ad 'http:listen' (args) ↦ numerus
+fn listen(list<value> args) → int {
+    return call 'http:listen' (args) ↦ int
 }
 
 # Accept one request record from a listener. The returned valor contains the
 # provider request id plus method, path, headers, and body fields.
-functio accept(numerus handle) → valor {
-    redde ad 'http:accept' (handle) ↦ valor
+fn accept(int handle) → value {
+    return call 'http:accept' (handle) ↦ value
 }
 
 # Send one response using the request id and target-neutral status, headers,
 # and body values carried in `args`.
-functio respond(lista<valor> args) → vacuum {
-    redde ad 'http:respond' (args) ↦ vacuum
+fn respond(list<value> args) → void {
+    return call 'http:respond' (args) ↦ void
 }
 
 # Stop a listener and release its pending request state.
-functio stop(numerus handle) → vacuum {
-    redde ad 'http:stop' (handle) ↦ vacuum
+fn stop(int handle) → void {
+    return call 'http:stop' (handle) ↦ void
 }
 
 # HTTP Response
-implendum Replicatio {
-    functio status() → numerus
+interface Replicatio {
+    fn status() → int
 
-    functio corpus() → textus
+    fn corpus() → string
 
-    functio corpus_octeti() → octeti
+    fn corpus_octeti() → bytes
 
-    functio corpus_json() → valor
+    fn corpus_json() → value
 
-    functio capita() → tabula<textus, textus>
+    fn capita() → map<string, string>
 
-    functio caput(textus nomen) → textus ∪ nihil
+    fn caput(string nomen) → string ∪ null
 
     # True if status is 2xx
-    functio bene() → bivalens
+    fn bene() → bool
 }
 
 # HTTP Request (received by server)
-implendum Rogatio {
-    functio modus() → textus
+interface Rogatio {
+    fn modus() → string
 
-    functio via() → textus
+    fn via() → string
 
-    functio corpus() → textus
+    fn corpus() → string
 
-    functio corpus_json() → valor
+    fn corpus_json() → value
 
-    functio capita() → tabula<textus, textus>
+    fn capita() → map<string, string>
 
-    functio caput(textus nomen) → textus ∪ nihil
+    fn caput(string nomen) → string ∪ null
 
-    functio param(textus nomen) → textus ∪ nihil
+    fn param(string nomen) → string ∪ null
 }

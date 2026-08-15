@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # tempus.fab — public Faber datetime library (native Faber catalog)
@@ -18,34 +18,34 @@ locale = "la"
 
 
 # Why: Pad a single-digit field to two decimal characters for RFC3339 wire.
-@ privata
-functio _duo(numerus n) → textus {
-    si n < 10 ergo redde "0§"(n ↦ textus)
+@ private
+fn _duo(int n) → string {
+    if n < 10 then return "0§"(n ↦ string)
 
-    redde n ↦ textus
+    return n ↦ string
 }
 
 # Why: Pad a year (or similar) to four decimal digits on the wire.
-@ privata
-functio _quattuor(numerus n) → textus {
-    varia textus out ← n ↦ textus
-    dum out.longitudo() < 4 {
+@ private
+fn _quattuor(int n) → string {
+    var string out ← n ↦ string
+    while out.length() < 4 {
         out ← "0§"(out)
     }
-    redde out
+    return out
 }
 
 # Why: Slice a fixed wire substring and parse it as a civil integer field.
-@ privata
-functio _campus(instans t, numerus initium, numerus finis) → numerus {
-    fixum textus wire ← t ↦ textus
-    redde wire.sectio(initium, finis) ↦ numerus
+@ private
+fn _campus(instant t, int initium, int finis) → int {
+    const string wire ← t ↦ string
+    return wire.slice(initium, finis) ↦ int
 }
 
 # Why: Build canonical UTC RFC3339 wire from civil components (always ends with Z).
-@ privata
-functio _wire(numerus annus, numerus mensis, numerus dies, numerus hora, numerus minuta, numerus secunda) → textus {
-    redde "§-§-§T§:§:§Z"(_quattuor(annus), _duo(mensis), _duo(dies), _duo(hora), _duo(minuta), _duo(secunda))
+@ private
+fn _wire(int annus, int mensis, int dies, int hora, int minuta, int secunda) → string {
+    return "§-§-§T§:§:§Z"(_quattuor(annus), _duo(mensis), _duo(dies), _duo(hora), _duo(minuta), _duo(secunda))
 }
 
 # =========================================================================
@@ -54,14 +54,14 @@ functio _wire(numerus annus, numerus mensis, numerus dies, numerus hora, numerus
 
 # Verb: solve from "solvere" (to loosen, untangle)
 # Why: Parse RFC3339 UTC wire text into instans via conversio.
-functio solve(textus wire) → instans {
-    redde wire ↦ instans
+fn solve(string wire) → instant {
+    return wire ↦ instant
 }
 
 # Verb: exprimit from "exprimere" (to express, render outward)
 # Why: Render instans as RFC3339 UTC wire text via conversio.
-functio exprimit(instans t) → textus {
-    redde t ↦ textus
+fn exprimit(instant t) → string {
+    return t ↦ string
 }
 
 # =========================================================================
@@ -69,33 +69,33 @@ functio exprimit(instans t) → textus {
 # =========================================================================
 
 # Why: Four-digit calendar year from wire positions [0, 4).
-functio annus(instans t) → numerus {
-    redde _campus(t, 0, 4)
+fn annus(instant t) → int {
+    return _campus(t, 0, 4)
 }
 
 # Why: Month of year (1-indexed) from wire positions [5, 7).
-functio mensis(instans t) → numerus {
-    redde _campus(t, 5, 7)
+fn mensis(instant t) → int {
+    return _campus(t, 5, 7)
 }
 
 # Why: Day of month from wire positions [8, 10).
-functio dies(instans t) → numerus {
-    redde _campus(t, 8, 10)
+fn dies(instant t) → int {
+    return _campus(t, 8, 10)
 }
 
 # Why: UTC hour from wire positions [11, 13).
-functio hora(instans t) → numerus {
-    redde _campus(t, 11, 13)
+fn hora(instant t) → int {
+    return _campus(t, 11, 13)
 }
 
 # Why: UTC minute from wire positions [14, 16).
-functio minuta(instans t) → numerus {
-    redde _campus(t, 14, 16)
+fn minuta(instant t) → int {
+    return _campus(t, 14, 16)
 }
 
 # Why: UTC second from wire positions [17, 19); sub-second wire tails are floored.
-functio secunda(instans t) → numerus {
-    redde _campus(t, 17, 19)
+fn secunda(instant t) → int {
+    return _campus(t, 17, 19)
 }
 
 # =========================================================================
@@ -104,16 +104,16 @@ functio secunda(instans t) → numerus {
 
 # Verb: structa from "struere" (to build, arrange)
 # Why: Construct midnight UTC instans from calendar date; invalid civil input throws.
-functio structa(numerus annus, numerus mensis, numerus dies) → instans ⇥ textus {
-    fixum textus wire ← _wire(annus, mensis, dies, 0, 0, 0)
-    redde wire ↦ instans
+fn structa(int annus, int mensis, int dies) → instant ⇥ string {
+    const string wire ← _wire(annus, mensis, dies, 0, 0, 0)
+    return wire ↦ instant
 }
 
 # Verb: structa_momenti — full civil moment (date + time)
 # Why: Construct UTC instans from all civil components; invalid input throws.
-functio structa_momenti(numerus annus, numerus mensis, numerus dies, numerus hora, numerus minuta, numerus secunda) → instans ⇥ textus {
-    fixum textus wire ← _wire(annus, mensis, dies, hora, minuta, secunda)
-    redde wire ↦ instans
+fn structa_momenti(int annus, int mensis, int dies, int hora, int minuta, int secunda) → instant ⇥ string {
+    const string wire ← _wire(annus, mensis, dies, hora, minuta, secunda)
+    return wire ↦ instant
 }
 
 # =========================================================================
@@ -121,23 +121,23 @@ functio structa_momenti(numerus annus, numerus mensis, numerus dies, numerus hor
 # =========================================================================
 
 # Current epoch time in nanoseconds (canonical wall clock; downconvert at use site)
-@ publica
-functio nunc() → instans<ns> {
-    redde ad 'tempus:nunc' ↦ instans<ns>
+@ public
+fn nunc() → instant<ns> {
+    return call 'tempus:nunc' ↦ instant<ns>
 }
 
 # =========================================================================
 # MONOTONIC CLOCK (never decreases)
 # =========================================================================
 
-@ publica
-functio monotonicum() → numerus {
-    redde ad 'tempus:monotonicum' ↦ numerus
+@ public
+fn monotonicum() → int {
+    return call 'tempus:monotonicum' ↦ int
 }
 
-@ publica
-functio activum() → numerus {
-    redde ad 'tempus:activum' ↦ numerus
+@ public
+fn activum() → int {
+    return call 'tempus:activum' ↦ int
 }
 
 # =========================================================================
@@ -150,18 +150,18 @@ functio activum() → numerus {
 # This is the one-shot timer pattern: ad + materialize, host delays.
 
 # Sleep for `ms` milliseconds with async caller materialization.
-@ publica
-@ futura
-functio dormiet(numerus ms) → vacuum {
-    redde ad 'tempus:dormiet' (ms) ↦ vacuum
+@ public
+@ future
+fn dormiet(int ms) → void {
+    return call 'tempus:dormiet' (ms) ↦ void
 }
 
 # Sleep (block) for `ms` milliseconds. Sync one-shot timer: blocks the
 # calling thread on the host response. Same route as dormiet; the
 # difference is sync vs async posture, mirroring the lege/leget split.
-@ publica
-functio expectet(numerus ms) → vacuum {
-    redde ad 'tempus:dormiet' (ms) ↦ vacuum
+@ public
+fn expectet(int ms) → void {
+    return call 'tempus:dormiet' (ms) ↦ void
 }
 
 # =========================================================================
@@ -184,8 +184,8 @@ functio expectet(numerus ms) → vacuum {
 # A native-Faber form becomes possible once cursor-return-from-function
 # ships.
 @ cursor
-functio vigila(numerus ms) → cursor<instans> {
-    mori "norma:tempus.vigila is deferred pending Stage 2 dispatch"
+fn vigila(int ms) → cursor<instant> {
+    panic "norma:tempus.vigila is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -193,23 +193,23 @@ functio vigila(numerus ms) → cursor<instans> {
 # =========================================================================
 # Why: trivial native Faber bodies; no host route needed.
 
-@ publica
-functio MILLISECUNDUM() → numerus {
-    redde 1
+@ public
+fn MILLISECUNDUM() → int {
+    return 1
 }
 
-functio SECUNDUM() → numerus {
-    redde 1000
+fn SECUNDUM() → int {
+    return 1000
 }
 
-functio MINUTUM() → numerus {
-    redde 60000
+fn MINUTUM() → int {
+    return 60000
 }
 
-functio HORA() → numerus {
-    redde 3600000
+fn HORA() → int {
+    return 3600000
 }
 
-functio DIES() → numerus {
-    redde 86400000
+fn DIES() → int {
+    return 86400000
 }

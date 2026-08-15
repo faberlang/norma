@@ -6,33 +6,33 @@ canonical = false
 summary = "Predicate and interval cord filtering."
 syntax = "retenta_iudicio(<cord>, <predicate>) | retenta(<cord>, <lo>, <hi>) | expurgata(<cord>, <lo>, <hi>)"
 related = ["chorda", "textus"]
-locale = "la"
+locale = "en"
 +++
 # chorda/retenta — predicate and interval cord filtering
 #
 # Filter ≠ clamp: retention walks scalars; it does not snap a whole cord to an interval endpoint.
 # Scalar ordering (Seam B): `c ≥ 'a'` inside `retenta` and native interval bodies.
 
-importa ex "norma:chorda" privata chorda
+import from "norma:chorda" chorda
 
-incipit {
-    fixum textus slug ← chorda.retenta("hello7!", "a", "z")
-    adfirma slug ≡ "hello"
+main {
+    const string slug ← chorda.retenta("hello7!", "a", "z")
+    assert slug ≡ "hello"
 
-    fixum textus letters ← chorda.retenta_iudicio("hello7!", textus c ∴ c ≥ 'a' et c ≤ 'z')
-    adfirma letters ≡ slug
+    const string letters ← chorda.retenta_iudicio("hello7!", string c ∴ c ≥ 'a' and c ≤ 'z')
+    assert letters ≡ slug
 
-    fixum textus digits ← chorda.retenta_iudicio("id42x", textus c ∴ (((c ≡ "0" aut c ≡ "1") aut c ≡ "2") aut c ≡ "3") aut c ≡ "4")
-    adfirma digits ≡ "42"
+    const string digits ← chorda.retenta_iudicio("id42x", string c ∴ (((c ≡ "0" or c ≡ "1") or c ≡ "2") or c ≡ "3") or c ≡ "4")
+    assert digits ≡ "42"
 
-    fixum textus stripped ← chorda.expurgata_iudicio("hi, world!", textus c ∴ (c ≡ "," aut c ≡ "!") aut c ≡ " ")
-    adfirma stripped ≡ "hiworld"
+    const string stripped ← chorda.expurgata_iudicio("hi, world!", string c ∴ (c ≡ "," or c ≡ "!") or c ≡ " ")
+    assert stripped ≡ "hiworld"
 
-    fixum textus without_digits ← chorda.expurgata("hello7!", "0", "9")
-    adfirma without_digits ≡ "hello!"
+    const string without_digits ← chorda.expurgata("hello7!", "0", "9")
+    assert without_digits ≡ "hello!"
 
-    fixum lista<textus> scalae ← chorda.scala("ab")
-    adfirma scalae.longitudo() ≡ 2
+    const list<string> scalae ← chorda.scala("ab")
+    assert scalae.length() ≡ 2
 
-    nota slug, digits, stripped
+    print slug, digits, stripped
 }

@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # json.fab — JSON wire floor facade
@@ -19,9 +19,9 @@ locale = "la"
 # Verb: pange from "pangere" (to fasten, compose)
 # Why: Composing/fastening data into JSON text representation.
 
-@ publica
-functio pange(json documentum) → textus {
-    mori "norma:json.pange is deferred pending runtime codec dispatch"
+@ public
+fn pange(json documentum) → string {
+    panic "norma:json.pange is deferred pending runtime codec dispatch"
 }
 
 # =========================================================================
@@ -30,15 +30,15 @@ functio pange(json documentum) → textus {
 # Verb: solve from "solvere" (to loosen, untangle)
 # Why: Untangling/extracting data from JSON text.
 
-@ publica
-functio solve(textus wire) → json ⇥ textus {
-    iace "norma:json.solve is deferred pending runtime codec dispatch"
+@ public
+fn solve(string wire) → json ⇥ string {
+    throw "norma:json.solve is deferred pending runtime codec dispatch"
 }
 
 # Verb: tempta from "temptare" (to try, attempt)
 # Why: Attempting to parse, returning null on failure instead of throwing.
 
-@ publica
-functio tempta(textus wire) → json ∪ nihil {
-    redde nihil
+@ public
+fn tempta(string wire) → json ∪ null {
+    return null
 }

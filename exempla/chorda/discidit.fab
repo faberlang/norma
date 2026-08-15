@@ -6,7 +6,7 @@ canonical = false
 summary = "Limited split and residuum helpers on cords."
 syntax = "discissa(<cord>, <delimiter>, <limit>)"
 related = ["chorda", "textus"]
-locale = "la"
+locale = "en"
 +++
 
 
@@ -20,14 +20,14 @@ locale = "la"
 # EXPECTED OUTPUT:
 #   chorda/discidit.expected — split segments and residuum.
 
-importa ex "norma:chorda" privata chorda
+import from "norma:chorda" chorda
 
-incipit {
-    fixum lista<textus> head ← chorda.discissa("a=b=c", "=", 2)
-    adfirma head.longitudo() ≡ 2
+main {
+    const list<string> head ← chorda.discissa("a=b=c", "=", 2)
+    assert head.length() ≡ 2
 
-    fixum textus tail ← chorda.residuum("hello", 2)
-    adfirma tail ≡ "llo"
+    const string tail ← chorda.residuum("hello", 2)
+    assert tail ≡ "llo"
 
-    nota head.primus(), head.accipe(1), tail
+    print head.first(), head.get(1), tail
 }

@@ -6,7 +6,7 @@ canonical = false
 summary = "Type-only stdlib file import through file namespace binding."
 syntax = "importa ex \"norma:caelum/terminus\" privata terminus"
 related = ["caelum", "stdlib-nativum", "imports"]
-locale = "la"
+locale = "en"
 +++
 
 
@@ -15,12 +15,12 @@ locale = "la"
 # EXPECTED OUTPUT:
 #   localhost
 
-importa ex "norma:caelum/terminus" privata terminus
+import from "norma:caelum/terminus" terminus
 
-incipit {
-    fixum terminus.Terminus endpoint ← terminus.Terminus {
+main {
+    const terminus.Terminus endpoint ← terminus.Terminus {
         hospes = "localhost",
         portus = 8080
     }
-    nota endpoint.hospes
+    print endpoint.hospes
 }

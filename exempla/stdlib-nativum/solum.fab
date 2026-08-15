@@ -6,7 +6,7 @@ canonical = false
 summary = "norma:solum filesystem API contract tests."
 syntax = "norma:solum — explora (native) | describe (mori) | path api"
 related = ["solum", "stdlib-nativum"]
-locale = "la"
+locale = "en"
 +++
 
 # stdlib-nativum/solum — norma:solum filesystem API contract tests
@@ -16,44 +16,44 @@ locale = "la"
 #   1. explora iace path — empty path segments (native body)
 #   2. describe/describet mori error text
 
-importa ex "norma:solum" privata solum
+import from "norma:solum" only
 
-incipit {
+main {
     # -----------------------------------------------------------------------
     # explora — native Faber glob reject empty path segment
     # -----------------------------------------------------------------------
-    fac {
-        solum.explora("/tmp", "a//b")
-        adfirma falsum
+    do {
+        only.explora("/tmp", "a//b")
+        assert false
     }
-    cape err {
-        adfirma err.continet("empty path segment")
+    catch err {
+        assert err.contains("empty path segment")
     }
 
-    fac {
-        solum.explora("/tmp", "*/")
-        adfirma falsum
+    do {
+        only.explora("/tmp", "*/")
+        assert false
     }
-    cape err {
-        adfirma err.continet("empty path segment")
+    catch err {
+        assert err.contains("empty path segment")
     }
 
     # -----------------------------------------------------------------------
     # describe — mori deferred body
     # -----------------------------------------------------------------------
-    fac {
-        solum.describe("/tmp")
-        adfirma falsum
+    do {
+        only.describe("/tmp")
+        assert false
     }
-    cape err {
-        nota err
+    catch err {
+        print err
     }
 
-    fac {
-        solum.describet("/tmp")
-        adfirma falsum
+    do {
+        only.describet("/tmp")
+        assert false
     }
-    cape err {
-        nota err
+    catch err {
+        print err
     }
 }
