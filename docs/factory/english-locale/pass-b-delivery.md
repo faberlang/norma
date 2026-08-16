@@ -27,7 +27,7 @@ first unit that applies them (PB-CHORDA applies the mechanical-trio and async-tw
   are confirmed before PB-CHORDA applies them; (c) the la-pack currency unit (PB-PACKS) is filed back to radix
   in the same wave as the first renames, or la-locale consumers read the new English canonicals directly
   (see §4 pack interplay and §5 rule 9); (d) `./scripta/check-source` is only green **after** the PA-4 gate
-  repair (`faber script` → `faber run`, faber 1.7.0); (e) **R1 parity repair** (delivery.md §4) lands before
+  repair (`faber script` → `faber run`, faber 1.7.0); (e) **RA-1 parity repair** (delivery.md §4) lands before
   PB-MATHESIS/PB-FILA/PB-ORDINATA/PB-VECTOR/PB-JSON, or those units' done_when is amended to "no new errors;
   parity unchanged" — those five modules carry pre-existing errors identical on the la baseline.
 - **Reasoning**: every Pass B rename is mechanical against the locked ledgers in §7; the per-module surface is
@@ -116,7 +116,7 @@ hosts) would need member-name updates — named follow-up, NOT this goal's compl
 ### 4.6 Toolchain contract (faber 1.7.0 — measured)
 
 - `FABER_BIN` = **rebuilt** `radix/target/debug/faber` (must postdate radix hand-6 `71b0f6801`,
-  2026-08-16 08:23). The pre-rebuild Aug-15 binary walked CWD ancestry for the dev locale pack and read a
+  2026-08-15 16:01:49 -0400). The pre-rebuild Aug-15 binary walked CWD ancestry for the dev locale pack and read a
   stale `/tmp/radix` checkout, misreporting csv/valor as en-pack-broken. The fixed binary resolves the exe
   tree first; the in-tree binary was rebuilt for this delivery and re-verified.
 - `FABER_LIBRARY_HOME` must resolve `norma:*` to the **tree under test** (packet root in lane mode; main
@@ -129,10 +129,10 @@ hosts) would need member-name updates — named follow-up, NOT this goal's compl
 - `faber test` per `.proba` uses the default en pack; the 4 la-bodied proba files are red until PA-3
   converts them. The norma root has no `faber.toml` (locale comes from file frontmatter); there is no
   root-package `faber test .` surface.
-- **R1 precondition**: `src/mathesis.fab`, `src/fila.fab`, `src/ordinata.fab`, `src/vector.fab`,
+- **RA-1 precondition**: `src/mathesis.fab`, `src/fila.fab`, `src/ordinata.fab`, `src/vector.fab`,
   `src/json/pange.fab` carry pre-existing errors identical on the la and en surfaces (delivery.md §3).
   PB-MATHESIS / PB-FILA / PB-ORDINATA / PB-VECTOR / PB-JSON done_when (`faber check` exit 0) is blocked
-  until R1 lands or is amended per delivery.md §4.
+  until RA-1 lands or is amended per delivery.md §4.
 
 ## 5. Rename authority: seed + locked conventions
 
@@ -207,7 +207,7 @@ F6  PB-DOCS                             (module headers, AGENTS/README, scripta/
 land in the same merge wave as the first rename unit that touches a pack-rowed identity (PB-CHORDA).
 
 > Count corrected 2026-08-16: the graph below is **29 units** (F1 3 + F2 1 + F3 22 + F4 1 + F6 1 = 28 norma
-> units, plus F5 PB-PACKS radix-coordinated = 29). The draft's "27" was a miscount. R1 (delivery.md §4)
+> units, plus F5 PB-PACKS radix-coordinated = 29). The draft's "27" was a miscount. RA-1 (delivery.md §4)
 > is a recommended pre-Pass-B parity precondition for the 5 pre-existing-error modules, not a Pass B unit.
 
 **Unit discipline (all src units).** Each unit renames **its own module's** identifiers per its ledger and
@@ -231,7 +231,7 @@ exempla-red until PB-CONSUMERS — see §8 merge gate); `est_basis` per unit.
    appear in `src/` only as comment text, never as code tokens.
 2. `faber check src/<m>.fab` (and each proba) exits 0 (lane authority setup: `FABER_BIN` from the packet,
    `FABER_LIBRARY_HOME` = parent of the repo root).
-3. `faber test .` from the norma root reports **zero semantic errors** (SEM006/SEM008/SEM010/…).
+3. `faber test` per file on the module's proba reports **zero semantic errors** (SEM006/SEM008/SEM010/…) — the norma root has no `faber.toml`, so the per-file oracle replaces the vacuous root `faber test .` (§4.6; delivery.md §7 Q4 default: no new manifest).
 4. `./scripta/check-source` green for the touched surface.
 5. `git diff --check` silent.
 
@@ -479,7 +479,7 @@ exempla-red until PB-CONSUMERS — see §8 merge gate); `est_basis` per unit.
 | --- | --- |
 | scope | `radix/stdlib/locale/en/pack.toml` + `la/pack.toml` — filed back to radix (radix read-only for norma Hands); lands in the same merge wave as PB-CHORDA |
 | ledger | en: rewrite `norma:chorda` rows to new canonicals (e.g. `reverse→reverse`, `join→join`, `encode→encode`, `decode→decode`, identity rows; drop stale `retorta`-era rows). la: add rows for every renamed public member (e.g. `reverse→retorta`, `join→nexa`, `read_file→lege`, `get→cape`, …) so la readers resolve the old Latin spellings |
-| done_when | `cargo test -p radix locale_*` green (pack validation); a la-locale consumer compiling `chorda.retorta(...)`/`solum.lege(...)` resolves |
+| done_when | `cargo test -p radix locale` green (substring filter — `locale_*` is not a glob cargo honors, so it matched no tests and vacuous-passed; the substring hits the locale-pack and locale round-trip tests); a la-locale consumer compiling `chorda.retorta(...)`/`solum.lege(...)` resolves |
 | integrable | yes (radix-side; gated with the first rename wave) |
 
 ### F6 — Docs / scripta
@@ -498,7 +498,7 @@ exempla-red until PB-CONSUMERS — see §8 merge gate); `est_basis` per unit.
 ## 8. Integration / merge gate
 
 - Every Pass B unit is `integrable: yes` for the **norma package** (per-module `faber check` zero errors
-  after each landing — R1 precondition for the 5 parity modules; `./scripta/check-source` green post-PA-4).
+  after each landing — RA-1 precondition for the 5 parity modules; `./scripta/check-source` green post-PA-4).
 - **Exempla are red from the first src unit until PB-CONSUMERS lands** (they reference the old member names).
   Merge lane: **hold Pass B on `factory/merge` and land the family batch together with PB-CONSUMERS**
   (atomic landing), or land incrementally with an acknowledged exempla-red window.
@@ -542,7 +542,7 @@ exempla-red until PB-CONSUMERS — see §8 merge gate); `est_basis` per unit.
    post-A baseline this delivery assumes.
 8. **Batch dispatch of the ⚡ leaves** (F3) may join any wave in any order; PB-OPTIMIZER is
    verification-only and may batch with any neighbor.
-9. **R1 parity precondition** (delivery.md §4): land the 5 pre-existing-error repairs (mathesis, fila,
+9. **RA-1 parity precondition** (delivery.md §4): land the 5 pre-existing-error repairs (mathesis, fila,
    ordinata, vector, json/pange) before PB-MATHESIS/PB-FILA/PB-ORDINATA/PB-VECTOR/PB-JSON, or amend those
    units' done_when to "no new errors; parity unchanged". Default: land first.
 10. **SEM006 visibility follow-up** (delivery.md §4, excluded from this delivery per task non-goals):

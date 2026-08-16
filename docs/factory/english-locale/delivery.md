@@ -5,7 +5,7 @@
 **Repo**: norma (direct on main; radix read-only for locale-pack verification).
 **Pass B detail spec**: [`pass-b-delivery.md`](pass-b-delivery.md) (refreshed in this wave; ledgers unchanged).
 **Status**: **READY for delivery audit.** Pass A = INTEGRATE decision + 5 completion units + 1 recommended
-pre-existing repair (R1). Pass B = 28 norma units + 1 radix-coordinated pack unit (PB-PACKS) = 29 units.
+pre-existing repair (RA-1). Pass B = 28 norma units + 1 radix-coordinated pack unit (PB-PACKS) = 29 units.
 
 ---
 
@@ -77,8 +77,8 @@ skews importing modules; caelum family numbers below are the honest ones).
 ## 4. Pass A unit graph (after the integrate decision)
 
 **PA-1 — INTEGRATE `c006af5`** (first unit; the only mandatory Pass A unit)
-- `write_scope`: norma only — bring `factory/hand-9`'s `c006af5` onto main (merge `--ff-only` or cherry-pick; byte-identical tree).
-- `done_when`: main contains the 58-file conversion as one commit; `faber check` (default en, rebuilt binary) on `src/chorda.fab`, `src/csv.fab`, `src/valor.fab` exits 0; `git diff main c006af5` empty.
+- `write_scope`: norma only — bring `factory/hand-9`'s `c006af5` onto main (merge-commit or cherry-pick; `--ff-only` is impossible since main and `factory/hand-9` diverged at `d755ada`, so main is not an ancestor; both preserve the `factory/hand-9` pointer; byte-identical tree).
+- `done_when`: main contains the 58-file conversion as one commit; `faber check` (default en, rebuilt binary) on `src/chorda.fab`, `src/csv.fab`, `src/valor.fab` exits 0; `git diff c006af5 main -- src exempla` empty.
 - `depends_on`: none. `integrable`: yes (docs-only main since merge-base; clean merge-tree proven). `risk`: low.
 
 **PA-2 — MANIFESTS: flip package exempla to `[locale] locale = "en"`**
@@ -88,7 +88,7 @@ skews importing modules; caelum family numbers below are the honest ones).
 
 **PA-3 — PROBA: convert the 4 Latin-surfaced `.proba` files**
 - `write_scope`: `src/mathesis.proba`, `exempla/caelum/terminus.proba`, `exempla/caelum/connexus.proba`, `exempla/caelum/auscultator.proba` (keyword surface `functio`→`fn`, `redde`→`return`, `fractus`→`float`, `fixum`→`const`, `forma(...)` constructor per the en surface, `importa ex`→`import from`; keep proba keywords and identifiers — those are Pass B).
-- `done_when`: `faber test src/mathesis.proba` runs under default en with zero locale-class SEM008s (parity source errors in mathesis.fab may still surface — see R1); the 3 caelum proba check clean or match their module's known residual.
+- `done_when`: `faber test src/mathesis.proba` runs under default en with zero locale-class SEM008s (parity source errors in mathesis.fab may still surface — see RA-1); the 3 caelum proba check clean or match their module's known residual.
 - `depends_on`: PA-1. `integrable`: yes. `risk`: low.
 - Note: `.proba` files carry no frontmatter and were skipped by the corpus pipeline; `faber test` uses the default en pack, so the la-bodied proba are red post-A.
 
@@ -103,7 +103,7 @@ skews importing modules; caelum family numbers below are the honest ones).
 - `done_when`: round-trip proof reproducible from main; goal ledger shows A1/A2 done; no radix pack gap filed.
 - `depends_on`: PA-1. `integrable`: yes. `risk`: low.
 
-**R1 — (recommended) PARITY: repair the 5 pre-existing src error files** — mathesis, fila, ordinata, vector, json/pange. *Not caused by Pass A* (identical errors on the la baseline); **precondition** for the full-green Pass B done_when on PB-MATHESIS/PB-FILA/PB-ORDINATA/PB-VECTOR/PB-JSON (`faber check src/<m>.fab` exit 0). Dispatch decision → Mind: land before the affected Pass B units, or amend those units' done_when to "no new errors; parity unchanged" and file a separate hygiene wave.
+**RA-1 — (recommended) PARITY: repair the 5 pre-existing src error files** — mathesis, fila, ordinata, vector, json/pange. *Not caused by Pass A* (identical errors on the la baseline); **precondition** for the full-green Pass B done_when on PB-MATHESIS/PB-FILA/PB-ORDINATA/PB-VECTOR/PB-JSON (`faber check src/<m>.fab` exit 0). Dispatch decision → Mind: land before the affected Pass B units, or amend those units' done_when to "no new errors; parity unchanged" and file a separate hygiene wave.
 
 **Excluded follow-up (per task non-goals — SEM006-style visibility work, NOT lowered here):** caelum family SEM006, exempla SEM004/SEM006 private-member violations, crypta-sha2 SEM006/SEM010. Pre-existing; the c006af5 author filed them for follow-up (hand-9 thread, 2026-08-15). Named so the audit knows the post-A en surface will not be 100% green until they land.
 
@@ -113,7 +113,7 @@ skews importing modules; caelum family numbers below are the honest ones).
 - **Count corrected**: 29 units (draft said 27 — miscount). 28 norma units (F1 3, F2 1, F3 22, F4 1, F6 1) + 1 radix-coordinated pack unit (F5 PB-PACKS).
 - **Preconditions** (updated vs the draft): PA-1 through PA-4 land first (integrate, manifests, proba, gates); FABER_BIN is the rebuilt binary; `./scripta/check-source` green only after PA-4.
 - **Ledgers verified live** in this wave: census holds (34 src `.fab` + 1 proba; 22 exempla corpus `.fab` + 3 proba; 2 packages); chorda/solum/valor/fila/tempus/json ledger names all present in live src; `renomina` spelling confirmed.
-- **R1 interplay**: the 5 parity modules keep pre-existing errors under Pass B renames unless R1 lands first (see §4).
+- **RA-1 interplay**: the 5 parity modules keep pre-existing errors under Pass B renames unless RA-1 lands first (see §4).
 - PB-PACKS (radix side) still required in the same merge wave as PB-CHORDA — the en pack defines `norma:chorda` as a **total identity** (9 rows, verified live in `radix/stdlib/locale/en/pack.toml`); the la pack has 0 rows, so la readers would read English canonicals after renames until rows land.
 
 ## 6. Lane-owned validation (named once)
@@ -125,7 +125,7 @@ skews importing modules; caelum family numbers below are the honest ones).
 
 ## 7. Open questions for Mind
 
-1. R1 dispatch: land the 5 parity repairs before the affected Pass B units, or amend those done_whens and file a separate hygiene wave? (Default: land first — keeps Pass B's `faber check` oracle honest.)
+1. RA-1 dispatch: land the 5 parity repairs before the affected Pass B units, or amend those done_whens and file a separate hygiene wave? (Default: land first — keeps Pass B's `faber check` oracle honest.)
 2. SEM006 visibility follow-up (excluded from this delivery): who owns the caelum-family + exempla + crypta-sha2 visibility repairs, and when? (Named by the c006af5 author as filed.)
 3. FABER_BIN rebuild: the in-tree binary was stale (Aug-15, pre-hand-6). Confirm the rebuilt binary (or a lane packet dev build) is the verified oracle for Hands.
 4. `faber test` surface: norma root has no `faber.toml`; per-file `faber test` needs `--locale`/package context. Should Pass A add a root package manifest, or is per-file `faber check` + `faber test <file>` the standing oracle? (Default: no new manifest; per-file.)
