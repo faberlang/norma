@@ -5,45 +5,45 @@ locale = "en"
 # caelum/connexus.fab — TCP socket (connected byte stream)
 #
 # Public import: importa ex "norma:caelum/connexus" privata connexus
-# Depends on: norma:caelum/terminus (for Terminus type in remotus()/localis())
+# Depends on: norma:caelum/terminus (for Endpoint type in remote()/local())
 
 import from "norma:caelum/terminus" terminus
 
-class Connexus {
+class Socket {
     int id = 0
 
     # Draw bytes (up to n if provided, otherwise whatever is available)
-    fn hauri(int n optional) → bytes {
-        panic "norma:caelum/connexus.hauri is deferred pending Stage 2 dispatch"
+    fn read_bytes(int n optional) → bytes {
+        panic "norma:caelum/connexus.read_bytes is deferred pending Stage 2 dispatch"
     }
 
     @ future
-    fn hauriet(int n optional) → bytes {
-        panic "norma:caelum/connexus.hauriet is deferred pending Stage 2 dispatch"
+    fn read_bytes_async(int n optional) → bytes {
+        panic "norma:caelum/connexus.read_bytes_async is deferred pending Stage 2 dispatch"
     }
 
     # Pour bytes
-    fn funde(bytes data) → void {
-        panic "norma:caelum/connexus.funde is deferred pending Stage 2 dispatch"
+    fn write_bytes(bytes data) → void {
+        panic "norma:caelum/connexus.write_bytes is deferred pending Stage 2 dispatch"
     }
 
     @ future
-    fn fundet(bytes data) → void {
-        panic "norma:caelum/connexus.fundet is deferred pending Stage 2 dispatch"
+    fn write_bytes_async(bytes data) → void {
+        panic "norma:caelum/connexus.write_bytes_async is deferred pending Stage 2 dispatch"
     }
 
     # Close connection
-    fn claude() → void {
-        panic "norma:caelum/connexus.claude is deferred pending Stage 2 dispatch"
+    fn close() → void {
+        panic "norma:caelum/connexus.close is deferred pending Stage 2 dispatch"
     }
 
     # Remote endpoint
-    fn remotus() → terminus.Terminus {
-        panic "norma:caelum/connexus.remotus is deferred pending Stage 2 dispatch"
+    fn remote() → terminus.Endpoint {
+        panic "norma:caelum/connexus.remote is deferred pending Stage 2 dispatch"
     }
 
     # Local endpoint
-    fn localis() → terminus.Terminus {
-        panic "norma:caelum/connexus.localis is deferred pending Stage 2 dispatch"
+    fn local() → terminus.Endpoint {
+        panic "norma:caelum/connexus.local is deferred pending Stage 2 dispatch"
     }
 }

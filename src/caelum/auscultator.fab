@@ -5,30 +5,30 @@ locale = "en"
 # caelum/auscultator.fab — TCP listener
 #
 # Public import: importa ex "norma:caelum/auscultator" privata auscultator
-# Depends on: norma:caelum/connexus (for Connexus type in accipe())
+# Depends on: norma:caelum/connexus (for Socket type in accept())
 
 import from "norma:caelum/connexus" connexus
 
-class Auscultator {
+class Listener {
     int id = 0
 
     # Accept next incoming connection
-    fn accipe() → connexus.Connexus {
-        panic "norma:caelum/auscultator.accipe is deferred pending Stage 2 dispatch"
+    fn accept() → connexus.Socket {
+        panic "norma:caelum/auscultator.accept is deferred pending Stage 2 dispatch"
     }
 
     @ future
-    fn accipiet() → connexus.Connexus {
-        panic "norma:caelum/auscultator.accipiet is deferred pending Stage 2 dispatch"
+    fn accept_async() → connexus.Socket {
+        panic "norma:caelum/auscultator.accept_async is deferred pending Stage 2 dispatch"
     }
 
     # Stop listening
-    fn claude() → void {
-        panic "norma:caelum/auscultator.claude is deferred pending Stage 2 dispatch"
+    fn close() → void {
+        panic "norma:caelum/auscultator.close is deferred pending Stage 2 dispatch"
     }
 
     # Local port
-    fn portus() → int {
-        panic "norma:caelum/auscultator.portus is deferred pending Stage 2 dispatch"
+    fn port() → int {
+        panic "norma:caelum/auscultator.port is deferred pending Stage 2 dispatch"
     }
 }

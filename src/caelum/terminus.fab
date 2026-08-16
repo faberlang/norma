@@ -7,7 +7,7 @@ locale = "en"
 # Public import: importa ex "norma:caelum/terminus" privata terminus
 
 @ public
-class Terminus {
-    string hospes
-    int portus
+class Endpoint {
+    string host
+    int port
 }

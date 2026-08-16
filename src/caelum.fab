@@ -19,7 +19,7 @@ locale = "en"
 # - Imperative (-a, -e, -i): synchronous (blocking)
 # - Future indicative (-et, -ebit): asynchronous
 # - TLS enabled via optional cert/key params (listen) or tute flag (connect)
-# - TCP: ausculta/auscultabit (listen), connecte/connectet (connect)
+# - TCP: listen/listen_async, connect/connect_async
 # - Sockets are bidirectional byte streams
 
 import from "norma:caelum/terminus" terminus
@@ -32,13 +32,13 @@ import from "norma:caelum/auscultator" auscultator
 # =========================================================================
 
 # Create TCP listener (TLS when cert/key provided)
-fn ausculta(int portus, string cert optional, string key optional) → auscultator.Auscultator {
-    panic "norma:caelum.ausculta is deferred pending Stage 2 dispatch"
+fn listen(int port, string cert optional, string key optional) → auscultator.Listener {
+    panic "norma:caelum.listen is deferred pending Stage 2 dispatch"
 }
 
 @ future
-fn auscultabit(int portus, string cert optional, string key optional) → auscultator.Auscultator {
-    panic "norma:caelum.auscultabit is deferred pending Stage 2 dispatch"
+fn listen_async(int port, string cert optional, string key optional) → auscultator.Listener {
+    panic "norma:caelum.listen_async is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -46,11 +46,11 @@ fn auscultabit(int portus, string cert optional, string key optional) → auscul
 # =========================================================================
 
 # Connect to TCP server (TLS when tute=verum)
-fn connecte(string hospes, int portus, bool tute optional coalesce false) → connexus.Connexus {
-    panic "norma:caelum.connecte is deferred pending Stage 2 dispatch"
+fn connect(string host, int port, bool tute optional coalesce false) → connexus.Socket {
+    panic "norma:caelum.connect is deferred pending Stage 2 dispatch"
 }
 
 @ future
-fn connectet(string hospes, int portus, bool tute optional coalesce false) → connexus.Connexus {
-    panic "norma:caelum.connectet is deferred pending Stage 2 dispatch"
+fn connect_async(string host, int port, bool tute optional coalesce false) → connexus.Socket {
+    panic "norma:caelum.connect_async is deferred pending Stage 2 dispatch"
 }
