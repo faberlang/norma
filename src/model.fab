@@ -15,12 +15,12 @@ locale = "en"
 # classification/diagnostic helper floor only. It imports nothing and does
 # no byte parsing.
 
-class Diagnosticum {
-    string severitas
-    string nuntius
+class Diagnostic {
+    string severity
+    string message
 }
 
-fn formatum(string status, string source) → string {
+fn detect_format(string status, string source) → string {
     if status ≡ "missing-download" then return "alias-missing"
     if source.contains("GGUF") then return "gguf"
     if source.ends_with(".gguf") then return "gguf"
@@ -29,7 +29,7 @@ fn formatum(string status, string source) → string {
     return "unknown"
 }
 
-fn diagnosticum(string status, string source, string router_model_id) → string {
+fn diagnose(string status, string source, string router_model_id) → string {
     if status ≡ "router-backed" then return "metadata parser pending; router model is " + router_model_id
     if status ≡ "missing-download" then return "missing local download for " + source
     if status ≡ "unsupported" then return "unsupported model format for " + source
@@ -37,34 +37,34 @@ fn diagnosticum(string status, string source, string router_model_id) → string
     return "unknown alias or unsupported path"
 }
 
-fn severitas_pro_status(string status) → string {
+fn severity_for_status(string status) → string {
     if status ≡ "error" then return "error"
     return "warning"
 }
 
-fn inanis_diagnosticum(string status, string source, string router_model_id) → list<Diagnosticum> {
+fn empty_diagnostic(string status, string source, string router_model_id) → list<Diagnostic> {
     return [
-        Diagnosticum {
-            severitas = severitas_pro_status(status),
-            nuntius = diagnosticum(status, source, router_model_id)
+        Diagnostic {
+            severity = severity_for_status(status),
+            message = diagnose(status, source, router_model_id)
         }
     ]
 }
 
 describe "model metadata facade" {
     test "classifies campaign alias formats" {
-        assert formatum("missing-download", "sentence-transformers/all-MiniLM-L6-v2") ≡ "alias-missing"
-        assert formatum("router-backed", "unsloth/Qwen3.6-35B-A3B-GGUF") ≡ "gguf"
-        assert formatum("local", "/tmp/model.safetensors") ≡ "safetensors"
+        assert detect_format("missing-download", "sentence-transformers/all-MiniLM-L6-v2") ≡ "alias-missing"
+        assert detect_format("router-backed", "unsloth/Qwen3.6-35B-A3B-GGUF") ≡ "gguf"
+        assert detect_format("local", "/tmp/model.safetensors") ≡ "safetensors"
     }
 
     test "builds structured diagnostic records" {
-        const list<Diagnosticum> diagnostics ← inanis_diagnosticum(
+        const list<Diagnostic> diagnostics ← empty_diagnostic(
             "error",
             "/tmp/not-a-model.bin",
             ""
         )
         assert diagnostics.length() ≡ 1
-        assert severitas_pro_status("error") ≡ "error"
+        assert severity_for_status("error") ≡ "error"
     }
 }
