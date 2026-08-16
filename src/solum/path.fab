@@ -39,7 +39,7 @@ locale = "en"
 # Join path segments into a single path string.
 # Maps to: Rust PathBuf::push, Go path.Join, Node path.join.
 # Imperativus — produces a joined path from parts.
-fn iunge(list<string> partes) → string {
+fn join(list<string> partes) → string {
     return call 'solum:iunge' (partes) ↦ string
 }
 
@@ -49,21 +49,21 @@ fn iunge(list<string> partes) → string {
 
 # Parent directory of a path. Returns "" for paths with no parent.
 # Maps to: Rust Path::parent, Go path.Dir, Node path.dirname.
-fn parens(string via) → string {
+fn parent(string via) → string {
     return call 'solum:parens' (via) ↦ string
 }
 
 # Final path segment (the filename). Returns "" for paths ending in "..".
 # Maps to: Rust Path::file_name, Go path.Base, Node path.basename.
 @ public
-fn nomen(string via) → string {
+fn file_name(string via) → string {
     return call 'solum:nomen' (via) ↦ string
 }
 
 # File extension, including the leading dot (e.g. ".txt"). Returns "" if
 # there is no extension.
 # Maps to: Rust Path::extension, Go path.Ext, Node path.extname.
-fn suffixum(string via) → string {
+fn extension(string via) → string {
     return call 'solum:suffixum' (via) ↦ string
 }
 
@@ -77,7 +77,7 @@ fn suffixum(string via) → string {
 # WHY: this one does touch the filesystem (canonicalize) — it lives here
 # because it is path resolution, but it can fail on non-existent paths and
 # falls back to cwd-join rather than throwing.
-fn absolve(string via) → string {
+fn resolve(string via) → string {
     return call 'solum:absolve' (via) ↦ string
 }
 
@@ -87,12 +87,12 @@ fn absolve(string via) → string {
 
 # User's home directory. Reads $HOME on Unix; falls back to "/" if unset.
 # Maps to: Rust env::var("HOME"), Go os.UserHomeDir, Node os.homedir.
-fn domus() → string {
+fn home() → string {
     return call 'solum:domus' ↦ string
 }
 
 # System temporary directory.
 # Maps to: Rust env::temp_dir, Go os.TempDir, Node os.tmpdir.
-fn temporarium() → string {
+fn temp_dir() → string {
     return call 'solum:temporarium' ↦ string
 }
