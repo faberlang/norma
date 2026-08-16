@@ -126,6 +126,14 @@ fn write(string via, string data) → void {
     return call 'solum:scribe' ([via, data]) ↦ void
 }
 
+# la reader surface: the Pass A en conversion (c006af5) rewrote this public
+# member from `scribe` to `write`; restore the export so la consumers keep
+# resolving `solum.scribe`.
+@ public
+fn scribe(string via, string data) → void {
+    return write(via, data)
+}
+
 # Write text to file, overwrites existing (async route; Faber blocks)
 @ future
 fn scribet(string via, string data) → void {

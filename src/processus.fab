@@ -175,6 +175,14 @@ fn args() → list<string> {
     return call 'processus:argumenta' ↦ list<string>
 }
 
+# la reader surface: the Pass A en conversion (c006af5) rewrote this public
+# member from `argumenta` to the en keyword spelling `args`; restore the
+# export so la consumers keep resolving `processus.argumenta`.
+@ public
+fn argumenta() → list<string> {
+    return args()
+}
+
 # =========================================================================
 # EXIT
 # =========================================================================
