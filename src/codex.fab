@@ -26,13 +26,13 @@ fn base64(bytes data) → string {
 }
 
 # Decode base64 string to bytes (throws on invalid input)
-fn deBase64(string data) → bytes {
-    panic "norma:codex.deBase64 is deferred pending Stage 2 dispatch"
+fn decode_base64(string data) → bytes {
+    panic "norma:codex.decode_base64 is deferred pending Stage 2 dispatch"
 }
 
 # Attempt to decode base64 (returns nihil on invalid input)
-fn temptaBase64(string data) → bytes ∪ null {
-    panic "norma:codex.temptaBase64 is deferred pending Stage 2 dispatch"
+fn try_decode_base64(string data) → bytes ∪ null {
+    panic "norma:codex.try_decode_base64 is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -45,13 +45,13 @@ fn hex(bytes data) → string {
 }
 
 # Decode hex string to bytes (throws on invalid input)
-fn deHex(string data) → bytes {
-    panic "norma:codex.deHex is deferred pending Stage 2 dispatch"
+fn decode_hex(string data) → bytes {
+    panic "norma:codex.decode_hex is deferred pending Stage 2 dispatch"
 }
 
 # Attempt to decode hex (returns nihil on invalid input)
-fn temptaHex(string data) → bytes ∪ null {
-    panic "norma:codex.temptaHex is deferred pending Stage 2 dispatch"
+fn try_decode_hex(string data) → bytes ∪ null {
+    panic "norma:codex.try_decode_hex is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -64,16 +64,16 @@ fn url(string data) → string {
 }
 
 # Decode URL-encoded text
-fn deUrl(string data) → string {
-    panic "norma:codex.deUrl is deferred pending Stage 2 dispatch"
+fn decode_url(string data) → string {
+    panic "norma:codex.decode_url is deferred pending Stage 2 dispatch"
 }
 
 # Encode for URL query component (also encodes &, =, etc.)
-fn urlComponentum(string data) → string {
-    panic "norma:codex.urlComponentum is deferred pending Stage 2 dispatch"
+fn encode_url_component(string data) → string {
+    panic "norma:codex.encode_url_component is deferred pending Stage 2 dispatch"
 }
 
 # Decode URL query component
-fn deUrlComponentum(string data) → string {
-    panic "norma:codex.deUrlComponentum is deferred pending Stage 2 dispatch"
+fn decode_url_component(string data) → string {
+    panic "norma:codex.decode_url_component is deferred pending Stage 2 dispatch"
 }
