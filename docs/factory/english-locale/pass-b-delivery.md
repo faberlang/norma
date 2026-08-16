@@ -151,7 +151,10 @@ hosts) would need member-name updates — named follow-up, NOT this goal's compl
    self main print test read write warn debug size name step range between within until line args call
    await async future format require exit`; types `string int bool float list map set bytes value void
    unknown null_ty instant json object any promise iterator tensor vector matrix ascii`; annotation keys
-   (`@ name`, `@ future`, `@ cursor`, …). Compound escapes (`read_file`, `is_null`, `write_bytes`) are legal
+   (`@ name`, `@ future`, `@ cursor`, …); compiler-owned builtin frame-type variants `request item byte bulk
+   done error cancel` (registered whenever frame types are needed — `STATUS_VARIANTS` in
+   `radix/crates/radix/src/builtins/frame_types.rs`; a fn named after one compiles bare but `+ call` = SEM005,
+   e.g. `fn request`). Compound escapes (`read_file`, `is_null`, `write_bytes`) are legal
    (exact-match lexing); `is_*` follows the seed's `est_*`→`is_*` precedent.
 2. **Locked shared verbs** (gradus seed where the same stem appears, extended for norma):
    `accipe`→`get` (map/semaphore contexts) or `accept` (listener context); `appende`→`append`;
@@ -342,7 +345,7 @@ exempla-red until PB-CONSUMERS — see §8 merge gate); `est_basis` per unit.
 
 | outcome | http module English surface complete |
 | --- | --- |
-| ledger | client: `petet`→`get`, `mittet`→`post`, `ponet`→`put`, `delet`→`delete`, `mutabit`→`patch`, `rogabit`→`request`; implendum `Replicatio`→`Response`: `corpus`→`body`, `corpus_octeti`→`body_bytes`, `corpus_json`→`body_json`, `capita`→`headers`, `caput`→`header`, `bene`→`is_ok`; implendum `Rogatio`→`Request`: `modus`→`method`, `via`→`path`, `corpus`→`body`, `corpus_json`→`body_json`, `capita`→`headers`, `caput`→`header`. Keep: `listen`, `accept`, `respond`, `stop`, `status`, `param` |
+| ledger | client: `petet`→`get`, `mittet`→`post`, `ponet`→`put`, `delet`→`delete`, `mutabit`→`patch`, `rogabit`→`send_request` (`request` collides with the builtin frame-type variant, SEM005 — see §5 rule 1); implendum `Replicatio`→`Response`: `corpus`→`body`, `corpus_octeti`→`body_bytes`, `corpus_json`→`body_json`, `capita`→`headers`, `caput`→`header`, `bene`→`is_ok`; implendum `Rogatio`→`Request`: `modus`→`method`, `via`→`path`, `corpus`→`body`, `corpus_json`→`body_json`, `capita`→`headers`, `caput`→`header`. Keep: `listen`, `accept`, `respond`, `stop`, `status`, `param` |
 | risk | low |
 | est_basis | pilot; ~16 renames |
 
