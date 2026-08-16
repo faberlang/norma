@@ -14,6 +14,15 @@ first unit that applies them (PB-CHORDA applies the mechanical-trio and async-tw
 > exempla corpus = **25 files** (22 `.fab` + 3 `.proba`), not 23. Toolchain oracle updated to the rebuilt
 > faber 1.7.0 binary (§4.6).
 
+> RA-1 amendment (2026-08-16, task 69381782): ledgers amended for the RA-1 parity repair `d3d5931`
+> (5 modules now compile). **ordinata**: `fines` and `_insere_ad` removed (generic `<` ordering
+> unavailable); PB-ORDINATA rows `fines`→`keys_between` and `_insere_ad`→`_insert_at` struck; RA-1-added
+> privata helper `_aequa`→`_equals` added. **vector**: generic `swizzle` wrapper removed (result width =
+> pattern length, unresolvable for size N — SEM014); PB-VECTOR "Keep: `swizzle`" dropped and `swizzle`
+> removed from the §5 rule-5 list. **constructors**: fila/ordinata free constructors now declare their
+> own type params (`creata<T>()`, `creata_ex<K, V>(…)`) with type-args-inferred `Fila { }`/`Ordinata { }`
+> bodies — call sites must use turbofish; PB-FILA/PB-ORDINATA/PB-CONSUMERS notes updated.
+
 ---
 
 ## 1. Goal-check summary (compact)
@@ -163,7 +172,7 @@ hosts) would need member-name updates — named follow-up, NOT this goal's compl
    (json/toml/yaml) / `try_lock` (Mutex) / `try_wait` (Semaphorum). Confirm at dispatch (§11 Q1).
 4. **Async twins** (§11 Q2 default): sync gets the plain English verb; the `@ futura` twin gets the same
    verb + `_async` suffix (`read_file`/`read_file_async`, `write_bytes`/`write_bytes_async`). Confirm.
-5. **Already English — do not touch**: `listen accept respond stop status param ttl uuid swizzle sgd_step`,
+5. **Already English — do not touch**: `listen accept respond stop status param ttl uuid sgd_step`,
    `PI E TAU`, `_sha256 _sha512_engine _K32` crypto internals, technical quant/dtype spellings, already-
    English params (`data`, `url`, `path`, `index`, `handle`, `args`). Pass B is not a style pass.
 6. **Pack vocabulary is Pass A's surface, not Pass B's**: keywords, types, intrinsics (`functio→fn`,
@@ -177,7 +186,7 @@ hosts) would need member-name updates — named follow-up, NOT this goal's compl
    "$FABER_BIN" check src/<m>.fab     # post-A: package locale is en, no --locale en
    ```
    Extra probes when the ledger introduces `fn file_name`-style names, `@ future`/`@ cursor` annotations,
-   or a name whose en spelling is a keyword suffix (`keys_between`, `read_bytes`).
+   or a name whose en spelling is a keyword suffix (`read_bytes`).
 9. **Pack currency**: every unit that renames **public** members records the old→new canonical pairs in
    its completion note; PB-PACKS (§8) consumes the union so en/la pack rows stay total and la readers
    lose nothing. The first rename unit (PB-CHORDA) MUST NOT land on main without PB-PACKS in the same
@@ -325,7 +334,7 @@ exempla-red until PB-CONSUMERS — see §8 merge gate); `est_basis` per unit.
 
 | outcome | fila module English surface complete |
 | --- | --- |
-| ledger | genus `Fila`→`Deque`; fields `caput`→`head`, `post`→`tail`; `longitudo`→`length`, `vacua`→`is_empty`, `appende`→`append`, `praepone`→`prepend`, `detrahe`→`pop_back`, `decapita`→`pop_front`, `primus`→`first`, `ultimus`→`last`, `collecta`→`to_list`, `creata`→`empty`, `creata_ex`→`from_list` |
+| ledger | genus `Fila`→`Deque`; fields `caput`→`head`, `post`→`tail`; `longitudo`→`length`, `vacua`→`is_empty`, `appende`→`append`, `praepone`→`prepend`, `detrahe`→`pop_back`, `decapita`→`pop_front`, `primus`→`first`, `ultimus`→`last`, `collecta`→`to_list`, `creata`→`empty`, `creata_ex`→`from_list` — constructors keep their explicit type param (`empty<T>()`, `from_list<T>(list<T>)`); call sites construct via turbofish (`fila.empty<T>()`) |
 | risk | low (no in-src callers; target-form module) |
 | est_basis | pilot; ~15 renames |
 
@@ -381,9 +390,9 @@ exempla-red until PB-CONSUMERS — see §8 merge gate); `est_basis` per unit.
 
 | outcome | ordinata module English surface complete |
 | --- | --- |
-| ledger | genus `Ordinata`→`SortedMap`; `longitudo`→`length`, `vacua`→`is_empty`, `accipe`→`get`, `habet`→`has`, `pone`→`put`, `dele`→`delete`, `claves`→`keys`, `valores`→`values`, `fines`→`keys_between` (`range`/`between` are en keywords), `creata`→`empty`, `creata_ex`→`from_map`, `_insere`→`_insert`, `_insere_ad`→`_insert_at`, `_amputa`→`_remove`, `_amputa_ad`→`_remove_at`. Keep: fields `index`, `entries` (English) |
+| ledger | genus `Ordinata`→`SortedMap`; `longitudo`→`length`, `vacua`→`is_empty`, `accipe`→`get`, `habet`→`has`, `pone`→`put`, `dele`→`delete`, `claves`→`keys`, `valores`→`values`, `creata`→`empty`, `creata_ex`→`from_map`, `_insere`→`_insert`, `_amputa`→`_remove`, `_amputa_ad`→`_remove_at`, `_aequa`→`_equals` (RA-1-added privata helper). Keep: fields `index`, `entries` (English). **Struck (RA-1 d3d5931, no target):** `fines`→`keys_between` and `_insere_ad`→`_insert_at` — both members removed (generic `<` ordering unavailable); `_insere` keeps the index sorted via `sort()`. Constructors declare their own type params (`creata<K, V>()`, `creata_ex<K, V>(map<K, V>)`) with type-args-inferred `Ordinata { }`; call sites construct via turbofish (`ordinata.empty<K, V>()`) |
 | risk | low |
-| est_basis | pilot; ~16 renames |
+| est_basis | pilot; ~15 renames |
 
 #### PB-PRESSURA — `src/pressura.fab`
 
@@ -445,7 +454,7 @@ exempla-red until PB-CONSUMERS — see §8 merge gate); `est_basis` per unit.
 
 | outcome | vector module English surface complete |
 | --- | --- |
-| ledger | `addita`→`add`, `subtrahe`→`subtract`, `multiplica`→`multiply`, `divida`→`divide`, `productum`→`dot`, `transversum`→`cross`. Keep: `swizzle` |
+| ledger | `addita`→`add`, `subtrahe`→`subtract`, `multiplica`→`multiply`, `divida`→`divide`, `productum`→`dot`, `transversum`→`cross`. ~~Keep: `swizzle`~~ — `swizzle` removed (RA-1 d3d5931): the generic wrapper's result width = swizzle pattern length, unresolvable for a size-N receiver (SEM014); the intrinsic stays compiler-exposed until the shape-param gap closes |
 | risk | low |
 | est_basis | pilot; 6 renames |
 
@@ -464,7 +473,7 @@ exempla-red until PB-CONSUMERS — see §8 merge gate); `est_basis` per unit.
 | outcome | all in-repo consumers track the new English surface; exempla corpus + packages green again |
 | --- | --- |
 | write_scope | `exempla/stdlib-nativum/*.fab` (17), `exempla/chorda/*.fab` (5), `exempla/caelum/*.proba` (3), `exempla/crypta-sha2/**`, `exempla/ad-multiplica-backward/**`, exempla `README.md` only where it quotes code |
-| ledger | 1. Rename every reference to the renamed norma identifiers across all exempla (the full §7 ledger applied to call sites — e.g. `chorda.retorta`→`chorda.reverse`, `chorda.pange`→`chorda.encode`, `mathesis.addita`→`mathesis.add`, `tempus.structa`→`tempus.construct`, `solum.explora`→`solum.glob`, `crypta.digere`→`crypta.digest`, `valor.cape`→`valor.get`, `tensor.structa`→`tensor.construct`, `csv.solve`→`csv.parse`, `aleator.fractum`→`aleator.random_float`). 2. Exemplum-local Latin identifiers follow the same conventions (e.g. tempus-civil `epochZero`/`build`/`buildMoment` keep — already English). 3. Frontmatter `syntax =`/`summary` fields updated to the new member names where they quote them |
+| ledger | 1. Rename every reference to the renamed norma identifiers across all exempla (the full §7 ledger applied to call sites — e.g. `chorda.retorta`→`chorda.reverse`, `chorda.pange`→`chorda.encode`, `mathesis.addita`→`mathesis.add`, `tempus.structa`→`tempus.construct`, `solum.explora`→`solum.glob`, `crypta.digere`→`crypta.digest`, `valor.cape`→`valor.get`, `tensor.structa`→`tensor.construct`, `csv.solve`→`csv.parse`, `aleator.fractum`→`aleator.random_float`; fila/ordinata constructor call sites construct via turbofish — `fila.empty<T>()`, `fila.from_list<T>(…)`, `ordinata.empty<K, V>()`, `ordinata.from_map<K, V>(…)` — per the RA-1 constructor shape (none currently in the exempla corpus, verified 2026-08-16)). 2. Exemplum-local Latin identifiers follow the same conventions (e.g. tempus-civil `epochZero`/`build`/`buildMoment` keep — already English). 3. Frontmatter `syntax =`/`summary` fields updated to the new member names where they quote them |
 | done_when | no ledger Latin name remains as a code token in `exempla/` (comment mentions allowed); `faber check` exit 0 on each exempla corpus file + each package exemplum (lane authority setup); `faber test .` still zero semantic errors; `./scripta/check-source` green |
 | non_goals | external repos (examples/, radix/corpus, faberlang.dev, hosts — §4.5 findings); prose comment language refresh |
 | risk | medium (wide but fully enumerated surface) |
