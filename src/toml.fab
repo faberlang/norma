@@ -6,7 +6,7 @@ locale = "en"
 #
 # Etymology: "TOML" — Tom's Obvious Minimal Language (universal, kept as-is).
 #
-# Wire floor only: solve (text → valor), pange (valor → text), tempta
+# Wire floor only: parse (text → valor), stringify (valor → text), try_parse
 # (lenient parse). Faber-native Norma source (no residual Rust norma crate). Shared valor-tree
 # navigation (cape/carpe/inveni/exige/*ne) lives in norma:valor.
 #
@@ -20,17 +20,17 @@ locale = "en"
 # =========================================================================
 # SERIALIZATION (wire floor)
 # =========================================================================
-fn pange(value value) → string {
-    panic "norma:toml.pange is deferred pending Stage 2 dispatch"
+fn stringify(value value) → string {
+    panic "norma:toml.stringify is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
 # PARSING (wire floor)
 # =========================================================================
 @ public
-fn solve(string toml) → value {
-    panic "norma:toml.solve is deferred pending Stage 2 dispatch"
+fn parse(string toml) → value {
+    panic "norma:toml.parse is deferred pending Stage 2 dispatch"
 }
-fn tempta(string toml) → value ∪ null {
-    panic "norma:toml.tempta is deferred pending Stage 2 dispatch"
+fn try_parse(string toml) → value ∪ null {
+    panic "norma:toml.try_parse is deferred pending Stage 2 dispatch"
 }
