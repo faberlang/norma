@@ -7,10 +7,10 @@ locale = "en"
 # Etymology: "pressura" - pressing, squeezing. Data compression.
 #
 # Part of the host effect surface (gateway-dispatched `pressura:*` routes).
-#
+
 # Design notes:
-# - comprime (compress): press data together
-# - solve (decompress): loosen/release compressed data
+# - compress: press data together
+# - decompress: loosen/release compressed data
 # - Algorithms: gzip, deflate, brotli, zstd
 # - Levels: 1 (fast) to 9 (best compression)
 # - Sync operations suitable for data <10MB
@@ -21,13 +21,13 @@ locale = "en"
 # =========================================================================
 
 # Compress bytes (optional level 1-9)
-fn comprime(string algorithmus, bytes data, int nivel optional) → bytes {
-    panic "norma:pressura.comprime is deferred pending Stage 2 dispatch"
+fn compress(string algorithmus, bytes data, int nivel optional) → bytes {
+    panic "norma:pressura.compress is deferred pending Stage 2 dispatch"
 }
 
 # Decompress bytes
-fn solve(string algorithmus, bytes data) → bytes {
-    panic "norma:pressura.solve is deferred pending Stage 2 dispatch"
+fn decompress(string algorithmus, bytes data) → bytes {
+    panic "norma:pressura.decompress is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -35,32 +35,32 @@ fn solve(string algorithmus, bytes data) → bytes {
 # =========================================================================
 
 # Create compression stream (optional level 1-9)
-fn comprimens(string algorithmus, int nivel optional) → Compressor {
-    panic "norma:pressura.comprimens is deferred pending Stage 2 dispatch"
+fn create_compressor(string algorithmus, int nivel optional) → Compressor {
+    panic "norma:pressura.create_compressor is deferred pending Stage 2 dispatch"
 }
 
 # Create decompression stream
-fn solvens(string algorithmus) → Decompressor {
-    panic "norma:pressura.solvens is deferred pending Stage 2 dispatch"
+fn create_decompressor(string algorithmus) → Decompressor {
+    panic "norma:pressura.create_decompressor is deferred pending Stage 2 dispatch"
 }
 
 # Compression stream
 interface Compressor {
-    # Pour data in
-    fn funde(bytes data) → void
+    # Write bytes in
+    fn write_bytes(bytes data) → void
 
     # Close and get compressed result
-    fn claude() → bytes
+    fn finish() → bytes
 }
 
 # Decompression stream
 interface Decompressor {
-    # Pour compressed data in
-    fn funde(bytes data) → void
+    # Write compressed bytes in
+    fn write_bytes(bytes data) → void
 
-    # Draw decompressed data out (partial)
-    fn hauri() → bytes
+    # Read decompressed bytes out (partial)
+    fn read_bytes() → bytes
 
     # Close and get final result
-    fn claude() → bytes
+    fn finish() → bytes
 }
