@@ -9,23 +9,23 @@ locale = "en"
 # `target/` entries with the same exit semantics as the shell version
 # (exit 1 if any tracked path matches `target/*` or `*/target/*`, else 0).
 
-importa ex "faber:processus" privata processus
-importa ex "faber:consolum" privata consolum
+import from "faber:processus" processus
+import from "faber:consolum" consolum
 
-incipit {
-    fixum textus root ← processus.sedes() ↦ textus
-    fixum tabula<textus, valor> result ← processus.captura(["git", "-C", root, "ls-files"]) ↦ tabula<textus, valor>
-    fixum textus tracked ← result["stdout"] ↦ textus
+main {
+    const string root ← processus.sedes() ↦ string
+    const map<string, value> result ← processus.captura(["git", "-C", root, "ls-files"]) ↦ map<string, value>
+    const string tracked ← result["stdout"] ↦ string
 
-    varia numerus status ← 0
-    varia numerus pos ← 0
-    dum pos < tracked.longitudo() {
-        varia numerus end ← pos
-        dum end < tracked.longitudo() et tracked.sectio(end, end + 1) ≠ "\n" {
+    var int status ← 0
+    var int pos ← 0
+    while pos < tracked.length() {
+        var int end ← pos
+        while end < tracked.length() and tracked.slice(end, end + 1) ≠ "\n" {
             end ← end + 1
         }
-        fixum textus file ← tracked.sectio(pos, end)
-        si file.initium("target/") aut file.continet("/target/") {
+        const string file ← tracked.slice(pos, end)
+        if file.starts_with("target/") or file.contains("/target/") {
             consolum.mone("check-generated-output: tracked generated output is not allowed: " + file)
             status ← 1
         }

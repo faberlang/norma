@@ -10,74 +10,74 @@ locale = "en"
 # (backtick-wrapped), must not list parked/compile-gap modules, and each
 # promoted module must pass a `faber check` import smoke.
 
-importa ex "faber:processus" privata processus
-importa ex "faber:solum" privata solum
-importa ex "faber:consolum" privata consolum
+import from "faber:processus" processus
+import from "faber:solum" solum
+import from "faber:consolum" consolum
 
 # First row of the document starting with the promoted-helper matrix header.
-functio find_promoted_row(textus via) → textus {
-    fixum lista<valor> rows ← solum.carpe(via) ↦ lista<valor>
-    fixum numerus n ← rows.longitudo()
-    varia numerus idx ← 0
-    dum idx < n {
-        fixum textus row ← rows[idx] ↦ textus
-        si row.initium("| Compile/import-evidenced native helpers |") {
-            redde row
+fn find_promoted_row(string via) → string {
+    const list<value> rows ← solum.carpe(via) ↦ list<value>
+    const int n ← rows.length()
+    var int idx ← 0
+    while idx < n {
+        const string row ← rows[idx] ↦ string
+        if row.starts_with("| Compile/import-evidenced native helpers |") {
+            return row
         }
         idx ← idx + 1
     }
-    redde ""
+    return ""
 }
 
-incipit {
-    fixum textus root ← processus.sedes() ↦ textus
+main {
+    const string root ← processus.sedes() ↦ string
 
     # FABER and FABER_LIBRARY_HOME overrides, matching ${VAR:-default}
-    fixum tabula<textus, valor> fr ← processus.captura(["sh", "-c", "printf '%s' \"$FABER\""]) ↦ tabula<textus, valor>
-    fixum textus faber_env ← fr["stdout"] ↦ textus
-    varia textus faber ← root + "/../faber/target/debug/faber"
-    si faber_env.longitudo() > 0 {
+    const map<string, value> fr ← processus.captura(["sh", "-c", "printf '%s' \"$FABER\""]) ↦ map<string, value>
+    const string faber_env ← fr["stdout"] ↦ string
+    var string faber ← root + "/../faber/target/debug/faber"
+    if faber_env.length() > 0 {
         faber ← faber_env
     }
-    fixum tabula<textus, valor> lr ← processus.captura(["sh", "-c", "printf '%s' \"$FABER_LIBRARY_HOME\""]) ↦ tabula<textus, valor>
-    fixum textus lib_env ← lr["stdout"] ↦ textus
-    varia textus lib_home ← root + "/.."
-    si lib_env.longitudo() > 0 {
+    const map<string, value> lr ← processus.captura(["sh", "-c", "printf '%s' \"$FABER_LIBRARY_HOME\""]) ↦ map<string, value>
+    const string lib_env ← lr["stdout"] ↦ string
+    var string lib_home ← root + "/.."
+    if lib_env.length() > 0 {
         lib_home ← lib_env
     }
 
     # Executable check for the pinned faber binary
-    si solum.exstat(faber) ↦ bivalens est falsum {
+    if solum.exstat(faber) ↦ bool is false {
         consolum.mone("check-promoted-helper-imports: missing executable faber at " + faber)
         processus.exi(1)
     }
-    fixum numerus mode ← solum.modus(faber) ↦ numerus
-    si (mode ∧ 64) ≡ 0 et (mode ∧ 8) ≡ 0 et (mode ∧ 1) ≡ 0 {
+    const int mode ← solum.modus(faber) ↦ int
+    if (mode ∧ 64) ≡ 0 and (mode ∧ 8) ≡ 0 and (mode ∧ 1) ≡ 0 {
         consolum.mone("check-promoted-helper-imports: missing executable faber at " + faber)
         processus.exi(1)
     }
 
     # Matrix row validation
-    fixum textus matrix ← root + "/docs/factory/provider-source-claim-matrix.md"
-    fixum textus promoted_row ← find_promoted_row(matrix)
-    si promoted_row.longitudo() ≡ 0 {
+    const string matrix ← root + "/docs/factory/provider-source-claim-matrix.md"
+    const string promoted_row ← find_promoted_row(matrix)
+    if promoted_row.length() ≡ 0 {
         consolum.mone("check-promoted-helper-imports: missing promoted helper matrix row")
         processus.exi(1)
     }
 
-    fixum textus tick ← "\`".sectio(1, 2)
+    const string tick ← "\`".slice(1, 2)
 
-    fixum lista<textus> promoted ← ["csv", "json", "json/solve", "json/cursor", "json/lexica", "model", "tensor", "valor", "vector", "chorda", "tempus", "solum/path"]
-    fixum lista<textus> parked ← ["fila", "ordinata", "mathesis", "json/pange"]
+    const list<string> promoted ← ["csv", "json", "json/solve", "json/cursor", "json/lexica", "model", "tensor", "valor", "vector", "chorda", "tempus", "solum/path"]
+    const list<string> parked ← ["fila", "ordinata", "mathesis", "json/pange"]
 
-    itera ex promoted fixum module {
-        si not (promoted_row.continet(tick + module + tick)) {
+    for from promoted const module {
+        if not (promoted_row.contains(tick + module + tick)) {
             consolum.mone("check-promoted-helper-imports: matrix row missing promoted module " + module)
             processus.exi(1)
         }
     }
-    itera ex parked fixum module {
-        si promoted_row.continet(tick + module + tick) {
+    for from parked const module {
+        if promoted_row.contains(tick + module + tick) {
             consolum.mone("check-promoted-helper-imports: parked/compile-gap module " + module + " is listed as promoted")
             processus.exi(1)
         }
@@ -85,38 +85,38 @@ incipit {
 
     # Import smoke: run `faber check` on a generated temp .fab per module
     processus.scribe("FABER_LIBRARY_HOME", lib_home)
-    fixum textus tmp ← solum.temporarium() ↦ textus
-    fixum numerus pid ← processus.identitas() ↦ numerus
-    fixum textus pid_s ← pid ↦ textus
-    varia numerus status ← 0
+    const string tmp ← solum.temporarium() ↦ string
+    const int pid ← processus.identitas() ↦ int
+    const string pid_s ← pid ↦ string
+    var int status ← 0
 
-    itera ex promoted fixum module {
-        varia textus safe ← ""
-        varia numerus i ← 0
-        dum i < module.longitudo() {
-            fixum textus c ← module.sectio(i, i + 1)
-            si c ≡ "/" {
+    for from promoted const module {
+        var string safe ← ""
+        var int i ← 0
+        while i < module.length() {
+            const string c ← module.slice(i, i + 1)
+            if c ≡ "/" {
                 safe ← safe + "_"
-            } secus {
+            } else {
                 safe ← safe + c
             }
             i ← i + 1
         }
-        fixum textus file ← tmp + "/check-promoted-helper-imports-" + pid_s + "-" + safe + ".fab"
-        solum.scribe(file, "importa ex \"norma:" + module + "\" privata m\nincipit { }\n")
-        fixum tabula<textus, valor> check ← processus.captura([faber, "check", file]) ↦ tabula<textus, valor>
-        fixum numerus check_status ← check["status"] ↦ numerus
-        fixum textus check_stdout ← check["stdout"] ↦ textus
-        fixum textus check_stderr ← check["stderr"] ↦ textus
+        const string file ← tmp + "/check-promoted-helper-imports-" + pid_s + "-" + safe + ".fab"
+        solum.scribe(file, "import from \"norma:" + module + "\" m\nmain { }\n")
+        const map<string, value> check ← processus.captura([faber, "check", file]) ↦ map<string, value>
+        const int check_status ← check["status"] ↦ int
+        const string check_stdout ← check["stdout"] ↦ string
+        const string check_stderr ← check["stderr"] ↦ string
         solum.dele(file)
-        si check_status ≡ 0 {
-            nota "ok: norma:" + module
-        } secus {
+        if check_status ≡ 0 {
+            print "ok: norma:" + module
+        } else {
             consolum.mone("check-promoted-helper-imports: failed import smoke for norma:" + module)
-            si check_stdout.longitudo() > 0 {
+            if check_stdout.length() > 0 {
                 consolum.mone(check_stdout)
             }
-            si check_stderr.longitudo() > 0 {
+            if check_stderr.length() > 0 {
                 consolum.mone(check_stderr)
             }
             status ← 1
