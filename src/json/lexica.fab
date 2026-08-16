@@ -15,15 +15,15 @@ locale = "en"
 # WHITESPACE
 # =========================================================================
 
-fn _est_sponte(string c) → bool {
+fn _is_whitespace(string c) → bool {
     return c ≡ " " or c ≡ "\t" or c ≡ "\n" or c ≡ "\r"
 }
 
 # Advance over whitespace; returns the next non-whitespace index.
-fn _salta_sponte(string s, int i) → int {
+fn _skip_whitespace(string s, int i) → int {
     var int pos ← i
     while pos < s.length() {
-        if _est_sponte(s.slice(pos, pos + 1)) {
+        if _is_whitespace(s.slice(pos, pos + 1)) {
             pos ← pos + 1
         }
         else {
@@ -39,22 +39,22 @@ fn _salta_sponte(string s, int i) → int {
 # Faber has no char ordering (textus < is rejected as non-numeric), so digit
 # classification uses membership against a literal digit string.
 
-fn _est_digita(string c) → bool {
+fn _is_digit(string c) → bool {
     return "0123456789".contains(c)
 }
 
 # A value terminator: the chars that legally end a scanned token.
-fn _est_finitura(string c) → bool {
-    return c ≡ "," or c ≡ "}" or c ≡ "]" or _est_sponte(c)
+fn _is_terminator(string c) → bool {
+    return c ≡ "," or c ≡ "}" or c ≡ "]" or _is_whitespace(c)
 }
 
 # =========================================================================
 # SERIALIZER ESCAPE TABLES
 # =========================================================================
-# _transeant_liber maps a single literal char to its backslash escape.
+# _escape_char maps a single literal char to its backslash escape.
 # Returns nihil when the char needs no escaping (caller emits it raw).
 
-fn _transeant_liber(string c) → string ∪ null {
+fn _escape_char(string c) → string ∪ null {
     if c ≡ "\"" then return "\\\""
     if c ≡ "\\" then return "\\\\"
     if c ≡ "\n" then return "\\n"
@@ -66,25 +66,25 @@ fn _transeant_liber(string c) → string ∪ null {
 }
 
 # Does this char require backslash-escaping? The structural " and \ always
-# do; other control chars (< space) are caught via _transeant_liber, which
+# do; other control chars (< space) are caught via _escape_char, which
 # knows the named escapes (\n \r \t \b \f). LIMITATION: Faber has no ord
 # intrinsic, so unnamed control chars (0x00-0x1F outside the named five)
 # are not escaped — real JSON rarely carries them, but full RFC 8259
 # compliance would require a \u00XX path and a codepoint intrinsic.
-fn _postulat_transeum(string c) → bool {
+fn _needs_escape(string c) → bool {
     if c ≡ "\"" or c ≡ "\\" then return true
-    if _transeant_liber(c) not is null then return true
+    if _escape_char(c) not is null then return true
     return false
 }
 
 # =========================================================================
 # PARSER ESCAPE TABLE
 # =========================================================================
-# _destruat_liber maps a single escape letter (the char following \) back
+# _unescape_char maps a single escape letter (the char following \) back
 # to the literal it represents. Returns nihil for unknown letters (caller
 # signals a syntax error) and treats "u" as a sentinel for \uXXXX handling.
 
-fn _destruat_liber(string s) → string ∪ null {
+fn _unescape_char(string s) → string ∪ null {
     if s ≡ "\"" then return "\""
     if s ≡ "\\" then return "\\"
     if s ≡ "/" then return "/"
@@ -102,7 +102,7 @@ fn _destruat_liber(string s) → string ∪ null {
 # Single-hex-digit → numeric value. Returns nihil for non-hex chars.
 # Plain lookup table: Faber has no ord intrinsic, so we enumerate.
 
-fn _valor_hexadecimalis(string c) → int ∪ null {
+fn _hex_value(string c) → int ∪ null {
     if c ≡ "0" then return 0
     if c ≡ "1" then return 1
     if c ≡ "2" then return 2

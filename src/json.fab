@@ -6,7 +6,7 @@ locale = "en"
 #
 # Etymology: "JSON" — JavaScript Object Notation (universal, kept as-is).
 #
-# Wire floor only: solve (text → json), pange (json → text), tempta
+# Wire floor only: parse (text → json), stringify (json → text), try_parse
 # (lenient parse). The compiler rejects direct `textus ↦ json` / `json ↦ textus`
 # conversions; the runtime-backed codec belongs behind this public Norma facade.
 #
@@ -16,29 +16,29 @@ locale = "en"
 # =========================================================================
 # SERIALIZATION
 # =========================================================================
-# Verb: pange from "pangere" (to fasten, compose)
+# Verb: stringify from "pangere" (to fasten, compose)
 # Why: Composing/fastening data into JSON text representation.
 
 @ public
-fn pange(json documentum) → string {
-    panic "norma:json.pange is deferred pending runtime codec dispatch"
+fn stringify(json documentum) → string {
+    panic "norma:json.stringify is deferred pending runtime codec dispatch"
 }
 
 # =========================================================================
 # PARSING
 # =========================================================================
-# Verb: solve from "solvere" (to loosen, untangle)
+# Verb: parse from "solvere" (to loosen, untangle)
 # Why: Untangling/extracting data from JSON text.
 
 @ public
-fn solve(string wire) → json ⇥ string {
-    throw "norma:json.solve is deferred pending runtime codec dispatch"
+fn parse(string wire) → json ⇥ string {
+    throw "norma:json.parse is deferred pending runtime codec dispatch"
 }
 
-# Verb: tempta from "temptare" (to try, attempt)
+# Verb: try_parse from "temptare" (to try, attempt)
 # Why: Attempting to parse, returning null on failure instead of throwing.
 
 @ public
-fn tempta(string wire) → json ∪ null {
+fn try_parse(string wire) → json ∪ null {
     return null
 }

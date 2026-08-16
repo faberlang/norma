@@ -8,10 +8,10 @@ locale = "en"
 # `textus ↦ json`; the runtime-backed codec belongs behind this Norma API.
 
 @ public
-fn solve(string wire) → json ⇥ string {
-    throw "norma:json.solve is deferred pending runtime codec dispatch"
+fn parse(string wire) → json ⇥ string {
+    throw "norma:json.parse is deferred pending runtime codec dispatch"
 }
 
-fn tempta(string wire) → json ∪ null {
+fn try_parse(string wire) → json ∪ null {
     return null
 }
