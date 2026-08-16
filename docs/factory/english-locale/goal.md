@@ -119,6 +119,8 @@ regressions. Named so the closeout is honest and the follow-up has a home.
 | Stale verb headers | `src/**` module headers still quote Latin verb naming prose ("Latin stems chosen for motion…", "Verbs route over stream `ad` (Latin `solum:*` routes)…") — F6/comment-pass territory, members already en | want `db928be6` |
 | json la-row currency check | la-pack `norma:json` rows were added in PB-PACKS but need a currency re-check against the landed json renames | want `bb21dc95` class |
 | crypta-sha2 49-err baseline | package exemplum red under en: SEM006×16 + SEM010×33 pre-existing private-member calls (see §3 measurement table) | baseline — visibility-model class, same as first row |
+| Measurement JSON staleness (downstream) | radix `corpus/measurement` compat JSON last regenerated at `487e1a556`, pre pack-rows — stale vs this goal's rename sweep | regen after the sweep settles (radix-side) |
+| faber-lib SEM004/LOCALE002 pending items (downstream) | ~58 faber-lib items pending against the pinned corpus that clear vs current main — test-lane classification; F4 landed post-pin | test-lane re-classification vs current main after the sweep |
 
 **Deferred units (recorded, not blocking):**
 

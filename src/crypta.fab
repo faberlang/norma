@@ -31,11 +31,11 @@ locale = "en"
 # route, provider, or foreign dependency is used. Unknown names and inputs over
 # the 64 MiB boundary fail through the ⇥ textus channel before padding.
 fn digest(string alg, bytes data) → bytes ⇥ string {
-    if data.length() > 67108864 then throw "norma:crypta.digere: input exceeds 67108864-byte limit"
+    if data.length() > 67108864 then throw "norma:crypta.digest: input exceeds 67108864-byte limit"
     if alg ≡ "sha256" then return _sha256(data)
     if alg ≡ "sha384" then return _sha384(data)
     if alg ≡ "sha512" then return _sha512(data)
-    throw "norma:crypta.digere: algorithm must be sha256, sha384, or sha512"
+    throw "norma:crypta.digest: algorithm must be sha256, sha384, or sha512"
 }
 
 # -------------------------------------------------------------------------

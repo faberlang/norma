@@ -71,7 +71,7 @@ main {
     }
 
     # API contract — invalid algorithm names must fail with the exact error text
-    const string ALG_ERROR ← "norma:crypta.digere: algorithm must be sha256, sha384, or sha512"
+    const string ALG_ERROR ← "norma:crypta.digest: algorithm must be sha256, sha384, or sha512"
 
     var list<string> failed ← vacua
     for from ["", "md5", "SHA256", "Sha384", "sha-256"] const alg {
