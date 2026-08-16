@@ -2,23 +2,31 @@
 #
 # These tests exercise the Auscultator implendum methods.
 
-probandum auscultator_methods_exist {
-    # Verify that Auscultator has the expected methods
-    # (Actual listening requires a running server)
-    nota "Auscultator methods verified by compilation"
+describe "auscultator_methods_exist" {
+    test "compilation check" {
+        # Verify that Auscultator has the expected methods
+        # (Actual listening requires a running server)
+        print "Auscultator methods verified by compilation"
+    }
 }
 
-probandum auscultator_accipe_returns_connexus {
-    # Verify that accipe() returns a Connexus type
-    nota "accipe() return type verified by compilation"
+describe "auscultator_accipe_returns_connexus" {
+    test "compilation check" {
+        # Verify that accipe() returns a Connexus type
+        print "accipe() return type verified by compilation"
+    }
 }
 
-probandum auscultator_claude_returns_vacuum {
-    # Verify that claude() returns vacuum
-    nota "claude() return type verified by compilation"
+describe "auscultator_claude_returns_vacuum" {
+    test "compilation check" {
+        # Verify that claude() returns vacuum
+        print "claude() return type verified by compilation"
+    }
 }
 
-probandum auscultator_portus_returns_numerus {
-    # Verify that portus() returns numerus
-    nota "portus() return type verified by compilation"
+describe "auscultator_portus_returns_numerus" {
+    test "compilation check" {
+        # Verify that portus() returns numerus
+        print "portus() return type verified by compilation"
+    }
 }
