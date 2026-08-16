@@ -19,7 +19,7 @@ locale = "en"
 # - Future indicative (-et, -ebit): asynchronous
 # - Provides real console output while language diagnostics use nota/vide/mone.
 # - Default output includes newline (common case)
-# - Use dic() for partial output without newline
+# - Use write_partial() for partial output without newline
 
 
 # =========================================================================
@@ -31,14 +31,14 @@ locale = "en"
 
 # Draw bytes from stdin (sync)
 @ public
-fn hauri(int mensura) → bytes {
-    return call 'consolum:hauri' (mensura) ↦ bytes
+fn read_bytes(int byte_length) → bytes {
+    return call 'consolum:hauri' (byte_length) ↦ bytes
 }
 
 # Draw bytes from stdin (async route; Faber blocks on the frame)
 @ public
-fn hauriet(int mensura) → bytes {
-    return call 'consolum:hauriet' (mensura) ↦ bytes
+fn read_bytes_async(int byte_length) → bytes {
+    return call 'consolum:hauriet' (byte_length) ↦ bytes
 }
 
 # =========================================================================
@@ -50,13 +50,13 @@ fn hauriet(int mensura) → bytes {
 
 # Read line from stdin (sync, blocks until newline)
 @ public
-fn read() → string {
+fn read_line() → string {
     return call 'consolum:lege' ↦ string
 }
 
 # Read line from stdin (async route; Faber blocks on the frame)
 @ public
-fn leget() → string {
+fn read_line_async() → string {
     return call 'consolum:leget' ↦ string
 }
 
@@ -70,14 +70,14 @@ fn leget() → string {
 # Pour bytes to stdout (sync)
 # Opener must be valor (SEM010); cast octeti → valor like solum.funde.
 @ public
-fn funde(bytes data) → void {
+fn write_bytes(bytes data) → void {
     return call 'consolum:funde' (data ↦ value) ↦ void
 }
 
 # Pour bytes to stdout (async route; Faber blocks)
 @ public
 @ future
-fn fundet(bytes data) → void {
+fn write_bytes_async(bytes data) → void {
     return call 'consolum:funde' (data ↦ value) ↦ void
 }
 
@@ -91,13 +91,13 @@ fn fundet(bytes data) → void {
 
 # Write line to stdout with newline (sync)
 @ public
-fn write(string msg) → void {
+fn write_line(string msg) → void {
     return call 'consolum:scribe' (msg) ↦ void
 }
 
 # Write line to stdout with newline (async route; Faber blocks)
 @ public
-fn scribet(string msg) → void {
+fn write_line_async(string msg) → void {
     return call 'consolum:scribet' (msg) ↦ void
 }
 
@@ -111,13 +111,13 @@ fn scribet(string msg) → void {
 
 # Say text to stdout without newline (sync)
 @ public
-fn dic(string msg) → void {
+fn write_partial(string msg) → void {
     return call 'consolum:dic' (msg) ↦ void
 }
 
 # Say text to stdout without newline (async route; Faber blocks)
 @ public
-fn dicet(string msg) → void {
+fn write_partial_async(string msg) → void {
     return call 'consolum:dicet' (msg) ↦ void
 }
 
@@ -131,13 +131,13 @@ fn dicet(string msg) → void {
 
 # Warn line to stderr with newline (sync)
 @ public
-fn warn(string msg) → void {
+fn warn_line(string msg) → void {
     return call 'consolum:mone' (msg) ↦ void
 }
 
 # Warn line to stderr with newline (async route; Faber blocks)
 @ public
-fn monet(string msg) → void {
+fn warn_line_async(string msg) → void {
     return call 'consolum:monet' (msg) ↦ void
 }
 
@@ -151,13 +151,13 @@ fn monet(string msg) → void {
 
 # Debug line with newline (sync)
 @ public
-fn debug(string msg) → void {
+fn debug_line(string msg) → void {
     return call 'consolum:vide' (msg) ↦ void
 }
 
 # Debug line with newline (async route; Faber blocks)
 @ public
-fn videbit(string msg) → void {
+fn debug_line_async(string msg) → void {
     return call 'consolum:videbit' (msg) ↦ void
 }
 
@@ -169,18 +169,18 @@ fn videbit(string msg) → void {
 
 # Can stdin hear an interactive user?
 @ public
-fn audit() → bool {
+fn stdin_is_tty() → bool {
     return call 'consolum:audit' ↦ bool
 }
 
 # Does stdout speak to an interactive user?
 @ public
-fn loquitur() → bool {
+fn stdout_is_tty() → bool {
     return call 'consolum:loquitur' ↦ bool
 }
 
 # Does stderr admonish an interactive user?
 @ public
-fn admonet() → bool {
+fn stderr_is_tty() → bool {
     return call 'consolum:admonet' ↦ bool
 }
