@@ -3,8 +3,8 @@ term = "toml"
 kind = "existing-home"
 category = "stdlib"
 canonical = false
-summary = "Required-key validation via valor.exige_claves(valor, lista<textus>)."
-syntax = "valor.exige_claves(doc, [\"id\", \"name\"])"
+summary = "Required-key validation via valor.require_strings(valor, list<string>)."
+syntax = "valor.require_strings(doc, [\"id\", \"name\"])"
 related = ["valor", "toml", "stdlib-nativum"]
 locale = "en"
 +++
@@ -22,12 +22,12 @@ id = "sample"»
 }
 
 main {
-    const value doc ← toml.solve(sampleToml())
+    const value doc ← toml.parse(sampleToml())
 
     do {
-        value.exige_claves(doc, ["id", "name"])
-        const string name ← value.cape(doc, "name") ↦ string ⇥ "missing"
-        const string id ← value.cape(doc, "id") ↦ string ⇥ "missing"
+        value.require_strings(doc, ["id", "name"])
+        const string name ← value.get(doc, "name") ↦ string ⇥ "missing"
+        const string id ← value.get(doc, "id") ↦ string ⇥ "missing"
         print name, id
     }
     catch err {
@@ -35,7 +35,7 @@ main {
     }
 
     do {
-        value.exige_claves(doc, ["absent"])
+        value.require_strings(doc, ["absent"])
         assert false
     }
     catch err {

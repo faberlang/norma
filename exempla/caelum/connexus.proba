@@ -1,32 +1,32 @@
 # caelum/connexus.proba — tests for TCP socket type
 #
-# These tests exercise the Connexus implendum methods.
+# These tests exercise the Socket implendum methods.
 # Note: Actual socket operations require a running server, so v1 tests
 # focus on type construction and method signatures.
 
 describe "connexus_methods_exist" {
     test "compilation check" {
-        # Verify that Connexus has the expected methods by calling them
+        # Verify that Socket has the expected methods by calling them
         # with appropriate types. In a real test, we'd need a running server
         # to connect to, but the compiler will catch signature errors.
 
         # This is a compile-time check — if any method doesn't exist or has
         # the wrong signature, the compiler will report an error.
-        print "Connexus methods verified by compilation"
+        print "Socket methods verified by compilation"
     }
 }
 
-describe "connexus_remotus_returns_terminus" {
+describe "connexus_remote_returns_endpoint" {
     test "compilation check" {
-        # Verify that remotus() returns a Terminus type
+        # Verify that remote() returns a Endpoint type
         # (This would require an actual connection to test fully)
-        print "remotus() return type verified by compilation"
+        print "remote() return type verified by compilation"
     }
 }
 
-describe "connexus_localis_returns_terminus" {
+describe "connexus_local_returns_endpoint" {
     test "compilation check" {
-        # Verify that localis() returns a Terminus type
-        print "localis() return type verified by compilation"
+        # Verify that local() returns a Endpoint type
+        print "local() return type verified by compilation"
     }
 }

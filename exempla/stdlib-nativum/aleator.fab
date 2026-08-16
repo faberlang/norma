@@ -4,7 +4,7 @@ kind = "concept"
 category = "stdlib"
 canonical = false
 summary = "norma:aleator entropy API contract tests."
-syntax = "norma:aleator — fractum | sortire | octetos | uuid | semina (all ad-routed)"
+syntax = "norma:aleator — random_float | random_int | random_bytes | uuid | seed (all ad-routed)"
 related = ["aleator", "stdlib-nativum"]
 locale = "en"
 +++
@@ -21,50 +21,50 @@ main {
     # Basic generation
     # -----------------------------------------------------------------------
     do {
-        const float val ← aleator.fractum()
+        const float val ← aleator.random_float()
         assert val ≥ 0.0
         assert val < 1.0
     }
     catch err {
-        print "aleator.fractum not available"
+        print "aleator.random_float not available"
     }
 
     do {
-        const int val ← aleator.sortire(1, 6)
+        const int val ← aleator.random_int(1, 6)
         assert val ≥ 1
         assert val ≤ 6
     }
     catch err {
-        print "aleator.sortire not available"
+        print "aleator.random_int not available"
     }
 
     # Edge: min = max should return the single value
     do {
-        const int val ← aleator.sortire(5, 5)
+        const int val ← aleator.random_int(5, 5)
         assert val ≡ 5
     }
     catch err {
-        print "aleator.sortire fixed range not available"
+        print "aleator.random_int fixed range not available"
     }
 
     # -----------------------------------------------------------------------
     # Cryptographic generation
     # -----------------------------------------------------------------------
     do {
-        const bytes val ← aleator.octetos(16)
+        const bytes val ← aleator.random_bytes(16)
         assert val.length() ≡ 16
     }
     catch err {
-        print "aleator.octetos not available"
+        print "aleator.random_bytes not available"
     }
 
     # Edge: n = 0 returns empty bytes
     do {
-        const bytes val ← aleator.octetos(0)
+        const bytes val ← aleator.random_bytes(0)
         assert val.length() ≡ 0
     }
     catch err {
-        print "aleator.octetos(0) not available"
+        print "aleator.random_bytes(0) not available"
     }
 
     do {
@@ -79,17 +79,17 @@ main {
     # Seeding (for reproducible tests)
     # -----------------------------------------------------------------------
     do {
-        aleator.semina(42)
+        aleator.seed(42)
     }
     catch err {
-        print "aleator.semina not available"
+        print "aleator.seed not available"
     }
 
     # Edge: semina with negative value (should reset to true random)
     do {
-        aleator.semina(-1)
+        aleator.seed(-1)
     }
     catch err {
-        print "aleator.semina(-1) not available"
+        print "aleator.seed(-1) not available"
     }
 }

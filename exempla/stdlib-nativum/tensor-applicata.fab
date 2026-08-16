@@ -1,10 +1,10 @@
 +++
-term = "tensor-applicata"
+term = "tensor-apply"
 kind = "concept"
 category = "stdlib"
 canonical = true
-summary = "norma:tensor applicata map and summa reduction."
-syntax = "norma:tensor — applicata | summa"
+summary = "norma:tensor apply map and sum reduction."
+syntax = "norma:tensor — apply | sum"
 related = ["tensor", "stdlib-nativum", "lista"]
 locale = "en"
 +++
@@ -17,8 +17,8 @@ import from "norma:tensor" tensor
 
 main {
     const list<int> flat ← [1, 2, 3, 4]
-    const tensor<int, [2, 2]> grid ← tensor.structa<tensor<int, [2, 2]>>(flat)
-    const tensor<int, [2, 2]> scaled ← tensor.applicata(grid, int x ∴ x + 1)
+    const tensor<int, [2, 2]> grid ← tensor.construct<tensor<int, [2, 2]>>(flat)
+    const tensor<int, [2, 2]> scaled ← tensor.apply(grid, int x ∴ x + 1)
     const int total ← tensor.sum(scaled)
     print total
 }

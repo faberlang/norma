@@ -1,10 +1,10 @@
 +++
-term = "retorta"
+term = "reverse"
 kind = "concept"
 category = "stdlib"
 canonical = true
 summary = "First native stdlib body wired through norma:chorda."
-syntax = "retorta(<cord>)"
+syntax = "reverse(<cord>)"
 related = ["chorda", "stdlib-nativum"]
 locale = "en"
 +++

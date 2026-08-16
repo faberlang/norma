@@ -4,7 +4,7 @@ kind = "concept"
 category = "stdlib"
 canonical = false
 summary = "norma:consolum console I/O API contract tests."
-syntax = "norma:consolum — lege | scribe | mone | vide | audit (all ad-routed)"
+syntax = "norma:consolum — read_line | write_line | warn_line | debug_line | stdin_is_tty (all ad-routed)"
 related = ["consolum", "stdlib-nativum"]
 locale = "en"
 +++
@@ -22,7 +22,7 @@ main {
     # STDIN - Bytes
     # -----------------------------------------------------------------------
     do {
-        consolum.hauri(16)
+        consolum.read_bytes(16)
         assert false
     }
     catch err {
@@ -30,7 +30,7 @@ main {
     }
 
     do {
-        consolum.hauriet(16)
+        consolum.read_bytes_async(16)
         assert false
     }
     catch err {
@@ -41,7 +41,7 @@ main {
     # STDIN - Text
     # -----------------------------------------------------------------------
     do {
-        consolum.lege()
+        consolum.read_line()
         assert false
     }
     catch err {
@@ -49,7 +49,7 @@ main {
     }
 
     do {
-        consolum.leget()
+        consolum.read_line_async()
         assert false
     }
     catch err {
@@ -60,7 +60,7 @@ main {
     # STDOUT - Bytes
     # -----------------------------------------------------------------------
     do {
-        consolum.funde(|01 02 03|)
+        consolum.write_bytes(|01 02 03|)
         assert false
     }
     catch err {
@@ -68,7 +68,7 @@ main {
     }
 
     do {
-        consolum.fundet(|01 02 03|)
+        consolum.write_bytes_async(|01 02 03|)
         assert false
     }
     catch err {
@@ -79,7 +79,7 @@ main {
     # STDOUT - Text
     # -----------------------------------------------------------------------
     do {
-        consolum.scribe("test-output")
+        consolum.write_line("test-output")
         assert false
     }
     catch err {
@@ -87,7 +87,7 @@ main {
     }
 
     do {
-        consolum.scribet("test-async")
+        consolum.write_line_async("test-async")
         assert false
     }
     catch err {
@@ -95,7 +95,7 @@ main {
     }
 
     do {
-        consolum.dic("partial")
+        consolum.write_partial("partial")
         assert false
     }
     catch err {
@@ -103,7 +103,7 @@ main {
     }
 
     do {
-        consolum.dicet("partial-async")
+        consolum.write_partial_async("partial-async")
         assert false
     }
     catch err {
@@ -114,7 +114,7 @@ main {
     # STDERR - Warning and Debug
     # -----------------------------------------------------------------------
     do {
-        consolum.mone("warn-output")
+        consolum.warn_line("warn-output")
         assert false
     }
     catch err {
@@ -122,7 +122,7 @@ main {
     }
 
     do {
-        consolum.monet("warn-async")
+        consolum.warn_line_async("warn-async")
         assert false
     }
     catch err {
@@ -130,7 +130,7 @@ main {
     }
 
     do {
-        consolum.vide("debug-output")
+        consolum.debug_line("debug-output")
         assert false
     }
     catch err {
@@ -138,7 +138,7 @@ main {
     }
 
     do {
-        consolum.videbit("debug-async")
+        consolum.debug_line_async("debug-async")
         assert false
     }
     catch err {
@@ -149,7 +149,7 @@ main {
     # TTY Detection
     # -----------------------------------------------------------------------
     do {
-        consolum.audit()
+        consolum.stdin_is_tty()
         assert false
     }
     catch err {
@@ -157,7 +157,7 @@ main {
     }
 
     do {
-        consolum.loquitur()
+        consolum.stdout_is_tty()
         assert false
     }
     catch err {
@@ -165,7 +165,7 @@ main {
     }
 
     do {
-        consolum.admonet()
+        consolum.stderr_is_tty()
         assert false
     }
     catch err {

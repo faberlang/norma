@@ -10,7 +10,7 @@ library source, not the keyword language dictionary.
 
 ```text
 exempla/
-  stdlib-nativum/    # module tours (chorda, mathesis, toml, solum.explora, …)
+  stdlib-nativum/    # module tours (chorda, mathesis, toml, solum.glob, …)
   chorda/            # deeper chorda method demos
 ```
 

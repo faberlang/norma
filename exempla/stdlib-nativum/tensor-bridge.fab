@@ -3,8 +3,8 @@ term = "tensor"
 kind = "concept"
 category = "stdlib"
 canonical = true
-summary = "norma:tensor bridge catalog — planata, structa, creata, productum."
-syntax = "norma:tensor — planata | structa | creata | productum"
+summary = "norma:tensor bridge catalog — flatten, construct, creata, product."
+syntax = "norma:tensor — flatten | construct | creata | product"
 related = ["tensor", "lista"]
 locale = "en"
 +++
@@ -20,7 +20,7 @@ import from "norma:tensor" tensor
 
 main {
     const list<int> xs ← [1, 2, 3, 4]
-    const tensor<int, [4]> grid ← tensor.structa<tensor<int, [4]>>(xs)
+    const tensor<int, [4]> grid ← tensor.construct<tensor<int, [4]>>(xs)
     const list<int> flat ← tensor.flatten(grid)
     print flat.length()
 
@@ -32,8 +32,8 @@ main {
         5.0,
         6.0,
     ]
-    const tensor<float<f32>, [2, 3]> shaped ← tensor.structa<tensor<float<f32>, [2, 3]>>(data)
+    const tensor<float<f32>, [2, 3]> shaped ← tensor.construct<tensor<float<f32>, [2, 3]>>(data)
     const tensor<float<f32>, [2, 3]> filled ← tensor.creata<tensor<float<f32>, [2, 3]>>(0.0 ∷ float<f32>)
-    print tensor.dot(shaped.shape())
+    print tensor.product(shaped.shape())
     print filled.length()
 }

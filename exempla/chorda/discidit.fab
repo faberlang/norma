@@ -3,8 +3,8 @@ term = "chorda"
 kind = "concept"
 category = "stdlib"
 canonical = false
-summary = "Limited split and residuum helpers on cords."
-syntax = "discissa(<cord>, <delimiter>, <limit>)"
+summary = "Limited split and suffix helpers on cords."
+syntax = "split_n(<cord>, <delimiter>, <limit>)"
 related = ["chorda", "textus"]
 locale = "en"
 +++
@@ -12,7 +12,7 @@ locale = "en"
 
 # chorda — limited split and residuum helpers
 #
-# discissa(<cord>, <delimiter>, <limit>) and residuum helpers on package path.
+# split_n(<cord>, <delimiter>, <limit>) and residuum helpers on package path.
 #
 # GRAMMAR:
 #   chordaCall :← ident '(' cordExpr (',' expr)* ')'
@@ -23,10 +23,10 @@ locale = "en"
 import from "norma:chorda" chorda
 
 main {
-    const list<string> head ← chorda.discissa("a=b=c", "=", 2)
+    const list<string> head ← chorda.split_n("a=b=c", "=", 2)
     assert head.length() ≡ 2
 
-    const string tail ← chorda.residuum("hello", 2)
+    const string tail ← chorda.suffix("hello", 2)
     assert tail ≡ "llo"
 
     print head.first(), head.get(1), tail

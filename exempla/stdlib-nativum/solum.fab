@@ -4,7 +4,7 @@ kind = "concept"
 category = "stdlib"
 canonical = false
 summary = "norma:solum filesystem API contract tests."
-syntax = "norma:solum — explora (native) | describe (mori) | path api"
+syntax = "norma:solum — glob (native) | stat (mori) | path api"
 related = ["solum", "stdlib-nativum"]
 locale = "en"
 +++
@@ -23,7 +23,7 @@ main {
     # explora — native Faber glob reject empty path segment
     # -----------------------------------------------------------------------
     do {
-        only.explora("/tmp", "a//b")
+        only.glob("/tmp", "a//b")
         assert false
     }
     catch err {
@@ -31,7 +31,7 @@ main {
     }
 
     do {
-        only.explora("/tmp", "*/")
+        only.glob("/tmp", "*/")
         assert false
     }
     catch err {
@@ -42,7 +42,7 @@ main {
     # describe — mori deferred body
     # -----------------------------------------------------------------------
     do {
-        only.describe("/tmp")
+        only.stat("/tmp")
         assert false
     }
     catch err {
@@ -50,7 +50,7 @@ main {
     }
 
     do {
-        only.describet("/tmp")
+        only.statt("/tmp")
         assert false
     }
     catch err {

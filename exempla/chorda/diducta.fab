@@ -4,7 +4,7 @@ kind = "concept"
 category = "stdlib"
 canonical = false
 summary = "Delimiter-leading document split into opaque metadata and corpus wires."
-syntax = "diducta(<documentum>, <delimiter>)"
+syntax = "split_frontmatter(<documentum>, <delimiter>)"
 related = ["chorda", "toml", "textus"]
 locale = "en"
 +++
@@ -27,7 +27,7 @@ main {
     # Happy path: well-formed document with delimiter fence
     do {
         const string doc ← sampleSkill()
-        const [metadatum, corpus] ← chorda.diducta(doc, "+++")
+        const [metadatum, corpus] ← chorda.split_frontmatter(doc, "+++")
 
         assert metadatum.contains("version = 1")
         assert metadatum.contains("id = sample")
@@ -41,7 +41,7 @@ main {
 
     # Missing opening delimiter: document does not start with delimiter
     do {
-        chorda.diducta("no front block", "+++")
+        chorda.split_frontmatter("no front block", "+++")
         assert false
     }
     catch err {
@@ -50,7 +50,7 @@ main {
 
     # Empty delimiter: delimiter string is zero-length
     do {
-        chorda.diducta("content", "")
+        chorda.split_frontmatter("content", "")
         assert false
     }
     catch err {
@@ -59,7 +59,7 @@ main {
 
     # Document shorter than delimiter: cannot contain the delimiter
     do {
-        chorda.diducta("ab", "+++")
+        chorda.split_frontmatter("ab", "+++")
         assert false
     }
     catch err {
@@ -68,7 +68,7 @@ main {
 
     # Missing closing delimiter: opening fence exists but no closing fence
     do {
-        chorda.diducta("+++\nkey = val\n", "+++")
+        chorda.split_frontmatter("+++\nkey = val\n", "+++")
         assert false
     }
     catch err {
@@ -77,7 +77,7 @@ main {
 
     # Delimiter-only: document is exactly the delimiter string
     do {
-        chorda.diducta("+++", "+++")
+        chorda.split_frontmatter("+++", "+++")
         assert false
     }
     catch err {
@@ -88,7 +88,7 @@ main {
     # opening fence then immediate content then closing fence
     do {
         const string doc ← "+++\nkey = val\n+++"
-        const [metadatum, corpus] ← chorda.diducta(doc, "+++")
+        const [metadatum, corpus] ← chorda.split_frontmatter(doc, "+++")
         assert metadatum.contains("key = val")
         assert corpus.length() ≡ 0
     }

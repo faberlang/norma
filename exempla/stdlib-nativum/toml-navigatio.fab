@@ -3,8 +3,8 @@ term = "toml"
 kind = "existing-home"
 category = "stdlib"
 canonical = false
-summary = "Native valor navigation over parsed TOML (cape, inveni, exige)."
-syntax = "toml.solve | valor.cape | valor.inveni | valor.exige"
+summary = "Native valor navigation over parsed TOML (get, find, require_string)."
+syntax = "toml.parse | valor.get | valor.find | valor.require_string"
 related = ["valor", "toml", "stdlib-nativum"]
 locale = "en"
 +++
@@ -23,19 +23,19 @@ id = "sample"»
 }
 
 main {
-    const value doc ← toml.solve(sampleToml())
+    const value doc ← toml.parse(sampleToml())
 
-    assert value.tabulane(doc)
-    assert value.textusne(value.cape(doc, "name"))
-    assert value.numerusne(value.cape(doc, "version"))
-    assert value.nihilne(doc) ≡ false
+    assert value.is_map(doc)
+    assert value.is_string(value.get(doc, "name"))
+    assert value.is_int(value.get(doc, "version"))
+    assert value.is_null(doc) ≡ false
 
-    const string name ← value.cape(doc, "name") ↦ string ⇥ "missing"
-    const int version ← value.cape(doc, "version") ↦ int ⇥ 0
-    const string id ← value.inveni(doc, "id") ↦ string ⇥ "missing"
+    const string name ← value.get(doc, "name") ↦ string ⇥ "missing"
+    const int version ← value.get(doc, "version") ↦ int ⇥ 0
+    const string id ← value.find(doc, "id") ↦ string ⇥ "missing"
 
     do {
-        const string required ← value.exige(doc, "id")
+        const string required ← value.require_string(doc, "id")
         assert required ≡ "sample"
     }
     catch err {
@@ -47,7 +47,7 @@ main {
     assert id ≡ "sample"
 
     do {
-        value.exige(doc, "absent")
+        value.require_string(doc, "absent")
         assert false
     }
     catch err {

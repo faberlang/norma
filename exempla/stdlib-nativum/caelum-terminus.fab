@@ -18,9 +18,9 @@ locale = "en"
 import from "norma:caelum/terminus" terminus
 
 main {
-    const terminus.Terminus endpoint ← terminus.Terminus {
-        hospes = "localhost",
-        portus = 8080
+    const terminus.Endpoint endpoint ← terminus.Endpoint {
+        host = "localhost",
+        port = 8080
     }
-    print endpoint.hospes
+    print endpoint.host
 }

@@ -4,7 +4,7 @@ kind = "concept"
 category = "stdlib"
 canonical = false
 summary = "Native stdlib chorda v1 subset: cord and UTF-8 mechanical trio."
-syntax = "norma:chorda — pange | solve | tempta"
+syntax = "norma:chorda — encode | decode | try_decode"
 related = ["chorda", "stdlib-nativum", "textus"]
 locale = "en"
 +++
@@ -24,14 +24,14 @@ import from "norma:chorda" chorda
 
 main {
     print chorda.reverse("roma")
-    print chorda.nexa(["alpha", "beta", "gamma"], "_")
-    print chorda.reputat("banana", "an")
-    print chorda.reciprocus("anna")
-    const bytes raw ← chorda.pange("Salve")
-    print chorda.solve(raw)
-    const bytes probe ← chorda.pange("Salve")
-    print chorda.tempta(probe)
-    print chorda.retenta("hello7!", "a", "z")
-    print chorda.comprimata("  foo   bar  ")
-    print chorda.discissa("a=b=c", "=", 2).first()
+    print chorda.join(["alpha", "beta", "gamma"], "_")
+    print chorda.count("banana", "an")
+    print chorda.is_palindrome("anna")
+    const bytes raw ← chorda.encode("Salve")
+    print chorda.decode(raw)
+    const bytes probe ← chorda.encode("Salve")
+    print chorda.try_decode(probe)
+    print chorda.keep_between("hello7!", "a", "z")
+    print chorda.collapse_spaces("  foo   bar  ")
+    print chorda.split_n("a=b=c", "=", 2).first()
 }

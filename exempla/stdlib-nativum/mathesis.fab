@@ -22,18 +22,18 @@ import from "norma:mathesis" mathesis
 
 main {
     const float pi ← mathesis.PI()
-    const float s ← mathesis.sinus(0.0)
-    const float c ← mathesis.cosinus(0.0)
-    const float r ← mathesis.radix(4.0)
-    const float clamped ← mathesis.constringens(5.0, 0.0, 3.0)
-    const float t ← mathesis.tangens(0.0)
-    const float exp1 ← mathesis.exponens(1.0)
-    const float ln_e ← mathesis.logarithmus(mathesis.E())
-    const float ln10 ← mathesis.logarithmus10(100.0)
-    const float neg_sqrt ← mathesis.radix(-1.0)
-    const float neg_log ← mathesis.logarithmus(-1.0)
-    const float pole_tan ← mathesis.tangens(mathesis.PI() / 2.0)
-    const float pow_cat ← mathesis.power(2.0, 3.0)
+    const float s ← mathesis.sin(0.0)
+    const float c ← mathesis.cos(0.0)
+    const float r ← mathesis.sqrt(4.0)
+    const float clamped ← mathesis.clamp(5.0, 0.0, 3.0)
+    const float t ← mathesis.tan(0.0)
+    const float exp1 ← mathesis.exp(1.0)
+    const float ln_e ← mathesis.ln(mathesis.E())
+    const float ln10 ← mathesis.log10(100.0)
+    const float neg_sqrt ← mathesis.sqrt(-1.0)
+    const float neg_log ← mathesis.ln(-1.0)
+    const float pole_tan ← mathesis.tan(mathesis.PI() / 2.0)
+    const float pow_cat ← mathesis.pow(2.0, 3.0)
     const float b ← 2.0
     const float pow_recv ← b.power(3.0)
     const float neg_b ← -2.0
@@ -67,5 +67,5 @@ main {
     assert pow_cat.approx(8.0, 0.000001)
     assert pow_recv ≡ pow_cat
     assert neg_pow_recv ≡ 0.0
-    assert mathesis.power(-2.0, 2.0) ≡ 0.0
+    assert mathesis.pow(-2.0, 2.0) ≡ 0.0
 }

@@ -4,7 +4,7 @@ kind = "existing-home"
 category = "stdlib"
 canonical = false
 summary = "Shallow glob contract on norma:solum."
-syntax = "solum.explora"
+syntax = "solum.glob"
 related = ["solum", "stdlib-nativum", "DEFER-067"]
 locale = "en"
 +++
