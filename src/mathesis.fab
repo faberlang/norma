@@ -198,7 +198,7 @@ fn _reduce_angle(float x) → float {
     const float tau ← TAU()
     const float half_tau ← tau / 2.0
     const int k ← ((x + half_tau) / tau).floor()
-    return x - tau * k
+    return x - tau * (k ↦ float)
 }
 
 # Why: Taylor series for sin(x) on reduced angle (fixed iteration count).
@@ -207,11 +207,11 @@ fn _sinus_series(float x) → float {
     var float term ← x
     var float sum ← x
     var float x2 ← x * x
-    var int n ← 1
+    var float n ← 1
     while n < 12 {
-        term ← (term * (-x2)) / ((2 * n) * (2 * n + 1))
+        term ← (term * (-x2)) / ((2.0 * n) * (2.0 * n + 1.0))
         sum ← sum + term
-        n ← n + 1
+        n ← n + 1.0
     }
     return sum
 }
@@ -222,11 +222,11 @@ fn _cosinus_series(float x) → float {
     var float term ← 1.0
     var float sum ← 1.0
     var float x2 ← x * x
-    var int n ← 1
+    var float n ← 1
     while n < 12 {
-        term ← (term * (-x2)) / ((2 * n - 1) * (2 * n))
+        term ← (term * (-x2)) / ((2.0 * n - 1.0) * (2.0 * n))
         sum ← sum + term
-        n ← n + 1
+        n ← n + 1.0
     }
     return sum
 }
@@ -236,11 +236,11 @@ fn _cosinus_series(float x) → float {
 fn _exponens_series(float x) → float {
     var float term ← 1.0
     var float sum ← 1.0
-    var int n ← 1
+    var float n ← 1
     while n < 20 {
         term ← (term * x) / n
         sum ← sum + term
-        n ← n + 1
+        n ← n + 1.0
     }
     return sum
 }
@@ -252,11 +252,11 @@ fn _logarithmus_series(float x) → float {
     var float y2 ← y * y
     var float term ← y
     var float sum ← y
-    var int n ← 1
+    var float n ← 1
     while n < 24 {
         term ← term * y2
-        sum ← sum + term / (2 * n + 1)
-        n ← n + 1
+        sum ← sum + term / (2.0 * n + 1.0)
+        n ← n + 1.0
     }
     return 2.0 * sum
 }

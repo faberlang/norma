@@ -7,17 +7,12 @@ locale = "en"
 # Etymology: "ordinata" — arranged, put in order (fem. of ordinatus).
 # Counterpart to tabula (hash-unordered map). Keys iterate in sorted order.
 #
-# TARGET: This module is written in its target form and assumes two parked
-# factory goals have landed:
-#   1. generic-genus-construction (docs/factory/generic-genus-construction/goal.md)
-#      — `Ordinata<K, V>` construction at call sites.
-#   2. an `Ord`-equivalent bound on K. Until user-specified type-parameter
-#      bounds exist, the workaround documented in the generic-genus-construction
-#      goal restricts K to compiler-ordered primitives (numerus, textus,
-#      fractus) and codegen emits the unconditional bound set.
-# Until both ship, this module will not compile. It is committed in target
-# form so the public surface is fixed and ready for the moment the compiler
-# work lands.
+# NOTE: Generic record construction (`Ordinata<K, V> { ... }`) and generic
+# `<` ordering are not yet supported by the compiler (the
+# generic-genus-construction and Ord-bound goals are still draft). The
+# constructors use `Ordinata { ... }` with type arguments inferred from the
+# return type, `_insere` keeps the index sorted via `sort()` instead of
+# comparison, and `fines` is removed until an ordering surface exists.
 #
 # Layering: pure native Faber over the builtin tabula<K, V> (for O(1) lookup)
 # plus a lista<K> kept in sorted order (for ordered iteration). No Rust
@@ -120,31 +115,9 @@ class Ordinata<K, V> {
         var list<V> out ← vacua
         for from self.index const k {
             # habet verified by construction; accipe cannot miss.
-            const V v ← self.entries.get(k)
+            const V ∪ null v ← self.entries.get(k)
+            if v ≡ null then continue
             out.append(v)
-        }
-        return out
-    }
-
-    # =========================================================================
-    # RANGE QUERIES (the second thing ordinata adds over tabula)
-    # =========================================================================
-
-    # Keys in [inferior, superior). `inferior` included, `superior` excluded.
-    # Named `fines` (bounds/limits, plural noun) — one Latin word for the
-    # range concept. (`intra` would be the more natural preposition but is a
-    # reserved Faber keyword — TokenKind::Intra.)
-    #
-    # WHY: both bounds required rather than nullable because Faber's param
-    # grammar does not accept `T ∪ nihil` in parameter position today. One-
-    # sided ranges are handled by the caller iterating claves() and filtering;
-    # a nullable-bound variant can be added if param-position unions ship.
-    fn fines(K inferior, K superior) → list<K> {
-        var list<K> out ← vacua
-        for from self.index const k {
-            if k < inferior then continue
-            if k ≥ superior then continue
-            out.append(k)
         }
         return out
     }
@@ -159,20 +132,15 @@ class Ordinata<K, V> {
 # reserved for the emptiness predicate above.
 
 # Empty sorted map constructor.
-fn creata() → Ordinata<K, V> {
-    return Ordinata<K, V> { }
+fn creata<K, V>() → Ordinata<K, V> {
+    return Ordinata { }
 }
 
 # Build a sorted map from a tabula, sorting keys once at construction.
 # WHY: One sort at build time is cheaper than re-sorting on every ordered
 # iteration, which is the common ordinata use case.
-#
-# EDGE: This constructor depends on tabula.claves(), a planned intrinsic for
-# reading all keys of a tabula. Until that ships, this constructor cannot
-# compile. The empty constructor creata() above is unaffected. Tracked as a
-# separate gap from the generic-construction work.
-fn creata_ex(map<K, V> res) → Ordinata<K, V> {
-    var Ordinata<K, V> out ← Ordinata<K, V> { entries = res }
+fn creata_ex<K, V>(map<K, V> res) → Ordinata<K, V> {
+    var Ordinata<K, V> out ← Ordinata { entries = res }
     var list<K> claves ← res.keys()
     claves.sort()
     out.index ← claves
@@ -189,40 +157,15 @@ fn creata_ex(map<K, V> res) → Ordinata<K, V> {
 # function pattern; file-scope functions do not inherit enclosing genus type
 # parameters.
 
-# Insert a key into the sorted index at its sorted position.
+# Insert a key into the sorted index.
+# WHY: the sorted position is found via `sort()` instead of a generic `<`
+# comparison — no ordering surface exists for type params yet (Ord-bound
+# goal). The append-then-sort keeps the index sorted; duplicates can't occur
+# here because callers check habet first.
 @ private
 fn _insere<K>(list<K> index, K clavis) → void {
-    var int i ← 0
-    while i < index.length() {
-        const K extans ← index.get(i)
-        # WHY: strict-less keeps the insert position stable; duplicates
-        # can't occur here because callers check habet first.
-        if clavis < extans {
-            _insere_ad<K>(index, i, clavis)
-            return
-        }
-        i ← i + 1
-    }
     index.append(clavis)
-}
-
-# Insert at a positional index. lista has no positional-insert intrinsic
-# yet, so this rebuilds the lista around the insertion point.
-@ private
-fn _insere_ad<K>(list<K> index, int positio, K clavis) → void {
-    var list<K> out ← vacua
-    var int i ← 0
-    while i < index.length() {
-        if i ≡ positio {
-            out.append(clavis)
-        }
-        out.append(index.get(i))
-        i ← i + 1
-    }
-    if positio ≡ index.length() {
-        out.append(clavis)
-    }
-    index ← out
+    index.sort()
 }
 
 # Remove a key from the sorted index. Reuses the `amputa` (cut away) stem
@@ -231,7 +174,12 @@ fn _insere_ad<K>(list<K> index, int positio, K clavis) → void {
 fn _amputa<K>(list<K> index, K clavis) → void {
     var int i ← 0
     while i < index.length() {
-        if index.get(i) ≡ clavis {
+        const K ∪ null extans ← index.get(i)
+        if extans ≡ null {
+            i ← i + 1
+            continue
+        }
+        if _aequa<K>(extans, clavis) {
             _amputa_ad<K>(index, i)
             return
         }
@@ -239,16 +187,34 @@ fn _amputa<K>(list<K> index, K clavis) → void {
     }
 }
 
+# Generic equality through the call-argument path: the `≡` operator on a
+# null-narrowed binding does not see the refined type, so the comparison is
+# delegated to a two-rigid-param helper.
+@ private
+fn _aequa<K>(K a, K b) → bool {
+    return a ≡ b
+}
+
 # Positional removal helper — rebuilds the lista without index `positio`.
+# The rebuild mutates the receiver in place: a parameter binding cannot be
+# reassigned (SEM020), so the original is drained and refilled.
 @ private
 fn _amputa_ad<K>(list<K> index, int positio) → void {
     var list<K> out ← vacua
     var int i ← 0
     while i < index.length() {
+        const K ∪ null extans ← index.get(i)
+        if extans ≡ null {
+            i ← i + 1
+            continue
+        }
         if i ≠ positio {
-            out.append(index.get(i))
+            out.append(extans)
         }
         i ← i + 1
     }
-    index ← out
+    while not index.is_empty() { index.remove_last() }
+    for from out const item {
+        index.append(item)
+    }
 }

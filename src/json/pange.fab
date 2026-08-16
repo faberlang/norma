@@ -7,7 +7,11 @@ locale = "en"
 # The compiler/runtime-owned formal `json` conversio is the single codec
 # authority. This module exists so direct `norma:json/pange` imports share the
 # same path as the top-level `norma:json.pange` facade.
+#
+# The direct `json ↦ string` conversion is rejected by the compiler (SEM016);
+# the runtime-backed codec mirrors the `json.pange` facade, deferred pending
+# runtime codec dispatch.
 
 fn pange(json documentum) → string {
-    return documentum ↦ string
+    panic "norma:json/pange.pange is deferred pending runtime codec dispatch"
 }

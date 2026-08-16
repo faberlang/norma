@@ -7,12 +7,10 @@ locale = "en"
 # Etymology: "fila" — thread, string, strand. A sequence drawn from either end.
 # Counterpart to lista (ordered random access) and acervus (heap-priority).
 #
-# TARGET: This module is written in its target form and assumes the
-# generic-genus-construction factory goal
-# (docs/factory/generic-genus-construction/goal.md) has landed. Until that
-# goal ships, `Fila<T>` construction at call sites does not typecheck and this
-# module will not compile. It is committed in target form so the public surface
-# is fixed and ready for the moment the compiler fix lands.
+# NOTE: Generic record construction (`Fila<T> { ... }`) is not yet supported by
+# the parser (generic-genus-construction goal is still draft); the constructors
+# below use `Fila { ... }` with the type arguments inferred from the return
+# type, and the free functions declare their own `<T>`.
 #
 # Layering: pure native Faber over the builtin lista<T>. No Rust backing, no
 # ad routes, no I/O. Backed by two listas: `caput` (its tail is the queue
@@ -165,12 +163,12 @@ class Fila<T> {
 # predicate above.
 
 # Empty queue constructor.
-fn creata() → Fila<T> {
-    return Fila<T> { }
+fn creata<T>() → Fila<T> {
+    return Fila { }
 }
 
 # Build a queue from a lista, preserving order. The first element of the
 # source becomes the head of the queue.
-fn creata_ex(list<T> res) → Fila<T> {
-    return Fila<T> { post = res }
+fn creata_ex<T>(list<T> res) → Fila<T> {
+    return Fila { post = res }
 }
