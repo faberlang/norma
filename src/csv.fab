@@ -12,7 +12,7 @@ import from "norma:chorda" chorda
 
 # Why: Strip a single trailing CR when rows arrive CRLF-split (v1 LF contract).
 @ private
-fn _normaliza_row(string row) → string {
+fn _normalize_row(string row) → string {
     if row.length() ≡ 0 then return row
 
     const string last ← row.slice(row.length() - 1, row.length())
@@ -21,25 +21,25 @@ fn _normaliza_row(string row) → string {
     return row
 }
 
-# Verb: solve from "solvere" (to loosen, untangle)
+# Verb: parse (text → rows of fields)
 # Why: Parse naive comma/LF wire into rows of fields (see csv-methods.md for limits).
 @ public
-fn solve(string wire) → list<list<string>> {
+fn parse(string wire) → list<list<string>> {
     if wire.length() ≡ 0 then return vacua
 
     const list<string> rows ← chorda.split_n(wire, "\n", wire.length() + 1)
     var list<list<string>> map ← vacua
     for from rows const row {
-        const string normalized ← _normaliza_row(row)
+        const string normalized ← _normalize_row(row)
         map.append(chorda.split_n(normalized, ",", normalized.length() + 1))
     }
     return map
 }
 
-# Verb: pange from "pangere" (to fasten, compose)
+# Verb: stringify (rows of fields → text)
 # Why: Compose rows of fields into comma-separated, LF-joined wire text.
 @ public
-fn pange(list<list<string>> map) → string {
+fn stringify(list<list<string>> map) → string {
     var list<string> rows ← vacua
     for from map const fields {
         rows.append(chorda.join(fields, ","))
