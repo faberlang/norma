@@ -5,6 +5,11 @@ imports. This repo owns `.fab` source under `src/`; Radix consumes it through
 `FABER_LIBRARY_HOME`, usually the parent `faberlang/` directory in local
 development.
 
+**Workspace work mode.** Ordinary development is **direct** in this
+checkout on `main`. Worktree packets under `../worktrees/<lane>/` are
+optional Tugboat isolation. Do not stand up lanes unless the operator
+asked. Container law: [`../AGENTS.md`](../AGENTS.md).
+
 ## Rules
 
 - Keep public modules under `src/**/*.fab`.
