@@ -20,13 +20,13 @@ locale = "en"
 
 # Random float in [0, 1)
 @ public
-fn fractum() → float {
+fn random_float() → float {
     return call 'aleator:fractum' ↦ float
 }
 
 # Random integer in [min, max] inclusive (draw by lot)
 @ public
-fn sortire(int min, int max) → int {
+fn random_int(int min, int max) → int {
     return call 'aleator:sortire' ([min, max]) ↦ int
 }
 
@@ -36,7 +36,7 @@ fn sortire(int min, int max) → int {
 
 # Random bytes (crypto-secure)
 @ public
-fn octetos(int n) → bytes {
+fn random_bytes(int n) → bytes {
     return call 'aleator:octetos' (n) ↦ bytes
 }
 
@@ -53,6 +53,6 @@ fn uuid() → string {
 # Seed the RNG. Only affects non-crypto functions.
 # Pass 0 or negative to reset to true random.
 @ public
-fn semina(int n) → void {
+fn seed(int n) → void {
     return call 'aleator:semina' (n) ↦ void
 }
