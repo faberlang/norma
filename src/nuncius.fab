@@ -22,8 +22,8 @@ locale = "en"
 # =========================================================================
 
 # Allocate shared memory buffer
-fn alloca(int mensura) → bytes {
-    panic "norma:nuncius.alloca is deferred pending Stage 2 dispatch"
+fn allocate(int byte_length) → bytes {
+    panic "norma:nuncius.allocate is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -33,8 +33,8 @@ fn alloca(int mensura) → bytes {
 # Why: Opening a communication channel between endpoints.
 
 # Open a connected message port pair
-fn aperi() → ParPortarum {
-    panic "norma:nuncius.aperi is deferred pending Stage 2 dispatch"
+fn open_pair() → PortPair {
+    panic "norma:nuncius.open_pair is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -50,81 +50,81 @@ fn aperi() → ParPortarum {
 # Why: Threads keep watch at a condition variable.
 
 # Restrict access via mutex backed by shared memory
-fn restringe(bytes memoria, int offset) → Mutex {
-    panic "norma:nuncius.restringe is deferred pending Stage 2 dispatch"
+fn create_mutex(bytes memoria, int offset) → Mutex {
+    panic "norma:nuncius.create_mutex is deferred pending Stage 2 dispatch"
 }
 
 # Count permits via semaphore backed by shared memory
-fn numera(bytes memoria, int offset, int value) → Semaphorum {
-    panic "norma:nuncius.numera is deferred pending Stage 2 dispatch"
+fn create_semaphore(bytes memoria, int offset, int value) → Semaphore {
+    panic "norma:nuncius.create_semaphore is deferred pending Stage 2 dispatch"
 }
 
 # Keep watch via condition variable backed by shared memory
-fn vigila(bytes memoria, int offset) → Conditio {
-    panic "norma:nuncius.vigila is deferred pending Stage 2 dispatch"
+fn create_condvar(bytes memoria, int offset) → Condition {
+    panic "norma:nuncius.create_condvar is deferred pending Stage 2 dispatch"
 }
 
 # Message port pair
-interface ParPortarum {
-    fn a() → Porta
+interface PortPair {
+    fn first() → Port
 
-    fn b() → Porta
+    fn second() → Port
 }
 
 # Message port (one end of a channel)
-interface Porta {
+interface Port {
     # Send message
-    fn mitte(value nuntius) → void
+    fn send(value nuntius) → void
 
     # Receive message (async, blocks until available)
     @ future
-    fn recipiet() → value
+    fn receive() → value
 
     # Check if message available
-    fn paratum() → bool
+    fn ready() → bool
 
     # Close port
-    fn claude() → void
+    fn close() → void
 }
 
 # Mutual exclusion lock
 interface Mutex {
     # Acquire lock (blocks until available)
-    fn obstringe() → void
+    fn lock() → void
 
     # Try to acquire without blocking
-    fn tempta() → bool
+    fn try_lock() → bool
 
     # Release lock
-    fn solve() → void
+    fn unlock() → void
 }
 
 # Counting semaphore
-interface Semaphorum {
+interface Semaphore {
     # Wait (decrement, blocks if zero)
-    fn exspecta() → void
+    fn wait() → void
 
     # Try to decrement without blocking
-    fn tempta() → bool
+    fn try_wait() → bool
 
     # Post (increment, wakes one waiter)
-    fn signa() → void
+    fn post() → void
 
     # Read current value
-    fn read() → int
+    fn read_value() → int
 }
 
 # Condition variable
-interface Conditio {
+interface Condition {
     # Wait for signal (must hold mutex)
-    fn exspecta(Mutex mutex) → void
+    fn wait(Mutex mutex) → void
 
     # Wait with timeout, returns false if timed out
-    fn morare(Mutex mutex, int ms) → bool
+    fn wait_timeout(Mutex mutex, int ms) → bool
 
     # Wake one waiting thread
-    fn signa() → void
+    fn signal() → void
 
     # Wake all waiting threads
-    fn diffunde() → void
+    fn broadcast() → void
 }
