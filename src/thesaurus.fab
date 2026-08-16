@@ -22,44 +22,44 @@ locale = "en"
 
 # Get value by key (returns nihil if not found)
 @ future
-fn capiet(string clavis) → string ∪ null {
-    panic "norma:thesaurus.capiet is deferred pending Stage 2 dispatch"
+fn get(string key) → string ∪ null {
+    panic "norma:thesaurus.get is deferred pending Stage 2 dispatch"
 }
 
 # Set value with optional TTL in seconds
 @ future
-fn ponet(string clavis, string value, int ttl) → void {
-    panic "norma:thesaurus.ponet is deferred pending Stage 2 dispatch"
+fn put(string key, string value, int ttl) → void {
+    panic "norma:thesaurus.put is deferred pending Stage 2 dispatch"
 }
 
 # Set value only if key doesn't exist
 @ future
-fn condet(string clavis, string value) → bool {
-    panic "norma:thesaurus.condet is deferred pending Stage 2 dispatch"
+fn put_if_absent(string key, string value) → bool {
+    panic "norma:thesaurus.put_if_absent is deferred pending Stage 2 dispatch"
 }
 
 # Delete key(s)
 @ future
-fn delet(list<string> claves) → int {
-    panic "norma:thesaurus.delet is deferred pending Stage 2 dispatch"
+fn delete(list<string> keys) → int {
+    panic "norma:thesaurus.delete is deferred pending Stage 2 dispatch"
 }
 
 # Check if key exists
 @ future
-fn exstabit(string clavis) → bool {
-    panic "norma:thesaurus.exstabit is deferred pending Stage 2 dispatch"
+fn exists(string key) → bool {
+    panic "norma:thesaurus.exists is deferred pending Stage 2 dispatch"
 }
 
 # Get remaining TTL in seconds (-1 = no expiry, -2 = not found)
 @ future
-fn ttl(string clavis) → int {
+fn ttl(string key) → int {
     panic "norma:thesaurus.ttl is deferred pending Stage 2 dispatch"
 }
 
 # Set expiry on existing key
 @ future
-fn expirabit(string clavis, int secundae) → bool {
-    panic "norma:thesaurus.expirabit is deferred pending Stage 2 dispatch"
+fn expire(string key, int secundae) → bool {
+    panic "norma:thesaurus.expire is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -68,14 +68,14 @@ fn expirabit(string clavis, int secundae) → bool {
 
 # Increment by amount (default 1)
 @ future
-fn augebit(string clavis, int quantum) → int {
-    panic "norma:thesaurus.augebit is deferred pending Stage 2 dispatch"
+fn increment(string key, int quantum) → int {
+    panic "norma:thesaurus.increment is deferred pending Stage 2 dispatch"
 }
 
 # Decrement by 1
 @ future
-fn minuet(string clavis) → int {
-    panic "norma:thesaurus.minuet is deferred pending Stage 2 dispatch"
+fn decrement(string key) → int {
+    panic "norma:thesaurus.decrement is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -84,8 +84,8 @@ fn minuet(string clavis) → int {
 
 # Find keys matching glob pattern
 @ future
-fn quaeret(string exemplar) → list<string> {
-    panic "norma:thesaurus.quaeret is deferred pending Stage 2 dispatch"
+fn find_keys(string exemplar) → list<string> {
+    panic "norma:thesaurus.find_keys is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -94,33 +94,33 @@ fn quaeret(string exemplar) → list<string> {
 
 # Publish message to topic, returns subscriber count
 @ future
-fn publicabit(string thema, string nuntius) → int {
-    panic "norma:thesaurus.publicabit is deferred pending Stage 2 dispatch"
+fn publish(string topic, string nuntius) → int {
+    panic "norma:thesaurus.publish is deferred pending Stage 2 dispatch"
 }
 
 # Subscribe to topic patterns
 # Pattern: * matches one segment, ** matches multiple
 @ future
-fn auscultabit(list<string> exemplaria) → Subscriptio {
-    panic "norma:thesaurus.auscultabit is deferred pending Stage 2 dispatch"
+fn subscribe(list<string> exemplaria) → Subscription {
+    panic "norma:thesaurus.subscribe is deferred pending Stage 2 dispatch"
 }
 
 # Pub/Sub subscription
-interface Subscriptio {
+interface Subscription {
     # Iterate over incoming messages (async generator)
     @ future
     @ cursor
-    fn nuntiabunt() → cursor<Nuntius>
+    fn messages() → cursor<Message>
 
     # Unsubscribe and cleanup
-    fn claude() → void
+    fn close() → void
 }
 
 # Pub/Sub message
-interface Nuntius {
-    fn thema() → string
+interface Message {
+    fn topic() → string
 
-    fn corpus() → string
+    fn body() → string
 
-    fn tempus() → int
+    fn timestamp() → int
 }
