@@ -11,7 +11,7 @@ locale = "en"
 # - Verb conjugation encodes sync/async for the client operations:
 # - Future (-et, -abit): async operations
 # - Imperative: sync operations
-# - Client: petet (GET), mittet (POST), ponet (PUT), delet (DELETE), mutabit (PATCH)
+# - Client: get (GET), post (POST), put (PUT), delete (DELETE), patch (PATCH)
 # - Server: listen/accept/respond/stop are generic target-neutral `ad` wrappers.
 #   Faber packages own request routing and response policy around the handle loop.
 # - Request and response carriers remain target-neutral interfaces below.
@@ -24,32 +24,32 @@ locale = "en"
 # GET request
 @ public
 @ future
-fn petet(string url) → Replicatio {
-    panic "norma:http.petet is deferred pending Stage 2 dispatch"
+fn get(string url) → Response {
+    panic "norma:http.get is deferred pending Stage 2 dispatch"
 }
 
 # POST request with body
 @ future
-fn mittet(string url, string corpus) → Replicatio {
-    panic "norma:http.mittet is deferred pending Stage 2 dispatch"
+fn post(string url, string body) → Response {
+    panic "norma:http.post is deferred pending Stage 2 dispatch"
 }
 
 # PUT request with body
 @ future
-fn ponet(string url, string corpus) → Replicatio {
-    panic "norma:http.ponet is deferred pending Stage 2 dispatch"
+fn put(string url, string body) → Response {
+    panic "norma:http.put is deferred pending Stage 2 dispatch"
 }
 
 # DELETE request
 @ future
-fn delet(string url) → Replicatio {
-    panic "norma:http.delet is deferred pending Stage 2 dispatch"
+fn delete(string url) → Response {
+    panic "norma:http.delete is deferred pending Stage 2 dispatch"
 }
 
 # PATCH request with body
 @ future
-fn mutabit(string url, string corpus) → Replicatio {
-    panic "norma:http.mutabit is deferred pending Stage 2 dispatch"
+fn patch(string url, string body) → Response {
+    panic "norma:http.patch is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -58,8 +58,8 @@ fn mutabit(string url, string corpus) → Replicatio {
 
 # Generic request with full control
 @ future
-fn rogabit(string modus, string url, map<string, string> capita, string corpus) → Replicatio {
-    panic "norma:http.rogabit is deferred pending Stage 2 dispatch"
+fn send_request(string method, string url, map<string, string> headers, string body) → Response {
+    panic "norma:http.send_request is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -91,36 +91,36 @@ fn stop(int handle) → void {
 }
 
 # HTTP Response
-interface Replicatio {
+interface Response {
     fn status() → int
 
-    fn corpus() → string
+    fn body() → string
 
-    fn corpus_octeti() → bytes
+    fn body_bytes() → bytes
 
-    fn corpus_json() → value
+    fn body_json() → value
 
-    fn capita() → map<string, string>
+    fn headers() → map<string, string>
 
-    fn caput(string nomen) → string ∪ null
+    fn header(string nomen) → string ∪ null
 
     # True if status is 2xx
-    fn bene() → bool
+    fn is_ok() → bool
 }
 
 # HTTP Request (received by server)
-interface Rogatio {
-    fn modus() → string
+interface Request {
+    fn method() → string
 
-    fn via() → string
+    fn path() → string
 
-    fn corpus() → string
+    fn body() → string
 
-    fn corpus_json() → value
+    fn body_json() → value
 
-    fn capita() → map<string, string>
+    fn headers() → map<string, string>
 
-    fn caput(string nomen) → string ∪ null
+    fn header(string nomen) → string ∪ null
 
     fn param(string nomen) → string ∪ null
 }
