@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # json/cursor.fab — parser cursor type
@@ -9,7 +9,7 @@ locale = "la"
 # both the parsed valor and the next scan index. Mirrors the caelum pattern
 # of placing a shared value type in its own submodule file.
 
-genus Resultus {
-    valor v
-    numerus i
+class Resultus {
+    value v
+    int i
 }

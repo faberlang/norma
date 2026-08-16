@@ -6,7 +6,7 @@ canonical = false
 summary = "norma:vector pending placeholder calls are rejected before runtime."
 syntax = "norma:vector — crea | shuffle rejected until implemented"
 related = ["vector", "stdlib-nativum"]
-locale = "la"
+locale = "en"
 +++
 
 
@@ -19,9 +19,9 @@ locale = "la"
 # This exemplum intentionally fails to compile; it is registered in the
 # per-backend EXPECTED_FAILURES lists.
 
-importa ex "norma:vector" privata vector
+import from "norma:vector" vector
 
-incipit {
-    vector.crea([0])
-    vector.shuffle(nihil, [0])
+main {
+    vector.create([0])
+    vector.shuffle(null, [0])
 }

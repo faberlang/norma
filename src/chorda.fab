@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # chorda.fab — public Faber text library (cord operations + mechanical verbs)
@@ -23,17 +23,17 @@ locale = "la"
 # Why: Provide a cord-level reverse operation without making textus itself
 # carry every derived helper.
 # Edge: v1 walks the compiler-owned sectio index space.
-@ publica
-functio retorta(textus s) → textus {
-    varia numerus i ← s.longitudo()
-    varia textus out ← ""
+@ public
+fn retorta(string s) → string {
+    var int i ← s.length()
+    var string out ← ""
 
-    dum i > 0 {
+    while i > 0 {
         i ← i - 1
-        out ← out + s.sectio(i, i + 1)
+        out ← out + s.slice(i, i + 1)
     }
 
-    redde out
+    return out
 }
 
 # Name: nexa from nectere, "to bind" or "to tie."
@@ -42,13 +42,13 @@ functio retorta(textus s) → textus {
 # Why: Join cord segments with an arbitrary bond string, avoiding separate
 # join helpers for every naming convention.
 # Edge: An empty partes list returns the empty cord.
-@ publica
-functio nexa(lista<textus> partes, textus vinculum) → textus {
-    varia textus out ← ""
-    varia numerus index ← 0
+@ public
+fn nexa(list<string> partes, string vinculum) → string {
+    var string out ← ""
+    var int index ← 0
 
-    itera ex partes fixum pars {
-        si index > 0 {
+    for from partes const pars {
+        if index > 0 {
             out ← out + vinculum
         }
 
@@ -56,7 +56,7 @@ functio nexa(lista<textus> partes, textus vinculum) → textus {
         out ← out + pars
     }
 
-    redde out
+    return out
 }
 
 # Name: reputat from reputare, "to reckon" or "to count."
@@ -64,26 +64,26 @@ functio nexa(lista<textus> partes, textus vinculum) → textus {
 # count rather than returning a transformed cord.
 # Why: Count non-overlapping occurrences of quaesitum in s.
 # Edge: Empty quaesitum is defined as zero matches, not every boundary.
-functio reputat(textus s, textus quaesitum) → numerus {
-    varia numerus pos ← 0
-    varia numerus count ← 0
-    fixum numerus quaesiti_longitudo ← quaesitum.longitudo()
+fn reputat(string s, string quaesitum) → int {
+    var int pos ← 0
+    var int count ← 0
+    const int quaesiti_longitudo ← quaesitum.length()
 
-    si quaesiti_longitudo ≡ 0 ergo redde 0
+    if quaesiti_longitudo ≡ 0 then return 0
 
     # Advance by the query length on a match so overlapping occurrences are
     # intentionally not counted.
-    dum pos + quaesiti_longitudo ≤ s.longitudo() {
-        si s.sectio(pos, pos + quaesiti_longitudo) ≡ quaesitum {
+    while pos + quaesiti_longitudo ≤ s.length() {
+        if s.slice(pos, pos + quaesiti_longitudo) ≡ quaesitum {
             count ← count + 1
             pos ← pos + quaesiti_longitudo
         }
-        secus {
+        else {
             pos ← pos + 1
         }
     }
 
-    redde count
+    return count
 }
 
 # Name: reciprocus from reciprocus, "running back the same way."
@@ -91,8 +91,8 @@ functio reputat(textus s, textus quaesitum) → numerus {
 # has reciprocal forward/backward reading.
 # Why: Public palindrome test built on retorta rather than duplicating the
 # reverse walk.
-functio reciprocus(textus s) → bivalens {
-    redde s ≡ retorta(s)
+fn reciprocus(string s) → bool {
+    return s ≡ retorta(s)
 }
 
 # =========================================================================
@@ -104,16 +104,16 @@ functio reciprocus(textus s) → bivalens {
 # segments rather than a newly inflected cord.
 # Why: Expose the scalar walk as data for callers that need explicit pieces.
 # Edge: v1 follows the same sectio index model used by textus intrinsics.
-functio scala(textus s) → lista<textus> {
-    varia lista<textus> out ← vacua
-    varia numerus i ← 0
+fn scala(string s) → list<string> {
+    var list<string> out ← vacua
+    var int i ← 0
 
-    dum i < s.longitudo() {
-        out.appende(s.sectio(i, i + 1))
+    while i < s.length() {
+        out.append(s.slice(i, i + 1))
         i ← i + 1
     }
 
-    redde out
+    return out
 }
 
 # Name: retenta_iudicio from retinere + iudicium, "judgment."
@@ -121,21 +121,21 @@ functio scala(textus s) → lista<textus> {
 # scalars that have been retained.
 # Why: Predicate form for caller-defined retention logic.
 # Edge: The predicate receives one scalar textus segment at a time.
-@ publica
-functio retenta_iudicio(textus s, (textus) → bivalens pred) → textus {
-    varia lista<textus> kept ← vacua
-    varia numerus i ← 0
+@ public
+fn retenta_iudicio(string s, (string) → bool pred) → string {
+    var list<string> kept ← vacua
+    var int i ← 0
 
-    dum i < s.longitudo() {
-        fixum textus c ← s.sectio(i, i + 1)
-        si pred(c) {
-            kept.appende(c)
+    while i < s.length() {
+        const string c ← s.slice(i, i + 1)
+        if pred(c) {
+            kept.append(c)
         }
 
         i ← i + 1
     }
 
-    redde nexa(kept, "")
+    return nexa(kept, "")
 }
 
 # Name: retenta from retinere, "to keep back."
@@ -144,31 +144,31 @@ functio retenta_iudicio(textus s, (textus) → bivalens pred) → textus {
 # Why: Inclusive scalar-order filtering.
 # Edge: sponte bounds are open ends; nihil infimum means no lower bound,
 # nihil supremum means no upper bound.
-@ publica
-functio retenta(textus s, textus infimum sponte, textus supremum sponte) → textus {
-    varia lista<textus> kept ← vacua
-    varia numerus i ← 0
+@ public
+fn retenta(string s, string infimum optional, string supremum optional) → string {
+    var list<string> kept ← vacua
+    var int i ← 0
 
     # Start optimistic for each scalar and rule it out only when a present
     # bound excludes it.
-    dum i < s.longitudo() {
-        fixum textus c ← s.sectio(i, i + 1)
-        varia bivalens keep ← verum
+    while i < s.length() {
+        const string c ← s.slice(i, i + 1)
+        var bool keep ← true
 
-        si infimum non est nihil et c < infimum {
-            keep ← falsum
+        if infimum not is null and c < infimum {
+            keep ← false
         }
-        si supremum non est nihil et c > supremum {
-            keep ← falsum
+        if supremum not is null and c > supremum {
+            keep ← false
         }
-        si keep {
-            kept.appende(c)
+        if keep {
+            kept.append(c)
         }
 
         i ← i + 1
     }
 
-    redde nexa(kept, "")
+    return nexa(kept, "")
 }
 
 # Name: expurgata_iudicio from expurgare + iudicium, "judgment."
@@ -176,20 +176,20 @@ functio retenta(textus s, textus infimum sponte, textus supremum sponte) → tex
 # rejected scalars purged from it.
 # Why: Predicate form for caller-defined removal logic.
 # Edge: pred(c) = verum means c is removed, not retained.
-functio expurgata_iudicio(textus s, (textus) → bivalens pred) → textus {
-    varia lista<textus> kept ← vacua
-    varia numerus i ← 0
+fn expurgata_iudicio(string s, (string) → bool pred) → string {
+    var list<string> kept ← vacua
+    var int i ← 0
 
-    dum i < s.longitudo() {
-        fixum textus c ← s.sectio(i, i + 1)
-        si pred(c) ≡ falsum {
-            kept.appende(c)
+    while i < s.length() {
+        const string c ← s.slice(i, i + 1)
+        if pred(c) ≡ false {
+            kept.append(c)
         }
 
         i ← i + 1
     }
 
-    redde nexa(kept, "")
+    return nexa(kept, "")
 }
 
 # Name: expurgata from expurgare, "to purge."
@@ -198,31 +198,31 @@ functio expurgata_iudicio(textus s, (textus) → bivalens pred) → textus {
 # Why: Remove scalars inside inclusive bounds and keep scalars outside them.
 # Edge: sponte bounds are open ends; with both bounds absent, every scalar is
 # inside the open interval and is therefore purged.
-@ publica
-functio expurgata(textus s, textus infimum sponte, textus supremum sponte) → textus {
-    varia lista<textus> kept ← vacua
-    varia numerus i ← 0
+@ public
+fn expurgata(string s, string infimum optional, string supremum optional) → string {
+    var list<string> kept ← vacua
+    var int i ← 0
 
     # Start with each scalar inside the purged interval; present bounds can
     # prove it lies outside and should be kept.
-    dum i < s.longitudo() {
-        fixum textus c ← s.sectio(i, i + 1)
-        varia bivalens drop ← verum
+    while i < s.length() {
+        const string c ← s.slice(i, i + 1)
+        var bool drop ← true
 
-        si infimum non est nihil et c < infimum {
-            drop ← falsum
+        if infimum not is null and c < infimum {
+            drop ← false
         }
-        si supremum non est nihil et c > supremum {
-            drop ← falsum
+        if supremum not is null and c > supremum {
+            drop ← false
         }
-        si drop ≡ falsum {
-            kept.appende(c)
+        if drop ≡ false {
+            kept.append(c)
         }
 
         i ← i + 1
     }
 
-    redde nexa(kept, "")
+    return nexa(kept, "")
 }
 
 # Name: residuum from residuum, "what remains."
@@ -230,8 +230,8 @@ functio expurgata(textus s, textus infimum sponte, textus supremum sponte) → t
 # action performed on the cord.
 # Why: Return the suffix of s from initium through the end.
 # Edge: sectio owns out-of-range clamping behavior for initium.
-functio residuum(textus s, numerus initium) → textus {
-    redde s.sectio(initium, s.longitudo())
+fn residuum(string s, int initium) → string {
+    return s.slice(initium, s.length())
 }
 
 # =========================================================================
@@ -242,31 +242,31 @@ functio residuum(textus s, numerus initium) → textus {
 # Morphologia: Private support noun; this isolates the line delimiter used
 # by diducta helpers.
 # Why: Keep newline spelling in one place for fence-line detection.
-@ privata
-functio _newline() → textus {
-    redde "\n"
+@ private
+fn _newline() → string {
+    return "\n"
 }
 
 # Name: _finis_delimitris means the delimiter boundary found while scanning.
 # Morphologia: Private nominal helper; it returns a position, not a cord.
 # Why: Find the newline before a line whose full content is the delimiter.
 # Edge: A delimiter at document end is accepted as the closing fence.
-@ privata
-functio _finis_delimitris(textus documentum, textus delimiter, numerus search_from) → numerus {
-    fixum numerus delim_len ← delimiter.longitudo()
-    fixum textus newline ← _newline()
-    varia numerus pos ← search_from
+@ private
+fn _finis_delimitris(string documentum, string delimiter, int search_from) → int {
+    const int delim_len ← delimiter.length()
+    const string newline ← _newline()
+    var int pos ← search_from
 
-    dum pos < documentum.longitudo() {
-        si documentum.sectio(pos, pos + 1) ≡ newline {
-            fixum numerus line_start ← pos + 1
+    while pos < documentum.length() {
+        if documentum.slice(pos, pos + 1) ≡ newline {
+            const int line_start ← pos + 1
 
-            si line_start + delim_len ≤ documentum.longitudo() {
-                si documentum.sectio(line_start, line_start + delim_len) ≡ delimiter {
-                    fixum numerus line_end ← line_start + delim_len
+            if line_start + delim_len ≤ documentum.length() {
+                if documentum.slice(line_start, line_start + delim_len) ≡ delimiter {
+                    const int line_end ← line_start + delim_len
 
-                    si line_end ≡ documentum.longitudo() ergo redde pos
-                    si documentum.sectio(line_end, line_end + 1) ≡ newline ergo redde pos
+                    if line_end ≡ documentum.length() then return pos
+                    if documentum.slice(line_end, line_end + 1) ≡ newline then return pos
                 }
             }
         }
@@ -274,7 +274,7 @@ functio _finis_delimitris(textus documentum, textus delimiter, numerus search_fr
         pos ← pos + 1
     }
 
-    redde -1
+    return -1
 }
 
 # Name: _amputa_postremam_newline from amputare, "to cut off."
@@ -283,16 +283,16 @@ functio _finis_delimitris(textus documentum, textus delimiter, numerus search_fr
 # Why: Drop trailing newline(s) from an extracted metadata wire blob.
 # Edge: Multiple trailing newlines are removed because frontmatter payloads
 # are line records, not significant terminal blank lines.
-@ privata
-functio _amputa_postremam_newline(textus s) → textus {
-    varia numerus len ← s.longitudo()
-    fixum textus newline ← _newline()
+@ private
+fn _amputa_postremam_newline(string s) → string {
+    var int len ← s.length()
+    const string newline ← _newline()
 
-    dum len > 0 et s.sectio(len - 1, len) ≡ newline {
+    while len > 0 and s.slice(len - 1, len) ≡ newline {
         len ← len - 1
     }
 
-    redde s.sectio(0, len)
+    return s.slice(0, len)
 }
 
 # Name: diducta from deducere, "to lead apart."
@@ -303,36 +303,36 @@ functio _amputa_postremam_newline(textus s) → textus {
 # not parsed here — callers run `toml.tempta` / other parsers on the wire.
 # Edge: Missing or empty fences throw textus errors through the alternate
 # exit channel instead of returning partial data.
-@ publica
-functio diducta(textus documentum, textus delimiter) → lista<textus> ⇥ textus {
-    fixum numerus delim_len ← delimiter.longitudo()
+@ public
+fn diducta(string documentum, string delimiter) → list<string> ⇥ string {
+    const int delim_len ← delimiter.length()
 
     # Opening-fence validation is one cohesive guard paragraph. After this
     # block, delimiter slicing is safe and semantically meaningful.
-    si delim_len ≡ 0 ergo iace "empty delimiter"
-    si documentum.longitudo() < delim_len ergo iace "missing opening delimiter"
-    si documentum.sectio(0, delim_len) ≠ delimiter ergo iace "missing opening delimiter"
+    if delim_len ≡ 0 then throw "empty delimiter"
+    if documentum.length() < delim_len then throw "missing opening delimiter"
+    if documentum.slice(0, delim_len) ≠ delimiter then throw "missing opening delimiter"
 
-    varia numerus meta_start ← delim_len
-    fixum textus newline ← _newline()
+    var int meta_start ← delim_len
+    const string newline ← _newline()
 
-    si meta_start < documentum.longitudo() et documentum.sectio(meta_start, meta_start + 1) ≡ newline {
+    if meta_start < documentum.length() and documentum.slice(meta_start, meta_start + 1) ≡ newline {
         meta_start ← meta_start + 1
     }
 
-    fixum numerus close_line ← _finis_delimitris(documentum, delimiter, delim_len)
+    const int close_line ← _finis_delimitris(documentum, delimiter, delim_len)
 
-    si close_line < 0 ergo iace "missing closing delimiter"
+    if close_line < 0 then throw "missing closing delimiter"
 
-    fixum textus metadatum ← _amputa_postremam_newline(documentum.sectio(meta_start, close_line))
-    varia numerus corpus_start ← (close_line + 1) + delim_len
+    const string metadatum ← _amputa_postremam_newline(documentum.slice(meta_start, close_line))
+    var int corpus_start ← (close_line + 1) + delim_len
 
-    si corpus_start < documentum.longitudo() et documentum.sectio(corpus_start, corpus_start + 1) ≡ newline {
+    if corpus_start < documentum.length() and documentum.slice(corpus_start, corpus_start + 1) ≡ newline {
         corpus_start ← corpus_start + 1
     }
 
-    fixum textus corpus ← residuum(documentum, corpus_start)
-    redde [metadatum, corpus]
+    const string corpus ← residuum(documentum, corpus_start)
+    return [metadatum, corpus]
 }
 
 # =========================================================================
@@ -344,8 +344,8 @@ functio diducta(textus documentum, textus delimiter) → lista<textus> ⇥ textu
 # the returned cord.
 # Why: Collapse runs of ASCII spaces to a single space. This is
 # normalization, not byte encoding.
-functio comprimata(textus s) → textus {
-    mori "norma:chorda.comprimata is deferred pending Stage 2 dispatch"
+fn comprimata(string s) → string {
+    panic "norma:chorda.comprimata is deferred pending Stage 2 dispatch"
 }
 
 # Name: angustata from angustare, "to narrow."
@@ -353,16 +353,16 @@ functio comprimata(textus s) → textus {
 # ascii when every scalar can be represented.
 # Why: Trust-boundary narrowing from textus to ascii.
 # Edge: Throws textus when any codepoint cannot be represented as ascii.
-functio angustata(textus s) → ascii ⇥ textus {
-    mori "norma:chorda.angustata is deferred pending Stage 2 dispatch"
+fn angustata(string s) → ascii ⇥ string {
+    panic "norma:chorda.angustata is deferred pending Stage 2 dispatch"
 }
 
 # Name: temptat from temptare, "to try."
 # Morphologia: Praesens active verb; it attempts narrowing and reports
 # absence with nihil instead of throwing.
 # Why: Trust-boundary twin of angustata, distinct from mechanical tempta.
-functio temptat(textus s) → ascii ∪ nihil {
-    mori "norma:chorda.temptat is deferred pending Stage 2 dispatch"
+fn temptat(string s) → ascii ∪ null {
+    panic "norma:chorda.temptat is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -374,9 +374,9 @@ functio temptat(textus s) → ascii ∪ nihil {
 # after it has been cut into pieces.
 # Why: Split s by separator into at most limitem segments.
 # Edge: Unbounded split remains on textus.divide; this is the limited form.
-@ publica
-functio discissa(textus s, textus separator, numerus limitem) → lista<textus> {
-    mori "norma:chorda.discissa is deferred pending Stage 2 dispatch"
+@ public
+fn discissa(string s, string separator, int limitem) → list<string> {
+    panic "norma:chorda.discissa is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -386,24 +386,24 @@ functio discissa(textus s, textus separator, numerus limitem) → lista<textus> 
 # Name: pange from pangere, "to fasten" or "to compose."
 # Morphologia: Imperativus mechanical verb shared with structured codecs.
 # Why: Materialize textus as UTF-8 octeti for outward or storable byte form.
-@ publica
-functio pange(textus s) → octeti {
-    mori "norma:chorda.pange is deferred pending Stage 2 dispatch"
+@ public
+fn pange(string s) → bytes {
+    panic "norma:chorda.pange is deferred pending Stage 2 dispatch"
 }
 
 # Name: solve from solvere, "to loosen" or "to untangle."
 # Morphologia: Imperativus mechanical verb paired with pange.
 # Why: Interpret UTF-8 octeti as textus.
 # Edge: Invalid UTF-8 throws through the backing runtime.
-@ publica
-functio solve(octeti data) → textus {
-    mori "norma:chorda.solve is deferred pending Stage 2 dispatch"
+@ public
+fn solve(bytes data) → string {
+    panic "norma:chorda.solve is deferred pending Stage 2 dispatch"
 }
 
 # Name: tempta from temptare, "to try" or "to attempt."
 # Morphologia: Imperativus mechanical verb; try decode without alternate
 # exit propagation.
 # Why: Decode UTF-8 when possible and return nihil on invalid bytes.
-functio tempta(octeti data) → textus ∪ nihil {
-    mori "norma:chorda.tempta is deferred pending Stage 2 dispatch"
+fn tempta(bytes data) → string ∪ null {
+    panic "norma:chorda.tempta is deferred pending Stage 2 dispatch"
 }

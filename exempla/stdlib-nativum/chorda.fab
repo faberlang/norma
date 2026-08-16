@@ -6,7 +6,7 @@ canonical = false
 summary = "Native stdlib chorda v1 subset: cord and UTF-8 mechanical trio."
 syntax = "norma:chorda — pange | solve | tempta"
 related = ["chorda", "stdlib-nativum", "textus"]
-locale = "la"
+locale = "en"
 +++
 
 
@@ -20,18 +20,18 @@ locale = "la"
 #   Salve
 #   Salve
 
-importa ex "norma:chorda" privata chorda
+import from "norma:chorda" chorda
 
-incipit {
-    nota chorda.retorta("roma")
-    nota chorda.nexa(["alpha", "beta", "gamma"], "_")
-    nota chorda.reputat("banana", "an")
-    nota chorda.reciprocus("anna")
-    fixum octeti raw ← chorda.pange("Salve")
-    nota chorda.solve(raw)
-    fixum octeti probe ← chorda.pange("Salve")
-    nota chorda.tempta(probe)
-    nota chorda.retenta("hello7!", "a", "z")
-    nota chorda.comprimata("  foo   bar  ")
-    nota chorda.discissa("a=b=c", "=", 2).primus()
+main {
+    print chorda.reverse("roma")
+    print chorda.nexa(["alpha", "beta", "gamma"], "_")
+    print chorda.reputat("banana", "an")
+    print chorda.reciprocus("anna")
+    const bytes raw ← chorda.pange("Salve")
+    print chorda.solve(raw)
+    const bytes probe ← chorda.pange("Salve")
+    print chorda.tempta(probe)
+    print chorda.retenta("hello7!", "a", "z")
+    print chorda.comprimata("  foo   bar  ")
+    print chorda.discissa("a=b=c", "=", 2).first()
 }

@@ -1,13 +1,13 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # caelum/terminus.fab — TCP endpoint type
 #
 # Public import: importa ex "norma:caelum/terminus" privata terminus
 
-@ publica
-genus Terminus {
-    textus hospes
-    numerus portus
+@ public
+class Terminus {
+    string hospes
+    int portus
 }

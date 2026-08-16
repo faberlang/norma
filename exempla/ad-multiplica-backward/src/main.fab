@@ -1,3 +1,6 @@
++++
+locale = "en"
++++
 # Exemplum: ad-multiplica-backward
 #
 # Same-shape elementwise multiply with AIR lane backward annotation.
@@ -9,13 +12,13 @@
 
 @ radix lane "air"
 @ radix backward "multiplica_backward"
-functio multiplica(tensor<f32, [2]> a, tensor<f32, [2]> b) → tensor<f32, [2]> {
-    redde a.multiplica(b)
+fn multiplica(tensor<f32, [2]> a, tensor<f32, [2]> b) → tensor<f32, [2]> {
+    return a.multiply(b)
 }
 
-incipit {
-    fixum tensor<f32, [2]> left ← vacua
-    fixum tensor<f32, [2]> right ← vacua
-    fixum tensor<f32, [2]> product ← multiplica(left, right)
-    nota product.longitudo()
+main {
+    const tensor<f32, [2]> left ← vacua
+    const tensor<f32, [2]> right ← vacua
+    const tensor<f32, [2]> product ← multiplica(left, right)
+    print product.length()
 }

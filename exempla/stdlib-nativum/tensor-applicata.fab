@@ -6,19 +6,19 @@ canonical = true
 summary = "norma:tensor applicata map and summa reduction."
 syntax = "norma:tensor — applicata | summa"
 related = ["tensor", "stdlib-nativum", "lista"]
-locale = "la"
+locale = "en"
 +++
 # stdlib-nativum/tensor-applicata — loop-based map and intrinsic-backed sum
 #
 # EXPECTED OUTPUT:
 #   14
 
-importa ex "norma:tensor" privata tensor
+import from "norma:tensor" tensor
 
-incipit {
-    fixum lista<numerus> flat ← [1, 2, 3, 4]
-    fixum tensor<numerus, [2, 2]> grid ← tensor.structa<tensor<numerus, [2, 2]>>(flat)
-    fixum tensor<numerus, [2, 2]> scaled ← tensor.applicata(grid, numerus x ∴ x + 1)
-    fixum numerus total ← tensor.summa(scaled)
-    nota total
+main {
+    const list<int> flat ← [1, 2, 3, 4]
+    const tensor<int, [2, 2]> grid ← tensor.structa<tensor<int, [2, 2]>>(flat)
+    const tensor<int, [2, 2]> scaled ← tensor.applicata(grid, int x ∴ x + 1)
+    const int total ← tensor.sum(scaled)
+    print total
 }

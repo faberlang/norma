@@ -6,7 +6,7 @@ canonical = true
 summary = "norma:tensor bridge catalog — planata, structa, creata, productum."
 syntax = "norma:tensor — planata | structa | creata | productum"
 related = ["tensor", "lista"]
-locale = "la"
+locale = "en"
 +++
 
 
@@ -16,15 +16,15 @@ locale = "la"
 #   4
 #   6
 
-importa ex "norma:tensor" privata tensor
+import from "norma:tensor" tensor
 
-incipit {
-    fixum lista<numerus> xs ← [1, 2, 3, 4]
-    fixum tensor<numerus, [4]> grid ← tensor.structa<tensor<numerus, [4]>>(xs)
-    fixum lista<numerus> flat ← tensor.planata(grid)
-    nota flat.longitudo()
+main {
+    const list<int> xs ← [1, 2, 3, 4]
+    const tensor<int, [4]> grid ← tensor.structa<tensor<int, [4]>>(xs)
+    const list<int> flat ← tensor.flatten(grid)
+    print flat.length()
 
-    fixum lista<fractus<f32>> data ← [
+    const list<float<f32>> data ← [
         1.0,
         2.0,
         3.0,
@@ -32,8 +32,8 @@ incipit {
         5.0,
         6.0,
     ]
-    fixum tensor<fractus<f32>, [2, 3]> shaped ← tensor.structa<tensor<fractus<f32>, [2, 3]>>(data)
-    fixum tensor<fractus<f32>, [2, 3]> filled ← tensor.creata<tensor<fractus<f32>, [2, 3]>>(0.0 ∷ fractus<f32>)
-    nota tensor.productum(shaped.magnitudines())
-    nota filled.longitudo()
+    const tensor<float<f32>, [2, 3]> shaped ← tensor.structa<tensor<float<f32>, [2, 3]>>(data)
+    const tensor<float<f32>, [2, 3]> filled ← tensor.creata<tensor<float<f32>, [2, 3]>>(0.0 ∷ float<f32>)
+    print tensor.dot(shaped.shape())
+    print filled.length()
 }

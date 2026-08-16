@@ -6,93 +6,93 @@ canonical = false
 summary = "Delimiter-leading document split into opaque metadata and corpus wires."
 syntax = "diducta(<documentum>, <delimiter>)"
 related = ["chorda", "toml", "textus"]
-locale = "la"
+locale = "en"
 +++
 # chorda/diducta — front-block document split
 #
 # Structural split only: returns [metadataWire, corpusWire] for downstream parsers.
 # Matches EBNF `+++` file frontmatter convention (line-trimmed closing fence).
 
-importa ex "norma:chorda" privata chorda
+import from "norma:chorda" chorda
 
-functio newline() → textus {
-    redde "\n"
+fn newline() → string {
+    return "\n"
 }
 
-functio sampleSkill() → textus {
-    redde ((((((((("+++" + newline()) + "version = 1") + newline()) + "id = sample") + newline()) + "+++") + newline()) + newline()) + "Body line one.") + newline()
+fn sampleSkill() → string {
+    return ((((((((("+++" + newline()) + "version = 1") + newline()) + "id = sample") + newline()) + "+++") + newline()) + newline()) + "Body line one.") + newline()
 }
 
-incipit {
+main {
     # Happy path: well-formed document with delimiter fence
-    fac {
-        fixum textus doc ← sampleSkill()
-        fixum [metadatum, corpus] ← chorda.diducta(doc, "+++")
+    do {
+        const string doc ← sampleSkill()
+        const [metadatum, corpus] ← chorda.diducta(doc, "+++")
 
-        adfirma metadatum.continet("version = 1")
-        adfirma metadatum.continet("id = sample")
-        adfirma corpus.continet("Body line one.")
+        assert metadatum.contains("version = 1")
+        assert metadatum.contains("id = sample")
+        assert corpus.contains("Body line one.")
 
-        nota metadatum, corpus
+        print metadatum, corpus
     }
-    cape err {
-        mone err
+    catch err {
+        warn err
     }
 
     # Missing opening delimiter: document does not start with delimiter
-    fac {
+    do {
         chorda.diducta("no front block", "+++")
-        adfirma falsum
+        assert false
     }
-    cape err {
-        adfirma err.continet("missing opening delimiter")
+    catch err {
+        assert err.contains("missing opening delimiter")
     }
 
     # Empty delimiter: delimiter string is zero-length
-    fac {
+    do {
         chorda.diducta("content", "")
-        adfirma falsum
+        assert false
     }
-    cape err {
-        adfirma err.continet("empty delimiter")
+    catch err {
+        assert err.contains("empty delimiter")
     }
 
     # Document shorter than delimiter: cannot contain the delimiter
-    fac {
+    do {
         chorda.diducta("ab", "+++")
-        adfirma falsum
+        assert false
     }
-    cape err {
-        adfirma err.continet("missing opening delimiter")
+    catch err {
+        assert err.contains("missing opening delimiter")
     }
 
     # Missing closing delimiter: opening fence exists but no closing fence
-    fac {
+    do {
         chorda.diducta("+++\nkey = val\n", "+++")
-        adfirma falsum
+        assert false
     }
-    cape err {
-        adfirma err.continet("missing closing delimiter")
+    catch err {
+        assert err.contains("missing closing delimiter")
     }
 
     # Delimiter-only: document is exactly the delimiter string
-    fac {
+    do {
         chorda.diducta("+++", "+++")
-        adfirma falsum
+        assert false
     }
-    cape err {
-        adfirma err.continet("missing closing delimiter")
+    catch err {
+        assert err.contains("missing closing delimiter")
     }
 
     # Metadata with no trailing newline after opening fence:
     # opening fence then immediate content then closing fence
-    fac {
-        fixum textus doc ← "+++\nkey = val\n+++"
-        fixum [metadatum, corpus] ← chorda.diducta(doc, "+++")
-        adfirma metadatum.continet("key = val")
-        adfirma corpus.longitudo() ≡ 0
+    do {
+        const string doc ← "+++\nkey = val\n+++"
+        const [metadatum, corpus] ← chorda.diducta(doc, "+++")
+        assert metadatum.contains("key = val")
+        assert corpus.length() ≡ 0
     }
-    cape err {
-        mone err
+    catch err {
+        warn err
     }
 }

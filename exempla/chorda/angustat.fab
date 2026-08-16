@@ -6,7 +6,7 @@ canonical = false
 summary = "Trust-boundary narrowing and whitespace cleanup on cords."
 syntax = "temptat(<cord>) | comprimata(<cord>) | angustata(<cord>)"
 related = ["stdlib-nativum", "textus", "ascii"]
-locale = "la"
+locale = "en"
 +++
 
 
@@ -15,17 +15,17 @@ locale = "la"
 # `angustata` (failable `ascii ⇥ textus`) is covered in `crates/norma/chorda_test.rs`.
 # This exemplum exercises `temptat` and `comprimata` on the package path.
 
-importa ex "norma:chorda" privata chorda
+import from "norma:chorda" chorda
 
-incipit {
-    fixum ascii ∪ nihil present ← chorda.temptat("Authorization")
-    adfirma present ≠ nihil
+main {
+    const ascii ∪ null present ← chorda.temptat("Authorization")
+    assert present ≠ null
 
-    fixum ascii ∪ nihil absent ← chorda.temptat("π")
-    adfirma absent ≡ nihil
+    const ascii ∪ null absent ← chorda.temptat("π")
+    assert absent ≡ null
 
-    fixum textus neat ← chorda.comprimata("  foo   bar  ")
-    adfirma neat ≡ "foo bar"
+    const string neat ← chorda.comprimata("  foo   bar  ")
+    assert neat ≡ "foo bar"
 
-    nota neat
+    print neat
 }

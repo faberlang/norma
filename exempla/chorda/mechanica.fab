@@ -6,7 +6,7 @@ canonical = false
 summary = "Assertion-based tests for chorda UTF-8 mechanical trio: pange, solve, tempta."
 syntax = "pange | solve | tempta"
 related = ["chorda", "textus", "octeti", "stdlib-nativum"]
-locale = "la"
+locale = "en"
 +++
 
 # chorda/mechanica — UTF-8 mechanical trio contract tests
@@ -18,71 +18,71 @@ locale = "la"
 # All three are mori-deferred (Stage 2). Tests verify they throw
 # and the mori error can be inspected.
 
-importa ex "norma:chorda" privata chorda
+import from "norma:chorda" chorda
 
-incipit {
+main {
     # -----------------------------------------------------------------------
     # pange — UTF-8 encode (mori deferred)
     # -----------------------------------------------------------------------
-    fac {
-        fixum octeti raw ← chorda.pange("Salve")
-        adfirma falsum
+    do {
+        const bytes raw ← chorda.pange("Salve")
+        assert false
     }
-    cape err {
-        nota err
-    }
-
-    fac {
-        fixum octeti raw ← chorda.pange("")
-        adfirma falsum
-    }
-    cape err {
-        nota err
+    catch err {
+        print err
     }
 
-    fac {
-        fixum octeti raw ← chorda.pange("π ≈ 3.14")
-        adfirma falsum
+    do {
+        const bytes raw ← chorda.pange("")
+        assert false
     }
-    cape err {
-        nota err
+    catch err {
+        print err
+    }
+
+    do {
+        const bytes raw ← chorda.pange("π ≈ 3.14")
+        assert false
+    }
+    catch err {
+        print err
     }
 
     # -----------------------------------------------------------------------
     # solve — UTF-8 decode (mori deferred)
     # -----------------------------------------------------------------------
-    fac {
-        fixum textus decoded ← chorda.solve(|68 65 6c 6c 6f|)
-        adfirma falsum
+    do {
+        const string decoded ← chorda.solve(|68 65 6c 6c 6f|)
+        assert false
     }
-    cape err {
-        nota err
+    catch err {
+        print err
     }
 
-    fac {
-        fixum textus decoded ← chorda.solve(|ce bb|)
-        adfirma falsum
+    do {
+        const string decoded ← chorda.solve(|ce bb|)
+        assert false
     }
-    cape err {
-        nota err
+    catch err {
+        print err
     }
 
     # -----------------------------------------------------------------------
     # tempta — try UTF-8 decode (mori deferred)
     # -----------------------------------------------------------------------
-    fac {
-        fixum textus ∪ nihil decoded ← chorda.tempta(|68 65 6c 6c 6f|)
-        adfirma falsum
+    do {
+        const string ∪ null decoded ← chorda.tempta(|68 65 6c 6c 6f|)
+        assert false
     }
-    cape err {
-        nota err
+    catch err {
+        print err
     }
 
-    fac {
-        fixum textus ∪ nihil decoded ← chorda.tempta(|ff fe|)
-        adfirma falsum
+    do {
+        const string ∪ null decoded ← chorda.tempta(|ff fe|)
+        assert false
     }
-    cape err {
-        nota err
+    catch err {
+        print err
     }
 }

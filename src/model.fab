@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # model.fab — model metadata classification facade
@@ -15,35 +15,35 @@ locale = "la"
 # classification/diagnostic helper floor only. It imports nothing and does
 # no byte parsing.
 
-genus Diagnosticum {
-    textus severitas
-    textus nuntius
+class Diagnosticum {
+    string severitas
+    string nuntius
 }
 
-functio formatum(textus status, textus source) → textus {
-    si status ≡ "missing-download" ergo redde "alias-missing"
-    si source.continet("GGUF") ergo redde "gguf"
-    si source.finis(".gguf") ergo redde "gguf"
-    si source.continet("safetensors") ergo redde "safetensors"
-    si source.finis(".safetensors") ergo redde "safetensors"
-    redde "unknown"
+fn formatum(string status, string source) → string {
+    if status ≡ "missing-download" then return "alias-missing"
+    if source.contains("GGUF") then return "gguf"
+    if source.ends_with(".gguf") then return "gguf"
+    if source.contains("safetensors") then return "safetensors"
+    if source.ends_with(".safetensors") then return "safetensors"
+    return "unknown"
 }
 
-functio diagnosticum(textus status, textus source, textus router_model_id) → textus {
-    si status ≡ "router-backed" ergo redde "metadata parser pending; router model is " + router_model_id
-    si status ≡ "missing-download" ergo redde "missing local download for " + source
-    si status ≡ "unsupported" ergo redde "unsupported model format for " + source
-    si status ≡ "error" ergo redde "model metadata error for " + source
-    redde "unknown alias or unsupported path"
+fn diagnosticum(string status, string source, string router_model_id) → string {
+    if status ≡ "router-backed" then return "metadata parser pending; router model is " + router_model_id
+    if status ≡ "missing-download" then return "missing local download for " + source
+    if status ≡ "unsupported" then return "unsupported model format for " + source
+    if status ≡ "error" then return "model metadata error for " + source
+    return "unknown alias or unsupported path"
 }
 
-functio severitas_pro_status(textus status) → textus {
-    si status ≡ "error" ergo redde "error"
-    redde "warning"
+fn severitas_pro_status(string status) → string {
+    if status ≡ "error" then return "error"
+    return "warning"
 }
 
-functio inanis_diagnosticum(textus status, textus source, textus router_model_id) → lista<Diagnosticum> {
-    redde [
+fn inanis_diagnosticum(string status, string source, string router_model_id) → list<Diagnosticum> {
+    return [
         Diagnosticum {
             severitas = severitas_pro_status(status),
             nuntius = diagnosticum(status, source, router_model_id)
@@ -51,20 +51,20 @@ functio inanis_diagnosticum(textus status, textus source, textus router_model_id
     ]
 }
 
-probandum "model metadata facade" {
-    proba "classifies campaign alias formats" {
-        adfirma formatum("missing-download", "sentence-transformers/all-MiniLM-L6-v2") ≡ "alias-missing"
-        adfirma formatum("router-backed", "unsloth/Qwen3.6-35B-A3B-GGUF") ≡ "gguf"
-        adfirma formatum("local", "/tmp/model.safetensors") ≡ "safetensors"
+describe "model metadata facade" {
+    test "classifies campaign alias formats" {
+        assert formatum("missing-download", "sentence-transformers/all-MiniLM-L6-v2") ≡ "alias-missing"
+        assert formatum("router-backed", "unsloth/Qwen3.6-35B-A3B-GGUF") ≡ "gguf"
+        assert formatum("local", "/tmp/model.safetensors") ≡ "safetensors"
     }
 
-    proba "builds structured diagnostic records" {
-        fixum lista<Diagnosticum> diagnostics ← inanis_diagnosticum(
+    test "builds structured diagnostic records" {
+        const list<Diagnosticum> diagnostics ← inanis_diagnosticum(
             "error",
             "/tmp/not-a-model.bin",
             ""
         )
-        adfirma diagnostics.longitudo() ≡ 1
-        adfirma severitas_pro_status("error") ≡ "error"
+        assert diagnostics.length() ≡ 1
+        assert severitas_pro_status("error") ≡ "error"
     }
 }

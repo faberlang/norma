@@ -6,39 +6,39 @@ canonical = false
 summary = "Required-key validation via valor.exige_claves(valor, lista<textus>)."
 syntax = "valor.exige_claves(doc, [\"id\", \"name\"])"
 related = ["valor", "toml", "stdlib-nativum"]
-locale = "la"
+locale = "en"
 +++
 # stdlib-nativum/toml-exige-claves — multi-key exige_claves
 #
 # EXPECTED OUTPUT:
 #   faber sample
 
-importa ex "norma:toml" privata toml
-importa ex "norma:valor" privata valor
+import from "norma:toml" toml
+import from "norma:valor" value
 
-functio sampleToml() → textus {
-    redde «name = "faber"
+fn sampleToml() → string {
+    return «name = "faber"
 id = "sample"»
 }
 
-incipit {
-    fixum valor doc ← toml.solve(sampleToml())
+main {
+    const value doc ← toml.solve(sampleToml())
 
-    fac {
-        valor.exige_claves(doc, ["id", "name"])
-        fixum textus name ← valor.cape(doc, "name") ↦ textus ⇥ "missing"
-        fixum textus id ← valor.cape(doc, "id") ↦ textus ⇥ "missing"
-        nota name, id
+    do {
+        value.exige_claves(doc, ["id", "name"])
+        const string name ← value.cape(doc, "name") ↦ string ⇥ "missing"
+        const string id ← value.cape(doc, "id") ↦ string ⇥ "missing"
+        print name, id
     }
-    cape err {
-        adfirma falsum
+    catch err {
+        assert false
     }
 
-    fac {
-        valor.exige_claves(doc, ["absent"])
-        adfirma falsum
+    do {
+        value.exige_claves(doc, ["absent"])
+        assert false
     }
-    cape err {
-        adfirma err.continet("missing key")
+    catch err {
+        assert err.contains("missing key")
     }
 }

@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # caelum.fab - Network Socket Device (TCP/UDP)
@@ -22,9 +22,9 @@ locale = "la"
 # - TCP: ausculta/auscultabit (listen), connecte/connectet (connect)
 # - Sockets are bidirectional byte streams
 
-importa ex "norma:caelum/terminus" privata terminus
-importa ex "norma:caelum/connexus" privata connexus
-importa ex "norma:caelum/auscultator" privata auscultator
+import from "norma:caelum/terminus" terminus
+import from "norma:caelum/connexus" connexus
+import from "norma:caelum/auscultator" auscultator
 
 
 # =========================================================================
@@ -32,13 +32,13 @@ importa ex "norma:caelum/auscultator" privata auscultator
 # =========================================================================
 
 # Create TCP listener (TLS when cert/key provided)
-functio ausculta(numerus portus, textus cert sponte, textus key sponte) → auscultator.Auscultator {
-    mori "norma:caelum.ausculta is deferred pending Stage 2 dispatch"
+fn ausculta(int portus, string cert optional, string key optional) → auscultator.Auscultator {
+    panic "norma:caelum.ausculta is deferred pending Stage 2 dispatch"
 }
 
-@ futura
-functio auscultabit(numerus portus, textus cert sponte, textus key sponte) → auscultator.Auscultator {
-    mori "norma:caelum.auscultabit is deferred pending Stage 2 dispatch"
+@ future
+fn auscultabit(int portus, string cert optional, string key optional) → auscultator.Auscultator {
+    panic "norma:caelum.auscultabit is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -46,11 +46,11 @@ functio auscultabit(numerus portus, textus cert sponte, textus key sponte) → a
 # =========================================================================
 
 # Connect to TCP server (TLS when tute=verum)
-functio connecte(textus hospes, numerus portus, bivalens tute sponte vel falsum) → connexus.Connexus {
-    mori "norma:caelum.connecte is deferred pending Stage 2 dispatch"
+fn connecte(string hospes, int portus, bool tute optional coalesce false) → connexus.Connexus {
+    panic "norma:caelum.connecte is deferred pending Stage 2 dispatch"
 }
 
-@ futura
-functio connectet(textus hospes, numerus portus, bivalens tute sponte vel falsum) → connexus.Connexus {
-    mori "norma:caelum.connectet is deferred pending Stage 2 dispatch"
+@ future
+fn connectet(string hospes, int portus, bool tute optional coalesce false) → connexus.Connexus {
+    panic "norma:caelum.connectet is deferred pending Stage 2 dispatch"
 }

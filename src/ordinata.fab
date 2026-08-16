@@ -1,5 +1,5 @@
 +++
-locale = "la"
+locale = "en"
 +++
 
 # copula/ordinata.fab — key-ordered associative collection
@@ -50,23 +50,23 @@ locale = "la"
 # the actual key→value bindings. Maintaining both lets lookup stay O(1)
 # (tabula accipe) while ordered iteration is O(n) over an already-sorted
 # lista, instead of O(n log n) sort-on-each-iteration.
-genus Ordinata<K, V> {
-    lista<K> index = vacua
-    tabula<K, V> entries = vacua
+class Ordinata<K, V> {
+    list<K> index = vacua
+    map<K, V> entries = vacua
 
     # =========================================================================
     # STATE (nominal / present predicate)
     # =========================================================================
 
     # Number of entries. Nominal projection, matches tabula.longitudo().
-    functio longitudo() → numerus {
-        redde ego.index.longitudo()
+    fn longitudo() → int {
+        return self.index.length()
     }
 
     # Whether the map holds no entries. Present predicate, matches
     # tabula.vacua().
-    functio vacua() → bivalens {
-        redde ego.index.vacua()
+    fn vacua() → bool {
+        return self.index.is_empty()
     }
 
     # =========================================================================
@@ -74,13 +74,13 @@ genus Ordinata<K, V> {
     # =========================================================================
 
     # Get value by key; nihil if absent. Reuses the tabula lookup stem.
-    functio accipe(K clavis) → V ∪ nihil {
-        redde ego.entries.accipe(clavis)
+    fn accipe(K clavis) → V ∪ null {
+        return self.entries.get(clavis)
     }
 
     # Whether the key is present. Reuses the tabula presence-probe stem.
-    functio habet(K clavis) → bivalens {
-        redde ego.entries.habet(clavis)
+    fn habet(K clavis) → bool {
+        return self.entries.has(clavis)
     }
 
     # =========================================================================
@@ -89,19 +89,19 @@ genus Ordinata<K, V> {
 
     # Insert or update a binding. Maintains the sorted key index.
     # Reuses the tabula insert stem.
-    functio pone(K clavis, V valor) → vacuum {
-        si non ego.entries.habet(clavis) {
-            _insere<K>(ego.index, clavis)
+    fn pone(K clavis, V value) → void {
+        if not self.entries.has(clavis) {
+            _insere<K>(self.index, clavis)
         }
-        ego.entries.pone(clavis, valor)
+        self.entries.put(clavis, value)
     }
 
     # Remove a binding. No-op if the key was absent.
     # Reuses the tabula delete stem.
-    functio dele(K clavis) → vacuum {
-        si ego.entries.habet(clavis) {
-            ego.entries.dele(clavis)
-            _amputa<K>(ego.index, clavis)
+    fn dele(K clavis) → void {
+        if self.entries.has(clavis) {
+            self.entries.delete(clavis)
+            _amputa<K>(self.index, clavis)
         }
     }
 
@@ -111,19 +111,19 @@ genus Ordinata<K, V> {
 
     # Keys in ascending order. O(1) — returns the maintained sorted index.
     # Nominal projection (the keys, as a stable fact about the map).
-    functio claves() → lista<K> {
-        redde ego.index
+    fn claves() → list<K> {
+        return self.index
     }
 
     # Values in key-ascending order. Nominal projection.
-    functio valores() → lista<V> {
-        varia lista<V> out ← vacua
-        itera ex ego.index fixum k {
+    fn valores() → list<V> {
+        var list<V> out ← vacua
+        for from self.index const k {
             # habet verified by construction; accipe cannot miss.
-            fixum V v ← ego.entries.accipe(k)
-            out.appende(v)
+            const V v ← self.entries.get(k)
+            out.append(v)
         }
-        redde out
+        return out
     }
 
     # =========================================================================
@@ -139,14 +139,14 @@ genus Ordinata<K, V> {
     # grammar does not accept `T ∪ nihil` in parameter position today. One-
     # sided ranges are handled by the caller iterating claves() and filtering;
     # a nullable-bound variant can be added if param-position unions ship.
-    functio fines(K inferior, K superior) → lista<K> {
-        varia lista<K> out ← vacua
-        itera ex ego.index fixum k {
-            si k < inferior ergo perge
-            si k ≥ superior ergo perge
-            out.appende(k)
+    fn fines(K inferior, K superior) → list<K> {
+        var list<K> out ← vacua
+        for from self.index const k {
+            if k < inferior then continue
+            if k ≥ superior then continue
+            out.append(k)
         }
-        redde out
+        return out
     }
 }
 
@@ -159,8 +159,8 @@ genus Ordinata<K, V> {
 # reserved for the emptiness predicate above.
 
 # Empty sorted map constructor.
-functio creata() → Ordinata<K, V> {
-    redde Ordinata<K, V> { }
+fn creata() → Ordinata<K, V> {
+    return Ordinata<K, V> { }
 }
 
 # Build a sorted map from a tabula, sorting keys once at construction.
@@ -171,12 +171,12 @@ functio creata() → Ordinata<K, V> {
 # reading all keys of a tabula. Until that ships, this constructor cannot
 # compile. The empty constructor creata() above is unaffected. Tracked as a
 # separate gap from the generic-construction work.
-functio creata_ex(tabula<K, V> res) → Ordinata<K, V> {
-    varia Ordinata<K, V> out ← Ordinata<K, V> { entries = res }
-    varia lista<K> claves ← res.claves()
-    claves.ordina()
+fn creata_ex(map<K, V> res) → Ordinata<K, V> {
+    var Ordinata<K, V> out ← Ordinata<K, V> { entries = res }
+    var list<K> claves ← res.keys()
+    claves.sort()
     out.index ← claves
-    redde out
+    return out
 }
 
 # =============================================================================
@@ -190,63 +190,63 @@ functio creata_ex(tabula<K, V> res) → Ordinata<K, V> {
 # parameters.
 
 # Insert a key into the sorted index at its sorted position.
-@ privata
-functio _insere<K>(lista<K> index, K clavis) → vacuum {
-    varia numerus i ← 0
-    dum i < index.longitudo() {
-        fixum K extans ← index.accipe(i)
+@ private
+fn _insere<K>(list<K> index, K clavis) → void {
+    var int i ← 0
+    while i < index.length() {
+        const K extans ← index.get(i)
         # WHY: strict-less keeps the insert position stable; duplicates
         # can't occur here because callers check habet first.
-        si clavis < extans {
+        if clavis < extans {
             _insere_ad<K>(index, i, clavis)
-            redde
+            return
         }
         i ← i + 1
     }
-    index.appende(clavis)
+    index.append(clavis)
 }
 
 # Insert at a positional index. lista has no positional-insert intrinsic
 # yet, so this rebuilds the lista around the insertion point.
-@ privata
-functio _insere_ad<K>(lista<K> index, numerus positio, K clavis) → vacuum {
-    varia lista<K> out ← vacua
-    varia numerus i ← 0
-    dum i < index.longitudo() {
-        si i ≡ positio {
-            out.appende(clavis)
+@ private
+fn _insere_ad<K>(list<K> index, int positio, K clavis) → void {
+    var list<K> out ← vacua
+    var int i ← 0
+    while i < index.length() {
+        if i ≡ positio {
+            out.append(clavis)
         }
-        out.appende(index.accipe(i))
+        out.append(index.get(i))
         i ← i + 1
     }
-    si positio ≡ index.longitudo() {
-        out.appende(clavis)
+    if positio ≡ index.length() {
+        out.append(clavis)
     }
     index ← out
 }
 
 # Remove a key from the sorted index. Reuses the `amputa` (cut away) stem
 # rather than English "remove".
-@ privata
-functio _amputa<K>(lista<K> index, K clavis) → vacuum {
-    varia numerus i ← 0
-    dum i < index.longitudo() {
-        si index.accipe(i) ≡ clavis {
+@ private
+fn _amputa<K>(list<K> index, K clavis) → void {
+    var int i ← 0
+    while i < index.length() {
+        if index.get(i) ≡ clavis {
             _amputa_ad<K>(index, i)
-            redde
+            return
         }
         i ← i + 1
     }
 }
 
 # Positional removal helper — rebuilds the lista without index `positio`.
-@ privata
-functio _amputa_ad<K>(lista<K> index, numerus positio) → vacuum {
-    varia lista<K> out ← vacua
-    varia numerus i ← 0
-    dum i < index.longitudo() {
-        si i ≠ positio {
-            out.appende(index.accipe(i))
+@ private
+fn _amputa_ad<K>(list<K> index, int positio) → void {
+    var list<K> out ← vacua
+    var int i ← 0
+    while i < index.length() {
+        if i ≠ positio {
+            out.append(index.get(i))
         }
         i ← i + 1
     }
