@@ -29,28 +29,28 @@ locale = "en"
 # Not open yet: present plural (sync stream), sync finite query/connect.
 #
 # Stems (one root per operation; wrappers share the root):
-#   connect-  → connectet
+#   connect-  → connect
 #               async-only open (no connecte pair; DB is futurum-first)
 #   quaer-    (quaerere)
-#               quaeret  — async finite package → lista<series>
-#               quaerent — async stream         → cursor<series>
+#               query       — async finite package → list<series>
+#               query_stream — async stream        → cursor<series>
 #   capi-     (capere)
-#               capiet   — async first row      → series ∪ nihil
+#               first_row   — async first row      → series ∪ null
 #               (distinct operation from quaer-; not a wrapper spelling)
 #   exsequ-   (exsequi)
-#               exsequetur — async mutation     → numerus (rows affected)
+#               execute     — async mutation       → int (rows affected)
 #   inser-    (inserere)
-#               inseret  — async insert + last id → numerus
+#               insert      — async insert + last id → int
 #   incip-    (incipere)
-#               incipiet — async begin transaction → Transactio
+#               begin       — async begin transaction → Transaction
 #   commit-   (committere)
-#               committet — async commit
+#               commit      — async commit
 #   revert-   (revertere)
-#               revertet  — async rollback
+#               rollback    — async rollback
 #   claud-    (claudere)
-#               claude   — sync close
+#               close       — sync close
 #   (state)
-#               aperta   — open?
+#               is_open     — open?
 #
 # Types: bare series = dynamic SQL row (tabula<textus, valor>-shaped).
 # Typed census/series<S> adapters are out of scope for this module.
@@ -64,28 +64,28 @@ locale = "en"
 # Stem connect- · cell: future singular (async finite)
 # Driver inferred from URL scheme.
 @ future
-fn connectet(string url) → Connexio {
-    panic "norma:arca.connectet is deferred pending Stage 2 dispatch"
+fn connect(string url) → Connection {
+    panic "norma:arca.connect is deferred pending Stage 2 dispatch"
 }
 
 # Database connection handle
-interface Connexio {
+interface Connection {
     # -----------------------------------------------------------------
     # QUERIES — stem quaer- (quaerere) + stem capi- (capere)
     # -----------------------------------------------------------------
 
     # Stem quaer- · cell: future singular (async finite package)
     @ future
-    fn quaeret(string sql, list<value> params) → list<series>
+    fn query(string sql, list<value> params) → list<series>
 
     # Stem capi- · cell: future singular (async first row or nihil)
     @ future
-    fn capiet(string sql, list<value> params) → series ∪ null
+    fn first_row(string sql, list<value> params) → series ∪ null
 
     # Stem quaer- · cell: future plural (async stream)
     @ future
     @ cursor
-    fn quaerent(string sql, list<value> params) → cursor<series>
+    fn query_stream(string sql, list<value> params) → cursor<series>
 
     # -----------------------------------------------------------------
     # MUTATIONS — stems exsequ- / inser-
@@ -93,11 +93,11 @@ interface Connexio {
 
     # Stem exsequ- · cell: future singular (async rows-affected)
     @ future
-    fn exsequetur(string sql, list<value> params) → int
+    fn execute(string sql, list<value> params) → int
 
     # Stem inser- · cell: future singular (async last insert id)
     @ future
-    fn inseret(string sql, list<value> params) → int
+    fn insert(string sql, list<value> params) → int
 
     # -----------------------------------------------------------------
     # TRANSACTIONS — stem incip-
@@ -105,47 +105,47 @@ interface Connexio {
 
     # Stem incip- · cell: future singular
     @ future
-    fn async_main() → Transactio
+    fn begin() → Transaction
 
     # -----------------------------------------------------------------
     # LIFECYCLE
     # -----------------------------------------------------------------
 
     # Stem claud- · cell: imperative (sync command)
-    fn claude() → void
+    fn close() → void
 
     # State · adjectival
-    fn aperta() → bool
+    fn is_open() → bool
 }
 
-# Database transaction handle (same query/mutation stems as Connexio)
-interface Transactio {
+# Database transaction handle (same query/mutation stems as Connection)
+interface Transaction {
     # Stem quaer- · future singular
     @ future
-    fn quaeret(string sql, list<value> params) → list<series>
+    fn query(string sql, list<value> params) → list<series>
 
     # Stem capi- · future singular
     @ future
-    fn capiet(string sql, list<value> params) → series ∪ null
+    fn first_row(string sql, list<value> params) → series ∪ null
 
     # Stem quaer- · future plural
     @ future
     @ cursor
-    fn quaerent(string sql, list<value> params) → cursor<series>
+    fn query_stream(string sql, list<value> params) → cursor<series>
 
     # Stem exsequ- · future singular
     @ future
-    fn exsequetur(string sql, list<value> params) → int
+    fn execute(string sql, list<value> params) → int
 
-    # Stem inser- · future singular (parity with Connexio)
+    # Stem inser- · future singular (parity with Connection)
     @ future
-    fn inseret(string sql, list<value> params) → int
+    fn insert(string sql, list<value> params) → int
 
     # Stem commit- · future singular
     @ future
-    fn committet() → void
+    fn commit() → void
 
     # Stem revert- · future singular
     @ future
-    fn revertet() → void
+    fn rollback() → void
 }
