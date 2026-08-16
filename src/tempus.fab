@@ -19,7 +19,7 @@ locale = "en"
 
 # Why: Pad a single-digit field to two decimal characters for RFC3339 wire.
 @ private
-fn _duo(int n) → string {
+fn _pad2(int n) → string {
     if n < 10 then return "0§"(n ↦ string)
 
     return n ↦ string
@@ -27,7 +27,7 @@ fn _duo(int n) → string {
 
 # Why: Pad a year (or similar) to four decimal digits on the wire.
 @ private
-fn _quattuor(int n) → string {
+fn _pad4(int n) → string {
     var string out ← n ↦ string
     while out.length() < 4 {
         out ← "0§"(out)
@@ -37,15 +37,15 @@ fn _quattuor(int n) → string {
 
 # Why: Slice a fixed wire substring and parse it as a civil integer field.
 @ private
-fn _campus(instant t, int initium, int finis) → int {
+fn _field(instant t, int initium, int finis) → int {
     const string wire ← t ↦ string
     return wire.slice(initium, finis) ↦ int
 }
 
 # Why: Build canonical UTC RFC3339 wire from civil components (always ends with Z).
 @ private
-fn _wire(int annus, int mensis, int dies, int hora, int minuta, int secunda) → string {
-    return "§-§-§T§:§:§Z"(_quattuor(annus), _duo(mensis), _duo(dies), _duo(hora), _duo(minuta), _duo(secunda))
+fn _wire(int year, int month, int day, int hour, int minute, int second) → string {
+    return "§-§-§T§:§:§Z"(_pad4(year), _pad2(month), _pad2(day), _pad2(hour), _pad2(minute), _pad2(second))
 }
 
 # =========================================================================
@@ -54,13 +54,13 @@ fn _wire(int annus, int mensis, int dies, int hora, int minuta, int secunda) →
 
 # Verb: solve from "solvere" (to loosen, untangle)
 # Why: Parse RFC3339 UTC wire text into instans via conversio.
-fn solve(string wire) → instant {
+fn parse(string wire) → instant {
     return wire ↦ instant
 }
 
 # Verb: exprimit from "exprimere" (to express, render outward)
 # Why: Render instans as RFC3339 UTC wire text via conversio.
-fn exprimit(instant t) → string {
+fn render(instant t) → string {
     return t ↦ string
 }
 
@@ -69,33 +69,33 @@ fn exprimit(instant t) → string {
 # =========================================================================
 
 # Why: Four-digit calendar year from wire positions [0, 4).
-fn annus(instant t) → int {
-    return _campus(t, 0, 4)
+fn year(instant t) → int {
+    return _field(t, 0, 4)
 }
 
 # Why: Month of year (1-indexed) from wire positions [5, 7).
-fn mensis(instant t) → int {
-    return _campus(t, 5, 7)
+fn month(instant t) → int {
+    return _field(t, 5, 7)
 }
 
 # Why: Day of month from wire positions [8, 10).
-fn dies(instant t) → int {
-    return _campus(t, 8, 10)
+fn day(instant t) → int {
+    return _field(t, 8, 10)
 }
 
 # Why: UTC hour from wire positions [11, 13).
-fn hora(instant t) → int {
-    return _campus(t, 11, 13)
+fn hour(instant t) → int {
+    return _field(t, 11, 13)
 }
 
 # Why: UTC minute from wire positions [14, 16).
-fn minuta(instant t) → int {
-    return _campus(t, 14, 16)
+fn minute(instant t) → int {
+    return _field(t, 14, 16)
 }
 
 # Why: UTC second from wire positions [17, 19); sub-second wire tails are floored.
-fn secunda(instant t) → int {
-    return _campus(t, 17, 19)
+fn second(instant t) → int {
+    return _field(t, 17, 19)
 }
 
 # =========================================================================
@@ -104,15 +104,15 @@ fn secunda(instant t) → int {
 
 # Verb: structa from "struere" (to build, arrange)
 # Why: Construct midnight UTC instans from calendar date; invalid civil input throws.
-fn structa(int annus, int mensis, int dies) → instant ⇥ string {
-    const string wire ← _wire(annus, mensis, dies, 0, 0, 0)
+fn construct(int year, int month, int day) → instant ⇥ string {
+    const string wire ← _wire(year, month, day, 0, 0, 0)
     return wire ↦ instant
 }
 
 # Verb: structa_momenti — full civil moment (date + time)
 # Why: Construct UTC instans from all civil components; invalid input throws.
-fn structa_momenti(int annus, int mensis, int dies, int hora, int minuta, int secunda) → instant ⇥ string {
-    const string wire ← _wire(annus, mensis, dies, hora, minuta, secunda)
+fn construct_moment(int year, int month, int day, int hour, int minute, int second) → instant ⇥ string {
+    const string wire ← _wire(year, month, day, hour, minute, second)
     return wire ↦ instant
 }
 
@@ -122,7 +122,7 @@ fn structa_momenti(int annus, int mensis, int dies, int hora, int minuta, int se
 
 # Current epoch time in nanoseconds (canonical wall clock; downconvert at use site)
 @ public
-fn nunc() → instant<ns> {
+fn now() → instant<ns> {
     return call 'tempus:nunc' ↦ instant<ns>
 }
 
@@ -131,12 +131,12 @@ fn nunc() → instant<ns> {
 # =========================================================================
 
 @ public
-fn monotonicum() → int {
+fn monotonic() → int {
     return call 'tempus:monotonicum' ↦ int
 }
 
 @ public
-fn activum() → int {
+fn active() → int {
     return call 'tempus:activum' ↦ int
 }
 
@@ -152,7 +152,7 @@ fn activum() → int {
 # Sleep for `ms` milliseconds with async caller materialization.
 @ public
 @ future
-fn dormiet(int ms) → void {
+fn sleep_async(int ms) → void {
     return call 'tempus:dormiet' (ms) ↦ void
 }
 
@@ -160,7 +160,7 @@ fn dormiet(int ms) → void {
 # calling thread on the host response. Same route as dormiet; the
 # difference is sync vs async posture, mirroring the lege/leget split.
 @ public
-fn expectet(int ms) → void {
+fn sleep(int ms) → void {
     return call 'tempus:dormiet' (ms) ↦ void
 }
 
@@ -184,8 +184,8 @@ fn expectet(int ms) → void {
 # A native-Faber form becomes possible once cursor-return-from-function
 # ships.
 @ cursor
-fn vigila(int ms) → cursor<instant> {
-    panic "norma:tempus.vigila is deferred pending Stage 2 dispatch"
+fn interval(int ms) → cursor<instant> {
+    panic "norma:tempus.interval is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -194,22 +194,22 @@ fn vigila(int ms) → cursor<instant> {
 # Why: trivial native Faber bodies; no host route needed.
 
 @ public
-fn MILLISECUNDUM() → int {
+fn MILLISECOND() → int {
     return 1
 }
 
-fn SECUNDUM() → int {
+fn SECOND() → int {
     return 1000
 }
 
-fn MINUTUM() → int {
+fn MINUTE() → int {
     return 60000
 }
 
-fn HORA() → int {
+fn HOUR() → int {
     return 3600000
 }
 
-fn DIES() → int {
+fn DAY() → int {
     return 86400000
 }
