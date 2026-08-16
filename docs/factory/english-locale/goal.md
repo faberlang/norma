@@ -1,6 +1,6 @@
 # GOAL: Norma English locale + English identifiers
 
-**Status**: planned — Pass A awaiting dispatch; Pass B awaiting planner lowering
+**Status**: active — Pass A conversion commit c006af5 on factory/hand-9; integrate decision INTEGRATE (delivery.md, PA-1..PA-5); Pass B lowered (pass-b-delivery.md, 29 units)
 **Created**: 2026-08-15
 **Campaign:** `—` (standalone; mirrors `gradus/docs/factory/english-locale/`)
 **Source:** operator request 2026-08-15 (batch 2) — same conversion as gradus

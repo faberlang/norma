@@ -1,11 +1,18 @@
 # Delivery Lowering — Norma Pass B: English identifier renames (english-locale goal, unit B1+)
 
-**Planner**: planner-2. **Assignment**: task `ea73d43b` (Mind, 2026-08-15).
+**Planner**: planner-2 (authored) / planner (refreshed 2026-08-16, task `6e60ac86`).
 **Goal**: [`goal.md`](goal.md). **Campaign**: standalone (mirrors `gradus/docs/factory/english-locale/`).
 **Pattern authority**: `gradus/docs/factory/english-locale/pass-b-delivery.md` (planner-1, task 49a3ac9c).
-**Status**: **READY to dispatch** once Pass A lands (A1 convert + A2 pack completeness/manifest flips)
-and Mind confirms the §11 open questions before the first unit that applies them (PB-CHORDA applies the
-mechanical-trio and async-twin conventions).
+**Master delivery (this wave)**: [`delivery.md`](delivery.md) — Pass A integrate decision + Pass A units.
+**Status**: **REFRESHED — READY to dispatch** once Pass A lands on main (PA-1 integrate + PA-2 manifests +
+PA-3 proba + PA-4 scripta gates, per `delivery.md`) and Mind confirms the §11 open questions before the
+first unit that applies them (PB-CHORDA applies the mechanical-trio and async-twin conventions).
+
+> Refresh notes (2026-08-16): ledgers re-verified against live `norma/src` (census + spot-checks on
+> chorda/solum/valor/fila/tempus/json — all ledger names present; `renomina` spelling confirmed). Unit
+> count corrected from 27 to **29** (28 norma units + 1 radix-coordinated PB-PACKS). Census corrected:
+> exempla corpus = **25 files** (22 `.fab` + 3 `.proba`), not 23. Toolchain oracle updated to the rebuilt
+> faber 1.7.0 binary (§4.6).
 
 ---
 
@@ -13,9 +20,21 @@ mechanical-trio and async-twin conventions).
 
 - **Goal path**: `norma/docs/factory/english-locale/goal.md` (Pass B), unit row `B1+`.
 - **Evaluator mode**: delivery lowering (goal is `READY`-shaped — Pass A structure settled, identifier census below).
-- **Intended consumer**: delivery → factory Hands (Pass B units 1–27).
-- **Verdict**: **READY** with preconditions: (a) Pass A lands first — Pass B renames English-surface files, never Latin; (b) the §11 open questions (mechanical-trio English, async-twin `_async` suffix, `nomen`→`file_name` escape) are confirmed before PB-CHORDA applies them; (c) the la-pack currency unit (PB-PACKS) is filed back to radix in the same wave as the first renames, or la-locale consumers read the new English canonicals directly (see §4 pack interplay and §5 rule 9).
-- **Reasoning**: every Pass B rename is mechanical against the locked ledgers in §7; the per-module surface is fully enumerated here (§4) from the live tree; each unit fixes every in-repo reference to the names it renames, so the norma package (`faber test .` / `./scripta/check-source`) stays green after each landing; reserved-name escapes and the locked conventions close collision risk; external callers (examples/radix/faberlang.dev/hosts) are named findings (§4.5), not this goal's completion contract.
+- **Intended consumer**: delivery → factory Hands (Pass B units).
+- **Verdict**: **READY** with preconditions: (a) Pass A lands on main first — **integrate decision is INTEGRATE**
+  (`c006af5` applies cleanly; see `delivery.md` §2) — Pass B renames English-surface files, never Latin;
+  (b) the §11 open questions (mechanical-trio English, async-twin `_async` suffix, `nomen`→`file_name` escape)
+  are confirmed before PB-CHORDA applies them; (c) the la-pack currency unit (PB-PACKS) is filed back to radix
+  in the same wave as the first renames, or la-locale consumers read the new English canonicals directly
+  (see §4 pack interplay and §5 rule 9); (d) `./scripta/check-source` is only green **after** the PA-4 gate
+  repair (`faber script` → `faber run`, faber 1.7.0); (e) **R1 parity repair** (delivery.md §4) lands before
+  PB-MATHESIS/PB-FILA/PB-ORDINATA/PB-VECTOR/PB-JSON, or those units' done_when is amended to "no new errors;
+  parity unchanged" — those five modules carry pre-existing errors identical on the la baseline.
+- **Reasoning**: every Pass B rename is mechanical against the locked ledgers in §7; the per-module surface is
+  fully enumerated here (§4) from the live tree (re-verified 2026-08-16); each unit fixes every in-repo
+  reference to the names it renames, so the norma package (`faber test .` / `./scripta/check-source`) stays
+  green after each landing; reserved-name escapes and the locked conventions close collision risk; external
+  callers (examples/radix/faberlang.dev/hosts) are named findings (§4.5), not this goal's completion contract.
 
 ## 2. Interpreted theme
 
@@ -45,19 +64,24 @@ After Pass B, in the norma repo:
 
 ## 4. Repo-aware baseline (measured against norma main, read-only)
 
-- Pass A is **not yet dispatched** (goal row A1/A2 pending; Mind files next). All 34 `src/**/*.fab` carry
+- Pass A commit `c006af5` exists **only on `factory/hand-9`** (1 ahead of merge-base `d755ada`; main is
+  +1 docs-only `a21d1b5`). **Integrate decision: INTEGRATE** (clean merge-tree, zero regressions — full
+  evidence in `delivery.md` §2–§3). Until PA-1 lands, all 34 `src/**/*.fab` on main still carry
   `locale = "la"`; exempla corpus files carry `locale = "la"` frontmatter or la keyword surface; the two
-  package exempla (`exempla/crypta-sha2`, `exempla/ad-multiplica-backward`) have `[reader] locale = "la"`.
+  package exempla (`exempla/crypta-sha2`, `exempla/ad-multiplica-backward`) have `[reader] locale = "la"`
+  (flipped by PA-2).
 - Module surface (live, pre-Pass-A spellings — identifiers do not move in Pass A): **34 src files**
   (26 top-level + `caelum/*` 3 + `json/*` 4 + `solum/path`), **1 colocated proba** (`src/mathesis.proba`),
-  **23 exempla corpus files** (`exempla/stdlib-nativum/*` 17, `exempla/chorda/*` 5, `exempla/caelum/*.proba` 3),
-  **2 package exempla** (crypta-sha2, ad-multiplica-backward). Full identifier census per module in §7.
+  **22 exempla corpus `.fab` files** (`exempla/stdlib-nativum/*` 17, `exempla/chorda/*` 5), **3 exempla
+  `.proba` files** (`exempla/caelum/*.proba`), **2 package exempla** (crypta-sha2, ad-multiplica-backward).
+  Full identifier census per module in §7.
 - Import DAG (measured, for ordering): `chorda` is a leaf imported by `csv` and `valor`; `caelum` imports
   `caelum/terminus`, `caelum/connexus`, `caelum/auscultator`; `caelum/connexus` imports `caelum/terminus`;
   `caelum/auscultator` imports `caelum/connexus`; all other modules are leaves with no in-src importers.
-- Validation oracle (post-Pass-A): `faber test .` from the norma root discovers `src/*.proba` + exempla
-  proba; `./scripta/check-source` green; per-file `faber check src/<m>.fab` exits 0 (FABER_BIN from the
-  packet dev build, `FABER_LIBRARY_HOME` = parent of the repo root).
+- Validation oracle (post-Pass-A): per-file `faber check src/<m>.fab` exits 0 under the **default en pack**
+  (single-file check does not select a pack from frontmatter; the la baseline is measured with
+  `--locale la`); `faber test` on proba per file or via a package path; `./scripta/check-source` green
+  (after PA-4). See §4.6 for the toolchain contract.
 - **Pack interplay (measured)**: the en pack (`radix/stdlib/locale/en/pack.toml`) defines `[[library_members]]`
   for `norma:chorda` as a **total identity** — rows `retorta→reverse`, `nexa→nexa`, `retenta_iudicio→…`,
   `retenta`, `expurgata`, `diducta`, `discissa`, `pange`, `solve` (identity rows keep the canonical spelling).
@@ -67,6 +91,7 @@ After Pass B, in the norma repo:
   total identity). The la pack currently has **zero** `[[library_members]]` rows, so la readers resolve
   canonical names directly; after Pass B renames, la readers would read English unless the la pack gains rows.
   PB-PACKS is the mechanism that keeps the goal's "Latin reader loses nothing" invariant.
+  (Verified live 2026-08-16: 9 `package = "norma"` rows in the en pack; 0 rows in the la pack.)
 
 ### 4.5 External-caller census (findings — OUT of scope for Pass B Hands)
 
@@ -87,6 +112,27 @@ Every external consumer imports by **module coordinate** (`importa ex "norma:sol
 For **la-locale** consumers (examples/*), la-pack `[[library_members]]` rows (PB-PACKS, radix) preserve the
 Latin spellings, so they do **not** need code edits. **en-locale** consumers (radix/corpus, faberlang.dev,
 hosts) would need member-name updates — named follow-up, NOT this goal's completion contract (report to Mind).
+
+### 4.6 Toolchain contract (faber 1.7.0 — measured)
+
+- `FABER_BIN` = **rebuilt** `radix/target/debug/faber` (must postdate radix hand-6 `71b0f6801`,
+  2026-08-16 08:23). The pre-rebuild Aug-15 binary walked CWD ancestry for the dev locale pack and read a
+  stale `/tmp/radix` checkout, misreporting csv/valor as en-pack-broken. The fixed binary resolves the exe
+  tree first; the in-tree binary was rebuilt for this delivery and re-verified.
+- `FABER_LIBRARY_HOME` must resolve `norma:*` to the **tree under test** (packet root in lane mode; main
+  checkout in direct mode). Checking an importing module from a `/tmp` worktree silently resolves imports
+  to the main checkout (observed: caelum family PKG001/SEM006 artifacts).
+- Single-file `faber check` uses the default **en** pack; file frontmatter does not select the pack. The la
+  baseline is measured with `--locale la`.
+- `./scripta/check-source` currently calls the retired `faber script` and its two `.fab` gates carry en
+  frontmatter with Latin bodies — broken under 1.7.0 until the PA-4 gate repair lands.
+- `faber test` per `.proba` uses the default en pack; the 4 la-bodied proba files are red until PA-3
+  converts them. The norma root has no `faber.toml` (locale comes from file frontmatter); there is no
+  root-package `faber test .` surface.
+- **R1 precondition**: `src/mathesis.fab`, `src/fila.fab`, `src/ordinata.fab`, `src/vector.fab`,
+  `src/json/pange.fab` carry pre-existing errors identical on the la and en surfaces (delivery.md §3).
+  PB-MATHESIS / PB-FILA / PB-ORDINATA / PB-VECTOR / PB-JSON done_when (`faber check` exit 0) is blocked
+  until R1 lands or is amended per delivery.md §4.
 
 ## 5. Rename authority: seed + locked conventions
 
@@ -139,8 +185,9 @@ hosts) would need member-name updates — named follow-up, NOT this goal's compl
 
 ## 6. Unit graph (ordered)
 
-Pass B begins only after Pass A lands (A1 + A2). Units are **serialized only where caller files overlap**;
-all other units are caller-disjoint leaves and may be dispatched in parallel (⚡).
+Pass B begins only after Pass A lands (PA-1 integrate + PA-2 manifests + PA-3 proba + PA-4 scripta gates;
+see `delivery.md` §4). Units are **serialized only where caller files overlap**; all other units are
+caller-disjoint leaves and may be dispatched in parallel (⚡).
 
 ```
 Base: A1 (Pass A convert) → A2 (pack completeness + manifest flips)         [Pass A]
@@ -158,6 +205,10 @@ F6  PB-DOCS                             (module headers, AGENTS/README, scripta/
 
 27 units. All src units are ⚡ leaves except the F1 chain and F2; F1/F2 must land before F4. PB-PACKS must
 land in the same merge wave as the first rename unit that touches a pack-rowed identity (PB-CHORDA).
+
+> Count corrected 2026-08-16: the graph below is **29 units** (F1 3 + F2 1 + F3 22 + F4 1 + F6 1 = 28 norma
+> units, plus F5 PB-PACKS radix-coordinated = 29). The draft's "27" was a miscount. R1 (delivery.md §4)
+> is a recommended pre-Pass-B parity precondition for the 5 pre-existing-error modules, not a Pass B unit.
 
 **Unit discipline (all src units).** Each unit renames **its own module's** identifiers per its ledger and
 updates **every in-repo reference** to those identifiers — other `src/**/*.fab` files and its own proba —
@@ -446,8 +497,8 @@ exempla-red until PB-CONSUMERS — see §8 merge gate); `est_basis` per unit.
 
 ## 8. Integration / merge gate
 
-- Every Pass B unit is `integrable: yes` for the **norma package** (`faber test .` zero semantic errors after
-  each landing; `./scripta/check-source` green).
+- Every Pass B unit is `integrable: yes` for the **norma package** (per-module `faber check` zero errors
+  after each landing — R1 precondition for the 5 parity modules; `./scripta/check-source` green post-PA-4).
 - **Exempla are red from the first src unit until PB-CONSUMERS lands** (they reference the old member names).
   Merge lane: **hold Pass B on `factory/merge` and land the family batch together with PB-CONSUMERS**
   (atomic landing), or land incrementally with an acknowledged exempla-red window.
@@ -460,13 +511,13 @@ exempla-red until PB-CONSUMERS — see §8 merge gate); `est_basis` per unit.
 ## 9. Lane-owned validation (named once, not on children)
 
 - **Lint lane**: stages 1–2 on the integrated tree (mechanical renames; `git diff --check`).
-- **Test lane**: `faber test .` (zero semantic errors), `./scripta/check-source`, per-family probes
-  (`faber check` with the en pack), exempla corpus + package exempla after F4.
+- **Test lane**: per-module `faber check` (default en pack, §4.6 toolchain contract), `faber test` on proba,
+  `./scripta/check-source` (post-PA-4), exempla corpus + package exempla after F4.
 - **Merge lane**: integrates `factory/<lane>` branches in §6 order; batches PB-CONSUMERS with the final
   family dispatch; coordinates PB-PACKS (radix) with PB-CHORDA; runs
   `scripta/verify-main-consistent` per repo.
-- Pass A's own gates (converted en surface, pack completeness, round-trip proof) are preconditions, owned
-  by the A2 successor.
+- Pass A's own gates (converted en surface, manifest flips, pack completeness/round-trip proof) are
+  preconditions, owned by the PA-5 successor (delivery.md §4).
 
 ## 10. Open questions for Mind
 
@@ -491,16 +542,27 @@ exempla-red until PB-CONSUMERS — see §8 merge gate); `est_basis` per unit.
    post-A baseline this delivery assumes.
 8. **Batch dispatch of the ⚡ leaves** (F3) may join any wave in any order; PB-OPTIMIZER is
    verification-only and may batch with any neighbor.
+9. **R1 parity precondition** (delivery.md §4): land the 5 pre-existing-error repairs (mathesis, fila,
+   ordinata, vector, json/pange) before PB-MATHESIS/PB-FILA/PB-ORDINATA/PB-VECTOR/PB-JSON, or amend those
+   units' done_when to "no new errors; parity unchanged". Default: land first.
+10. **SEM006 visibility follow-up** (delivery.md §4, excluded from this delivery per task non-goals):
+   caelum family + exempla SEM004/SEM006 + crypta-sha2 private-member calls are pre-existing; the c006af5
+   author filed them. Confirm ownership/timing with Mind.
+11. **FABER_BIN currency** (§4.6): verify the lane packet's dev build postdates radix hand-6 `71b0f6801`
+    before Hands measure; the stale binary silently misreports csv/valor and importing-module checks.
 
 ## 11. Honesty notes
 
 - Per-module ledgers were derived from the live tree (function/type/field census per module, §4) plus the
   gradus seed and morphologia meanings. Every Latin identifier in `src/` is named in a ledger row above.
+  Re-verified 2026-08-16 against live `norma/src` (census + spot-checks; all ledger names present).
 - `_`-prefixed privata helpers are included in the rename surface (clean break leaves no Latin identifiers
   in `src/`); they are exempt from any coverage gate (norma has no api-reference-style gate).
 - The capsule-free import DAG means no merge-forcing cycles; the caelum chain and chorda→{csv,valor} edges
   are the only serialization constraints.
-- `faber test .` zero-semantic-errors is the unit oracle; FMIR runtime-stepper executed-value residuals
+- Per-module `faber check` zero errors is the unit oracle; FMIR runtime-stepper executed-value residuals
   (if any appear in proba) are out of this wave — report, don't chase.
-- "Semantic-error-free per landing" is measured on the **post-Pass-A en surface**; Pass A's own conversion
-  must be green before B1 starts (A2 manifest flips + pack completeness are preconditions).
+- "Zero-errors-per-landing" is measured on the **post-Pass-A en surface**; Pass A must land first
+  (PA-1 integrate + PA-2 manifests + PA-3 proba + PA-4 scripta gates; PA-5 pack completeness is the A2
+  precondition). The 5 parity modules and the SEM006 visibility class are pre-existing residuals named in
+  delivery.md §3–§4, not Pass B regressions.
