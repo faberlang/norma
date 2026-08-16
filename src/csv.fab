@@ -6,7 +6,7 @@ locale = "en"
 #
 # Public import: importa ex "norma:csv" privata csv
 # Method ledger: docs/stdlib/csv-methods.md
-# Internal dependency: norma:chorda (discissa + nexa)
+# Internal dependency: norma:chorda (split_n + join)
 
 import from "norma:chorda" chorda
 
@@ -27,11 +27,11 @@ fn _normaliza_row(string row) → string {
 fn solve(string wire) → list<list<string>> {
     if wire.length() ≡ 0 then return vacua
 
-    const list<string> rows ← chorda.discissa(wire, "\n", wire.length() + 1)
+    const list<string> rows ← chorda.split_n(wire, "\n", wire.length() + 1)
     var list<list<string>> map ← vacua
     for from rows const row {
         const string normalized ← _normaliza_row(row)
-        map.append(chorda.discissa(normalized, ",", normalized.length() + 1))
+        map.append(chorda.split_n(normalized, ",", normalized.length() + 1))
     }
     return map
 }
@@ -42,7 +42,7 @@ fn solve(string wire) → list<list<string>> {
 fn pange(list<list<string>> map) → string {
     var list<string> rows ← vacua
     for from map const fields {
-        rows.append(chorda.nexa(fields, ","))
+        rows.append(chorda.join(fields, ","))
     }
-    return chorda.nexa(rows, "\n")
+    return chorda.join(rows, "\n")
 }

@@ -96,9 +96,9 @@ fn carpe(value v, int index) → value {
 # Find value by dotted path (e.g. "user.address.city"). Walks tabulae by
 # key; numeric segments index listae. Returns nihil if any segment misses.
 fn inveni(value v, string via) → value {
-    # chorda.discissa limited split: at most via.longitudo()+1 segments,
+    # chorda.split_n limited split: at most via.longitudo()+1 segments,
     # which is more than any dotted path can produce.
-    const list<string> partes ← chorda.discissa(via, ".", via.length() + 1) ↦ list<string>
+    const list<string> partes ← chorda.split_n(via, ".", via.length() + 1) ↦ list<string>
     var value current ← v
     for from partes const pars {
         current ← inveni_partem(current, pars)
