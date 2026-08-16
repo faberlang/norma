@@ -3,7 +3,7 @@
 import from "./mathesis" mathesis
 
 fn sum_pi(float x) → float {
-    return mathesis.addita(mathesis.PI(), x)
+    return mathesis.add(mathesis.PI(), x)
 }
 
 describe "mathesis catalog" {
@@ -11,11 +11,11 @@ describe "mathesis catalog" {
         assert mathesis.PI() > 0.0
     }
 
-    test "addita composes with PI helper" {
+    test "add composes with PI helper" {
         assert sum_pi(0.0) ≡ mathesis.PI()
     }
 
-    test "addita is commutative on unit" {
-        assert mathesis.addita(1.0, 2.0) ≡ mathesis.addita(2.0, 1.0)
+    test "add is commutative on unit" {
+        assert mathesis.add(1.0, 2.0) ≡ mathesis.add(2.0, 1.0)
     }
 }

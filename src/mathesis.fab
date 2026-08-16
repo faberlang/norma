@@ -30,9 +30,9 @@ fn TAU() → float {
 # Clamp (present participle)
 # -------------------------------------------------------------------------
 
-# Verb: constringens from "constringere" (to bind tight) — present participle
+# Verb: clamp from "constringere" (to bind tight) — present participle
 # Why: Clamp x to the closed interval [lo, hi] via maximus/minimus.
-fn constringens(float x, float lo, float hi) → float {
+fn clamp(float x, float lo, float hi) → float {
     return (x.maximum(lo)).minimum(hi)
 }
 
@@ -41,32 +41,32 @@ fn constringens(float x, float lo, float hi) → float {
 # -------------------------------------------------------------------------
 
 # Why: Perfectum twin of `+` — returns a + b without mutating operands.
-fn addita(float a, float b) → float {
+fn add(float a, float b) → float {
     return a + b
 }
 
 # Why: Perfectum twin of `−` — returns a − b.
-fn subtracta(float a, float b) → float {
+fn subtract(float a, float b) → float {
     return a - b
 }
 
 # Why: Perfectum twin of `×` — returns a × b.
-fn multiplicata(float a, float b) → float {
+fn multiply(float a, float b) → float {
     return a * b
 }
 
 # Why: Perfectum twin of `÷` — returns a ÷ b.
-fn divisa(float a, float b) → float {
+fn divide(float a, float b) → float {
     return a / b
 }
 
 # Why: Perfectum twin of `%` — returns a mod b.
-fn modulata(float a, float b) → float {
+fn modulo(float a, float b) → float {
     return a % b
 }
 
 # Why: Perfectum twin of unary `−` — returns negated a.
-fn negativa(float a) → float {
+fn negate(float a) → float {
     return -a
 }
 
@@ -75,22 +75,22 @@ fn negativa(float a) → float {
 # -------------------------------------------------------------------------
 
 # Why: Perfectum twin of `<` — returns whether a is less than b.
-fn minor(float a, float b) → bool {
+fn less(float a, float b) → bool {
     return a < b
 }
 
 # Why: Perfectum twin of `>` — returns whether a is greater than b.
-fn maior(float a, float b) → bool {
+fn greater(float a, float b) → bool {
     return a > b
 }
 
 # Why: Perfectum twin of `≤` — returns whether a is at most b.
-fn minime(float a, float b) → bool {
+fn at_most(float a, float b) → bool {
     return a ≤ b
 }
 
 # Why: Perfectum twin of `≥` — returns whether a is at least b.
-fn maxime(float a, float b) → bool {
+fn at_least(float a, float b) → bool {
     return a ≥ b
 }
 
@@ -99,22 +99,22 @@ fn maxime(float a, float b) → bool {
 # -------------------------------------------------------------------------
 
 # Why: Perfectum twin of `∧` — bitwise AND on integer numerus operands.
-fn coniuncta(int a, int b) → int {
+fn bit_and(int a, int b) → int {
     return a ∧ b
 }
 
 # Why: Perfectum twin of `∨` — bitwise OR on integer numerus operands.
-fn disiuncta(int a, int b) → int {
+fn bit_or(int a, int b) → int {
     return a ∨ b
 }
 
 # Why: Perfectum twin of `⊻` — bitwise XOR on integer numerus operands.
-fn alternata(int a, int b) → int {
+fn bit_xor(int a, int b) → int {
     return a ⊻ b
 }
 
 # Why: Perfectum twin of `¬` — bitwise complement of integer numerus a.
-fn complementata(int a) → int {
+fn bit_not(int a) → int {
     return ¬a
 }
 
@@ -123,12 +123,12 @@ fn complementata(int a) → int {
 # -------------------------------------------------------------------------
 
 # Why: Perfectum twin of `⇐` — left-shift a by b bit positions.
-fn sinistrata(int a, int b) → int {
+fn shift_left(int a, int b) → int {
     return a ⇐ b
 }
 
 # Why: Perfectum twin of `⇒` — right-shift a by b bit positions.
-fn dextrata(int a, int b) → int {
+fn shift_right(int a, int b) → int {
     return a ⇒ b
 }
 
@@ -137,55 +137,55 @@ fn dextrata(int a, int b) → int {
 # -------------------------------------------------------------------------
 
 # Why: Sine of x radians via range reduction and Taylor series (self-hosted v1).
-fn sinus(float x) → float {
-    return _sinus_series(_reduce_angle(x))
+fn sin(float x) → float {
+    return _sin_series(_reduce_angle(x))
 }
 
 # Why: Cosine of x radians via range reduction and Taylor series.
-fn cosinus(float x) → float {
-    return _cosinus_series(_reduce_angle(x))
+fn cos(float x) → float {
+    return _cos_series(_reduce_angle(x))
 }
 
-# Why: Tangent of x radians — sinus/cosinus ratio; near-zero cosine → 0.0.
-fn tangens(float x) → float {
-    const float c ← cosinus(x)
+# Why: Tangent of x radians — sin/cos ratio; near-zero cosine → 0.0.
+fn tan(float x) → float {
+    const float c ← cos(x)
     if c.abs() ≤ 0.000000000001 then return 0.0
 
-    return sinus(x) / c
+    return sin(x) / c
 }
 
 # Why: Natural exponential e^x via Taylor series.
-fn exponens(float x) → float {
-    return _exponens_series(x)
+fn exp(float x) → float {
+    return _exp_series(x)
 }
 
 # Why: Natural logarithm of x; non-positive x → 0.0 (v1 silent guard).
-fn logarithmus(float x) → float {
+fn ln(float x) → float {
     if x ≤ 0.0 then return 0.0
 
-    return _logarithmus_series(x)
+    return _ln_series(x)
 }
 
 # Why: Base-10 logarithm via natural log identity.
-fn logarithmus10(float x) → float {
-    return logarithmus(x) / logarithmus(10.0)
+fn log10(float x) → float {
+    return ln(x) / ln(10.0)
 }
 
 # Why: Square root of x via Newton iteration; negative x → 0.0 (v1 guard).
-fn radix(float x) → float {
+fn sqrt(float x) → float {
     if x < 0.0 then return 0.0
 
     if x ≡ 0.0 then return 0.0
 
-    return _radix_newton(x)
+    return _sqrt_newton(x)
 }
 
-# potentia: ⋆ glyph not shipped — exp/log identity fallback (potentia-glyph goal)
-# Why: Raise base to exp via exp(exp * log(base)); non-positive base → 0.0.
-fn potentia(float base, float exp) → float {
+# pow: ⋆ glyph not shipped — exp/log identity fallback (pow-glyph goal)
+# Why: Raise base to exponent via exp(exponent * ln(base)); non-positive base → 0.0.
+fn pow(float base, float exponent) → float {
     if base ≤ 0.0 then return 0.0
 
-    return exponens(exp * logarithmus(base))
+    return exp(exponent * ln(base))
 }
 
 # -------------------------------------------------------------------------
@@ -203,7 +203,7 @@ fn _reduce_angle(float x) → float {
 
 # Why: Taylor series for sin(x) on reduced angle (fixed iteration count).
 @ private
-fn _sinus_series(float x) → float {
+fn _sin_series(float x) → float {
     var float term ← x
     var float sum ← x
     var float x2 ← x * x
@@ -218,7 +218,7 @@ fn _sinus_series(float x) → float {
 
 # Why: Taylor series for cos(x) on reduced angle.
 @ private
-fn _cosinus_series(float x) → float {
+fn _cos_series(float x) → float {
     var float term ← 1.0
     var float sum ← 1.0
     var float x2 ← x * x
@@ -233,7 +233,7 @@ fn _cosinus_series(float x) → float {
 
 # Why: Taylor series for e^x.
 @ private
-fn _exponens_series(float x) → float {
+fn _exp_series(float x) → float {
     var float term ← 1.0
     var float sum ← 1.0
     var float n ← 1
@@ -247,7 +247,7 @@ fn _exponens_series(float x) → float {
 
 # Why: Series for ln(x) valid when x > 0 (caller guards non-positive inputs).
 @ private
-fn _logarithmus_series(float x) → float {
+fn _ln_series(float x) → float {
     const float y ← (x - 1.0) / (x + 1.0)
     var float y2 ← y * y
     var float term ← y
@@ -263,7 +263,7 @@ fn _logarithmus_series(float x) → float {
 
 # Why: Newton–Raphson square root iteration for positive x.
 @ private
-fn _radix_newton(float x) → float {
+fn _sqrt_newton(float x) → float {
     var float guess ← x / 2.0
     var int i ← 0
     while i < 20 {
