@@ -14,9 +14,8 @@ locale = "en"
 # (extraction). The conversio-cascade pattern that previously lived in
 # json.fab and toml.fab is retired here in favor of the flat est dispatch.
 #
-# Same-file calls use bare helpers. `cape` is a reserved keyword (the fac/cape
-# error-catch clause), so internal callers use the private `_cape` helper while
-# the public `cape` export preserves the external namespace surface.
+# Same-file calls use bare helpers. Internal callers use the private `_get`
+# helper while the public `get` export preserves the external namespace surface.
 
 import from "norma:chorda" chorda
 
@@ -27,37 +26,37 @@ import from "norma:chorda" chorda
 # matches!(v, Valor::Variant(_)). See sibling faber/runtime/rust/src/valor.rs for the
 # enum whose variants these check.
 
-fn nihilne(value v) → bool {
+fn is_null(value v) → bool {
     return v is null
 }
 
-fn bivalensne(value v) → bool {
+fn is_bool(value v) → bool {
     return v is bool
 }
 
-fn textusne(value v) → bool {
+fn is_string(value v) → bool {
     return v is string
 }
 
-fn numerusne(value v) → bool {
+fn is_int(value v) → bool {
     return v is int
 }
 
-fn fractusne(value v) → bool {
+fn is_float(value v) → bool {
     return v is float
 }
 
-fn listane(value v) → bool {
+fn is_list(value v) → bool {
     return v is list<value>
 }
 
-fn tabulane(value v) → bool {
+fn is_map(value v) → bool {
     return v is map<string, value>
 }
 
 # Instans is the RFC3339 datetime wire form (Valor::Instans). Available to
 # all tree codecs — previously toml-only, now shared.
-fn instansne(value v) → bool {
+fn is_instant(value v) → bool {
     return v is instant
 }
 
@@ -70,7 +69,7 @@ fn instansne(value v) → bool {
 
 # Get value by key from a tabula (returns nihil if missing or non-tabula).
 @ private
-fn _cape(value v, string clavis) → value {
+fn _get(value v, string clavis) → value {
     if v is null then return null
     if v not is map<string, value> then return null
     const map<string, value> tab ← v ↦ map<string, value>
@@ -79,13 +78,13 @@ fn _cape(value v, string clavis) → value {
 }
 
 @ public
-fn catch(value v, string clavis) → value {
-    return _cape(v, clavis)
+fn get(value v, string clavis) → value {
+    return _get(v, clavis)
 }
 
 # Pluck value by index from a lista (returns nihil if out of bounds or
 # non-lista).
-fn carpe(value v, int index) → value {
+fn get_index(value v, int index) → value {
     if v is null then return null
     if v not is list<value> then return null
     const list<value> items ← v ↦ list<value>
@@ -95,13 +94,13 @@ fn carpe(value v, int index) → value {
 
 # Find value by dotted path (e.g. "user.address.city"). Walks tabulae by
 # key; numeric segments index listae. Returns nihil if any segment misses.
-fn inveni(value v, string via) → value {
+fn find(value v, string via) → value {
     # chorda.split_n limited split: at most via.longitudo()+1 segments,
     # which is more than any dotted path can produce.
     const list<string> partes ← chorda.split_n(via, ".", via.length() + 1) ↦ list<string>
     var value current ← v
     for from partes const pars {
-        current ← inveni_partem(current, pars)
+        current ← find_part(current, pars)
         if current is null then return null
     }
     return current
@@ -109,7 +108,7 @@ fn inveni(value v, string via) → value {
 
 # Walk one path segment. Tabula-keyed first; numeric segments fall through
 # to lista indexing. Non-collection variants return nihil.
-fn inveni_partem(value current, string part) → value {
+fn find_part(value current, string part) → value {
     if current is null then return null
     if current is map<string, value> {
         const map<string, value> tab ← current ↦ map<string, value>
@@ -120,7 +119,7 @@ fn inveni_partem(value current, string part) → value {
     if current is list<value> {
         do {
             const int idx ← part ↦ int
-            return carpe(current, idx)
+            return get_index(current, idx)
         }
         catch err {
             return null
@@ -135,8 +134,8 @@ fn inveni_partem(value current, string part) → value {
 
 # Require a textus child at clavis; throw on missing or non-textus.
 @ public
-fn exige(value v, string clavis) → string ⇥ string {
-    const value child ← _cape(v, clavis)
+fn require_string(value v, string clavis) → string ⇥ string {
+    const value child ← _get(v, clavis)
     if child is null then throw "missing key: §"(clavis)
     if child not is string then throw "key not textus: §"(clavis)
     return child ↦ string
@@ -145,9 +144,9 @@ fn exige(value v, string clavis) → string ⇥ string {
 # Require multiple textus children; throws on the first missing or
 # non-textus key. Used by codec callers that validate a schema shape.
 @ public
-fn exige_claves(value v, list<string> claves) → void ⇥ string {
+fn require_strings(value v, list<string> claves) → void ⇥ string {
     for from claves const clavis {
-        const value child ← _cape(v, clavis)
+        const value child ← _get(v, clavis)
         if child is null then throw "missing key: §"(clavis)
         if child not is string then throw "key not textus: §"(clavis)
     }
