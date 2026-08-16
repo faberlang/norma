@@ -6,6 +6,16 @@ SRC="$ROOT/src"
 FABER="${FABER:-$ROOT/../faber/target/debug/faber}"
 status=0
 
+# Pass B Latin-identifier guards (english-locale goal). The §7 rename ledgers
+# (docs/factory/english-locale/pass-b-delivery.md) moved these identifiers to
+# English; the pre-rename spellings must not reappear as code tokens in src/.
+# Comment text (etymology notes) and `call '…'` route strings keep the old
+# spellings by convention, so both are stripped before matching.
+# Coverage: units landed so far; add a module's ledger names as its unit lands.
+#   (per-module patterns selected by a case below — no associative arrays,
+#    for bash-3 compatibility)
+PASS_B_RESERVED='^(fn|class|interface|union|enum|type)[[:space:]]+(fn|class|union|enum|type|const|let|var|import|from|as|public|private|optional|return|if|else|elif|then|for|while|match|case|break|continue|throw|catch|do|assert|panic|true|false|null|and|or|not|is|self|main|print|test|read|write|warn|debug|size|name|step|range|between|within|until|line|args|call|await|async|future|format|require|exit|string|int|bool|float|list|map|set|bytes|value|void|unknown|null_ty|instant|json|object|any|promise|iterator|tensor|vector|matrix|ascii|request|item|byte|bulk|done|error|cancel)\b'
+
 if [[ ! -d "$SRC" ]]; then
   echo "check-source: missing src directory: $SRC" >&2
   exit 1
@@ -39,6 +49,53 @@ while IFS= read -r -d '' file; do
 
   if grep -nE '\bad[[:space:]]+[A-Za-z_][A-Za-z0-9_]*[[:space:]]*\{' "$file"; then
     echo "check-source: route calls must use canonical string route syntax in $file" >&2
+    status=1
+  fi
+
+  rel="${file#$SRC/}"
+  latin_names=""
+  case "$rel" in
+    aleator.fab) latin_names='fractum|sortire|octetos|semina' ;;
+    arca.fab) latin_names='connectet|Connexio|Transactio|quaeret|capiet|quaerent|exsequetur|inseret|incipiet|claude|aperta|committet|revertet' ;;
+    caelum.fab) latin_names='ausculta|auscultabit|connecte|connectet' ;;
+    caelum/terminus.fab) latin_names='Terminus|hospes|portus' ;;
+    caelum/connexus.fab) latin_names='Connexus|hauri|hauriet|funde|fundet|claude|remotus|localis' ;;
+    caelum/auscultator.fab) latin_names='Auscultator|accipe|accipiet|claude|portus' ;;
+    chorda.fab) latin_names='retorta|nexa|reputat|reciprocus|scala|retenta_iudicio|retenta|expurgata_iudicio|expurgata|residuum|_finis_delimitris|_amputa_postremam_newline|diducta|comprimata|angustata|temptat|discissa|pange|solve|tempta' ;;
+    codex.fab) latin_names='deBase64|temptaBase64|deHex|temptaHex|deUrl|urlComponentum|deUrlComponentum' ;;
+    consolum.fab) latin_names='hauri|hauriet|lege|leget|funde|fundet|scribe|scribet|dic|dicet|mone|monet|vide|videbit|audit|loquitur|admonet' ;;
+    crypta.fab) latin_names='digere|authenfica|cela|revela|signa|verifica|genera|gemina|derivabit|ParClavium|publica|privata|algorithmus|_dextra32|_dextra64|_verbum32|_verbum64|_schema32|_schema64|_comprima32|_comprima64|_seria32|_seria64|_padda32|_padda64' ;;
+    csv.fab) latin_names='_normaliza_row|solve|pange' ;;
+    fila.fab) latin_names='Fila|caput|post|longitudo|appende|praepone|detrahe|decapita|primus|ultimus|collecta|creata|creata_ex' ;;
+    http.fab) latin_names='petet|mittet|ponet|delet|mutabit|rogabit|Replicatio|corpus|capita|caput|bene|Rogatio|modus|via' ;;
+    json.fab) latin_names='pange|solve|tempta' ;;
+    json/pange.fab) latin_names='pange|solve|tempta' ;;
+    json/solve.fab) latin_names='pange|solve|tempta' ;;
+    json/lexica.fab) latin_names='_est_sponte|_salta_sponte|_est_digita|_est_finitura|_transeant_liber|_postulat_transeum|_destruat_liber|_valor_hexadecimalis' ;;
+    json/cursor.fab) latin_names='Resultus' ;;
+    mathesis.fab) latin_names='constringens|addita|subtracta|multiplicata|divisa|modulata|negativa|minor|maior|minime|maxime|coniuncta|disiuncta|alternata|complementata|sinistrata|dextrata|sinus|cosinus|tangens|exponens|logarithmus|logarithmus10|radix|potentia|_sinus_series|_cosinus_series|_exponens_series|_logarithmus_series|_radix_newton' ;;
+    model.fab) latin_names='Diagnosticum|severitas|nuntius|formatum|diagnosticum|severitas_pro_status|inanis_diagnosticum' ;;
+    nuncius.fab) latin_names='alloca|aperi|restringe|numera|vigila|ParPortarum|Porta|mitte|recipiet|paratum|claude|obstringe|tempta|solve|Semaphorum|exspecta|signa|lege|Conditio|morare|diffunde' ;;
+    ordinata.fab) latin_names='Ordinata|longitudo|accipe|habet|pone|dele|claves|valores|creata|creata_ex|_insere|_amputa|_amputa_ad|_aequa|fines|_insere_ad' ;;
+    pressura.fab) latin_names='comprime|solve|comprimens|solvens|funde|hauri|claude' ;;
+    processus.fab) latin_names='Subprocessus|genera|dimitte|captura|exsequi|exsequetur|lege|scribe|sedes|muta|identitas|argumenta|exi' ;;
+    solum.fab) latin_names='lege|leget|hauri|hauriet|partem|inveni|carpe|carpiet|scribe|scribet|funde|fundet|appone|apponet|exstat|exstabit|directoriumne|regularene|legibilene|vinculumne|mensura|modus|describe|describet|sequere|sequetur|vincula|dele|delet|exscribe|exscribet|renomina|renominabit|tange|tanget|modum|crea|creabit|enumera|enumerabit|amputa|amputabit|iunge|parens|nomen|suffixum|absolve|domus|temporarium|_iunge_duo|explora|SolumStatus|nexus|possessor|grex|modificatum' ;;
+    solum/path.fab) latin_names='iunge|parens|nomen|suffixum|absolve|domus|temporarium' ;;
+    tempus.fab) latin_names='_duo|_quattuor|_campus|solve|exprimit|annus|mensis|dies|hora|minuta|secunda|structa|structa_momenti|nunc|monotonicum|activum|dormiet|expectet|vigila|MILLISECUNDUM|SECUNDUM|MINUTUM|HORA|DIES' ;;
+    tensor.fab) latin_names='planata|structa|productum|applicata|summa|summa_fractus' ;;
+    thesaurus.fab) latin_names='capiet|ponet|condet|delet|exstabit|expirabit|augebit|minuet|quaeret|publicabit|auscultabit|Subscriptio|nuntiabunt|Nuntius|thema|corpus|tempus' ;;
+    toml.fab) latin_names='pange|solve|tempta' ;;
+    valor.fab) latin_names='nihilne|bivalensne|textusne|numerusne|fractusne|listane|tabulane|instansne|_cape|cape|carpe|inveni|inveni_partem|exige|exige_claves' ;;
+    vector.fab) latin_names='addita|subtrahe|multiplica|divida|productum|transversum' ;;
+    yaml.fab) latin_names='pange|necto|solve|tempta|collige' ;;
+  esac
+  if [[ -n "$latin_names" ]] && sed -E "s/'[^']*'//g; s/\"[^\"]*\"//g; s/#.*//" "$file" | grep -nE "\b($latin_names)\b"; then
+    echo "check-source: Pass B renamed identifier as a code token in $rel" >&2
+    status=1
+  fi
+
+  if grep -nE "$PASS_B_RESERVED" "$file"; then
+    echo "check-source: declaration collides with a reserved en keyword/type/frame variant in $file" >&2
     status=1
   fi
 done < <(find "$SRC" \( -name '*.fab' -o -name '*.proba' \) -print0)

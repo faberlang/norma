@@ -51,10 +51,20 @@ Round-trip locale proof both directions; `faber test .` green per package post-c
 | Unit | Status | Hand | Receipt | Notes |
 | --- | --- | --- | --- | --- |
 | A1 | done | hand-9 (PA-1) | `aad0d6a` (carries `c006af5`) | src (34) + exempla (24) la→en conversion, frontmatter en, `privata` marker removed; round-trip proof 3/3 byte-identical (arca, codex, toml) |
-| A2 | done | hand `7f3aa5ab` (PA-5) | `7f3aa5ab` | pack completeness verified on main: csv/valor/chorda check clean under en with rebuilt binary (hand-6 `71b0f6801` own-checkout-first; no radix pack gap); §3 measurement re-verified below |
+| A2 | done | hand `7f3aa5ab` (PA-5) | `03e612b` | pack completeness verified on main: csv/valor/chorda check clean under en with rebuilt binary (hand-6 `71b0f6801` own-checkout-first; no radix pack gap); §3 measurement re-verified below |
 | B1+ | pending | — | — | identifier renames per module (pass-b-delivery.md) |
 | C1+ | pending | — | — | proba coverage + faber-test fixes |
 | R1 | pending | — | — | formal tagged release |
+
+### Pass B ledger notes
+
+- **F6 fold-in (2026-08-16, PB-DOCS):** PB-SOLUM async-twin la-pack gap — checked against the §4.5
+  external-caller census: no la-locale consumer calls the async twins (`read_file_async`,
+  `write_file_async`, `read_bytes_async`, …). La consumers (examples/coreutils, vivilite,
+  ai-workbench) use sync spellings only; the only async-twin call sites (`solum.leget`,
+  `tempus.dormiet`) are en-surface radix/corpus files. The la pack therefore needs no async-twin
+  rows for PB-SOLUM (PB-PACKS covers the sync renames); gap recorded in the ledger notes, no rows
+  added.
 
 ### §3 Pass A measurement (post-A column re-verified on main)
 

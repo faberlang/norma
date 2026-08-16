@@ -65,5 +65,5 @@ packaged paths.
 
 ```bash
 ./scripta/check-source
-faber script scripta/check-promoted-helper-imports.fab
+faber run scripta/check-promoted-helper-imports.fab
 ```
