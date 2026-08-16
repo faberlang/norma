@@ -11,17 +11,17 @@ locale = "en"
 # the gateway decides how long to hold a request; Faber's posture is uniform.
 # There is no `@ futura` — sync/async is a route-naming distinction, not a
 # Faber-side marker. Sync and async verbs name distinct `processus:*` routes.
-# `genera` remains deferred: it returns the `Subprocessus` genus, which the
+# `spawn` remains deferred: it returns the `Subprocess` genus, which the
 # ad materializer does not yet support (same blocker as solum.describe).
 #
 # Design principles:
 # - Different verbs for different spawn semantics:
-# - genera: spawn attached, caller manages lifecycle
-# - dimitte: spawn detached, dismiss to run independently
+# - spawn: spawn attached, caller manages lifecycle
+# - detach: spawn detached, dismiss to run independently
 # - Shell execution uses traditional sync/async:
-# - Imperative (exsequi): sync, blocks until complete
-# - Future (exsequetur): async, returns promise
-# - Environment uses lege/scribe (read/write) - simple and consistent
+# - Imperative (exec): sync, blocks until complete
+# - Future (exec_async): async, returns promise
+# - Environment uses read_env/write_env (read/write) - simple and consistent
 
 
 # =============================================================================
@@ -30,7 +30,7 @@ locale = "en"
 
 # Spawned subprocess handle for attached processes
 # Maps to: Bun.spawn() result
-class Subprocessus {
+class Subprocess {
     int pid
 }
 
@@ -44,13 +44,13 @@ class Subprocessus {
 
 # Spawn attached process - caller can wait for exit via handle.expiravit
 # WHY: deferred because the ad materializer does not yet support
-# arbitrary genera like Subprocessus — only vacuum, valor, scalars, octeti,
-# instans, and lista<T>. The param name `argumenta` is also a reserved
-# keyword (TokenKind::Argumenta, used for CLI argument binding), so a
-# native body would need to rename it.
+# arbitrary spawn handles like Subprocess — only vacuum, valor, scalars,
+# octeti, instans, and lista<T>. The param name `argumenta` is also a
+# reserved keyword (TokenKind::Argumenta, used for CLI argument binding),
+# so a native body would need to rename it.
 @ public
-fn genera(list<string> args, string directorium optional, map<string, string> ambitus optional) → Subprocessus {
-    panic "norma:processus.genera is deferred pending Stage 2 dispatch"
+fn spawn(list<string> args, string directorium optional, map<string, string> ambitus optional) → Subprocess {
+    panic "norma:processus.spawn is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -66,14 +66,14 @@ fn genera(list<string> args, string directorium optional, map<string, string> am
 # WHY: param renamed from `argumenta` (reserved keyword, TokenKind::Argumenta
 # used for CLI argument binding) to `args`. The sponte defaults for
 # directorium and ambitus lower correctly to None at the handler call.
-fn dimitte(list<string> args, string directorium optional, map<string, string> ambitus optional) → int {
+fn detach(list<string> args, string directorium optional, map<string, string> ambitus optional) → int {
     return call 'processus:dimitte' (args) ↦ int
 }
 
 # Execute an argv vector directly and capture status, stdout, and stderr.
 # No shell is involved; args[0] is the executable and the remaining elements
 # are passed as literal argv entries.
-fn captura(list<string> args) → value {
+fn capture(list<string> args) → value {
     return call 'processus:captura' (args) ↦ value
 }
 
@@ -87,12 +87,12 @@ fn captura(list<string> args) → value {
 
 # Execute shell command, block until complete, return stdout (sync)
 @ public
-fn exsequi(string command) → string {
+fn exec(string command) → string {
     return call 'processus:exsequi' (command) ↦ string
 }
 
 # Execute shell command, return stdout when complete (async route; Faber blocks)
-fn exsequetur(string command) → string {
+fn exec_async(string command) → string {
     return call 'processus:exsequetur' (command) ↦ string
 }
 
@@ -106,7 +106,7 @@ fn exsequetur(string command) → string {
 
 # Read environment variable (Imperativus: fails when unset; set-to-empty → "")
 @ public
-fn read(string nomen) → string {
+fn read_env(string nomen) → string {
     return call 'processus:lege' (nomen) ↦ string
 }
 
@@ -119,7 +119,7 @@ fn read(string nomen) → string {
 # Maps to: Bun.env[name] = value / process.env[name] = value
 
 # Write environment variable
-fn write(string nomen, string value) → void {
+fn write_env(string nomen, string value) → void {
     return call 'processus:scribe' ([nomen, value]) ↦ void
 }
 
@@ -133,7 +133,7 @@ fn write(string nomen, string value) → void {
 # Maps to: process.cwd()
 
 # Get current working directory (where the process dwells)
-fn sedes() → string {
+fn cwd() → string {
     return call 'processus:sedes' ↦ string
 }
 
@@ -146,7 +146,7 @@ fn sedes() → string {
 # Maps to: process.chdir(path)
 
 # Change current working directory
-fn muta(string via) → void {
+fn chdir(string via) → void {
     return call 'processus:muta' (via) ↦ void
 }
 
@@ -158,7 +158,7 @@ fn muta(string via) → void {
 # Maps to: process.pid
 
 # Get process ID
-fn identitas() → int {
+fn pid() → int {
     return call 'processus:identitas' ↦ int
 }
 
@@ -171,16 +171,8 @@ fn identitas() → int {
 
 # Get command line arguments (excludes runtime and script path)
 @ public
-fn args() → list<string> {
+fn argv() → list<string> {
     return call 'processus:argumenta' ↦ list<string>
-}
-
-# la reader surface: the Pass A en conversion (c006af5) rewrote this public
-# member from `argumenta` to the en keyword spelling `args`; restore the
-# export so la consumers keep resolving `processus.argumenta`.
-@ public
-fn argumenta() → list<string> {
-    return args()
 }
 
 # =========================================================================
@@ -192,7 +184,7 @@ fn argumenta() → list<string> {
 # Maps to: process.exit(code)
 
 # Exit process with code (never returns)
-fn exi(int code) → never {
+fn exit_process(int code) → never {
     const void _ ← call 'processus:exi' (code) ↦ void
     panic "process exit returned unexpectedly"
 }
