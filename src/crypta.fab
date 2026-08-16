@@ -10,12 +10,12 @@ locale = "en"
 # except the SHA-2 digests, which are native Faber bodies in this file.
 #
 # Design notes:
-# - digere: hash (digerere = to digest) - native body below
-# - authenfica: HMAC (authenticare = to authenticate)
-# - cela/revela: encrypt/decrypt (celare/revelare = to hide/reveal)
-# - signa/verifica: asymmetric signatures
-# - genera/gemina: key generation
-# - derivabit: key derivation (async - intentionally slow)
+# - digest: hash (digerere = to digest) - native body below
+# - hmac: HMAC (authenticare = to authenticate)
+# - encrypt/decrypt: symmetric encryption (celare/revelare = to hide/reveal)
+# - sign/verify: asymmetric signatures
+# - generate_key/generate_pair: key generation
+# - derive_key: key derivation (async - intentionally slow)
 #
 # Algorithms:
 # - Hash: sha256, sha384, sha512
@@ -30,7 +30,7 @@ locale = "en"
 # Native Faber SHA-2 digests. Deterministic algorithms live in Norma; no host
 # route, provider, or foreign dependency is used. Unknown names and inputs over
 # the 64 MiB boundary fail through the ⇥ textus channel before padding.
-fn digere(string alg, bytes data) → bytes ⇥ string {
+fn digest(string alg, bytes data) → bytes ⇥ string {
     if data.length() > 67108864 then throw "norma:crypta.digere: input exceeds 67108864-byte limit"
     if alg ≡ "sha256" then return _sha256(data)
     if alg ≡ "sha384" then return _sha384(data)
@@ -43,37 +43,37 @@ fn digere(string alg, bytes data) → bytes ⇥ string {
 # -------------------------------------------------------------------------
 
 @ private
-fn _dextra32(uint<u32> x, uint<u32> n) → uint<u32> {
+fn _rotate_right32(uint<u32> x, uint<u32> n) → uint<u32> {
     return (x ⇒ n) ∨ (x ⇐ (32 - n))
 }
 
 @ private
-fn _dextra64(uint<u64> x, uint<u64> n) → uint<u64> {
+fn _rotate_right64(uint<u64> x, uint<u64> n) → uint<u64> {
     return (x ⇒ n) ∨ (x ⇐ (64 - n))
 }
 
 @ private
 fn _sigma0_32(uint<u32> x) → uint<u32> {
-    return _dextra32(x, 7) ⊻ _dextra32(x, 18) ⊻ (x ⇒ 3)
+    return _rotate_right32(x, 7) ⊻ _rotate_right32(x, 18) ⊻ (x ⇒ 3)
 }
 
 @ private
 fn _sigma1_32(uint<u32> x) → uint<u32> {
-    return _dextra32(x, 17) ⊻ _dextra32(x, 19) ⊻ (x ⇒ 10)
+    return _rotate_right32(x, 17) ⊻ _rotate_right32(x, 19) ⊻ (x ⇒ 10)
 }
 
 @ private
 fn _Sigma0_32(uint<u32> x) → uint<u32> {
-    return _dextra32(x, 2) ⊻ _dextra32(x, 13) ⊻ _dextra32(x, 22)
+    return _rotate_right32(x, 2) ⊻ _rotate_right32(x, 13) ⊻ _rotate_right32(x, 22)
 }
 
 @ private
 fn _Sigma1_32(uint<u32> x) → uint<u32> {
-    return _dextra32(x, 6) ⊻ _dextra32(x, 11) ⊻ _dextra32(x, 25)
+    return _rotate_right32(x, 6) ⊻ _rotate_right32(x, 11) ⊻ _rotate_right32(x, 25)
 }
 
 @ private
-fn _verbum32(list<int<u8>> buf, int off) → uint<u32> {
+fn _word32(list<int<u8>> buf, int off) → uint<u32> {
     var uint<u32> w ← buf[off] ↦ uint<u32>
     w ← w ⇐ 8
     w ← w ∨ (buf[off + 1] ↦ uint<u32>)
@@ -85,10 +85,10 @@ fn _verbum32(list<int<u8>> buf, int off) → uint<u32> {
 }
 
 @ private
-fn _schema32(list<int<u8>> buf, int init) → list<uint<u32>> {
+fn _schedule32(list<int<u8>> buf, int init) → list<uint<u32>> {
     var list<uint<u32>> w ← vacua
     for range 0‥16 const i {
-        w.append(_verbum32(buf, init + i * 4))
+        w.append(_word32(buf, init + i * 4))
     }
     for range 16‥64 const i {
         const uint<u32> s0 ← _sigma0_32(w[i - 15])
@@ -99,7 +99,7 @@ fn _schema32(list<int<u8>> buf, int init) → list<uint<u32>> {
 }
 
 @ private
-fn _comprima32(list<uint<u32>> statusus, list<uint<u32>> w, list<uint<u32>> k) → list<uint<u32>> {
+fn _compress32(list<uint<u32>> statusus, list<uint<u32>> w, list<uint<u32>> k) → list<uint<u32>> {
     var uint<u32> a ← statusus[0]
     var uint<u32> b ← statusus[1]
     var uint<u32> c ← statusus[2]
@@ -137,7 +137,7 @@ fn _comprima32(list<uint<u32>> statusus, list<uint<u32>> w, list<uint<u32>> k) �
 }
 
 @ private
-fn _seria32(list<uint<u32>> h) → list<int<u8>> {
+fn _serialize32(list<uint<u32>> h) → list<int<u8>> {
     var list<int<u8>> out ← vacua
     for range 0‥8 const i {
         const uint<u32> word ← h[i]
@@ -150,7 +150,7 @@ fn _seria32(list<uint<u32>> h) → list<int<u8>> {
 }
 
 @ private
-fn _padda32(bytes data) → list<int<u8>> {
+fn _pad32(bytes data) → list<int<u8>> {
     const int bit_len ← data.length() * 8
     var list<int<u8>> padded ← vacua
     for range 0‥data.length() const i {
@@ -174,41 +174,41 @@ fn _K32() → list<uint<u32>> {
 
 @ private
 fn _sha256(bytes data) → bytes {
-    const list<int<u8>> padded ← _padda32(data)
+    const list<int<u8>> padded ← _pad32(data)
     const list<uint<u32>> k ← _K32()
     var list<uint<u32>> statusus ← [1779033703, 3144134277, 1013904242, 2773480762, 1359893119, 2600822924, 528734635, 1541459225]
     const int n_blocks ← padded.length() / 64
     for range 0‥n_blocks const bi {
-        const list<uint<u32>> w ← _schema32(padded, bi * 64)
-        statusus ← _comprima32(statusus, w, k)
+        const list<uint<u32>> w ← _schedule32(padded, bi * 64)
+        statusus ← _compress32(statusus, w, k)
     }
-    const list<int<u8>> out ← _seria32(statusus)
+    const list<int<u8>> out ← _serialize32(statusus)
     const bytes result ← out
     return result
 }
 
 @ private
 fn _sigma0_64(uint<u64> x) → uint<u64> {
-    return _dextra64(x, 1) ⊻ _dextra64(x, 8) ⊻ (x ⇒ 7)
+    return _rotate_right64(x, 1) ⊻ _rotate_right64(x, 8) ⊻ (x ⇒ 7)
 }
 
 @ private
 fn _sigma1_64(uint<u64> x) → uint<u64> {
-    return _dextra64(x, 19) ⊻ _dextra64(x, 61) ⊻ (x ⇒ 6)
+    return _rotate_right64(x, 19) ⊻ _rotate_right64(x, 61) ⊻ (x ⇒ 6)
 }
 
 @ private
 fn _Sigma0_64(uint<u64> x) → uint<u64> {
-    return _dextra64(x, 28) ⊻ _dextra64(x, 34) ⊻ _dextra64(x, 39)
+    return _rotate_right64(x, 28) ⊻ _rotate_right64(x, 34) ⊻ _rotate_right64(x, 39)
 }
 
 @ private
 fn _Sigma1_64(uint<u64> x) → uint<u64> {
-    return _dextra64(x, 14) ⊻ _dextra64(x, 18) ⊻ _dextra64(x, 41)
+    return _rotate_right64(x, 14) ⊻ _rotate_right64(x, 18) ⊻ _rotate_right64(x, 41)
 }
 
 @ private
-fn _verbum64(list<int<u8>> buf, int off) → uint<u64> {
+fn _word64(list<int<u8>> buf, int off) → uint<u64> {
     var uint<u64> w ← buf[off] ↦ uint<u64>
     w ← w ⇐ 8
     w ← w ∨ (buf[off + 1] ↦ uint<u64>)
@@ -228,10 +228,10 @@ fn _verbum64(list<int<u8>> buf, int off) → uint<u64> {
 }
 
 @ private
-fn _schema64(list<int<u8>> buf, int init) → list<uint<u64>> {
+fn _schedule64(list<int<u8>> buf, int init) → list<uint<u64>> {
     var list<uint<u64>> w ← vacua
     for range 0‥16 const i {
-        w.append(_verbum64(buf, init + i * 8))
+        w.append(_word64(buf, init + i * 8))
     }
     for range 16‥80 const i {
         const uint<u64> s0 ← _sigma0_64(w[i - 15])
@@ -242,7 +242,7 @@ fn _schema64(list<int<u8>> buf, int init) → list<uint<u64>> {
 }
 
 @ private
-fn _comprima64(list<uint<u64>> statusus, list<uint<u64>> w, list<uint<u64>> k) → list<uint<u64>> {
+fn _compress64(list<uint<u64>> statusus, list<uint<u64>> w, list<uint<u64>> k) → list<uint<u64>> {
     var uint<u64> a ← statusus[0]
     var uint<u64> b ← statusus[1]
     var uint<u64> c ← statusus[2]
@@ -281,7 +281,7 @@ fn _comprima64(list<uint<u64>> statusus, list<uint<u64>> w, list<uint<u64>> k) �
 
 # n_words is 8 for SHA-512 and 6 for SHA-384 truncation.
 @ private
-fn _seria64(list<uint<u64>> h, int n_words) → list<int<u8>> {
+fn _serialize64(list<uint<u64>> h, int n_words) → list<int<u8>> {
     var list<int<u8>> out ← vacua
     for range 0‥n_words const i {
         const uint<u64> word ← h[i]
@@ -298,7 +298,7 @@ fn _seria64(list<uint<u64>> h, int n_words) → list<int<u8>> {
 }
 
 @ private
-fn _padda64(bytes data) → list<int<u8>> {
+fn _pad64(bytes data) → list<int<u8>> {
     const int bit_len ← data.length() * 8
     var list<int<u8>> padded ← vacua
     for range 0‥data.length() const i {
@@ -326,15 +326,15 @@ fn _K64() → list<uint<u64>> {
 
 @ private
 fn _sha512_engine(bytes data, list<uint<u64>> iv, int n_words) → bytes {
-    const list<int<u8>> padded ← _padda64(data)
+    const list<int<u8>> padded ← _pad64(data)
     const list<uint<u64>> k ← _K64()
     var list<uint<u64>> statusus ← iv
     const int n_blocks ← padded.length() / 128
     for range 0‥n_blocks const bi {
-        const list<uint<u64>> w ← _schema64(padded, bi * 128)
-        statusus ← _comprima64(statusus, w, k)
+        const list<uint<u64>> w ← _schedule64(padded, bi * 128)
+        statusus ← _compress64(statusus, w, k)
     }
-    const list<int<u8>> out ← _seria64(statusus, n_words)
+    const list<int<u8>> out ← _serialize64(statusus, n_words)
     const bytes result ← out
     return result
 }
@@ -356,7 +356,7 @@ fn _sha384(bytes data) → bytes {
 # =========================================================================
 
 # HMAC (hmac-sha256, hmac-sha384, hmac-sha512)
-fn authenfica(string alg, bytes clavis, bytes data) → bytes {
+fn hmac(string alg, bytes clavis, bytes data) → bytes {
     panic "norma:crypta.authenfica is deferred pending Stage 2 dispatch"
 }
 
@@ -366,12 +366,12 @@ fn authenfica(string alg, bytes clavis, bytes data) → bytes {
 
 # Encrypt (aes-256-gcm, aes-256-cbc)
 # Returns ciphertext with IV prepended
-fn cela(string alg, bytes clavis, bytes data) → bytes {
+fn encrypt(string alg, bytes clavis, bytes data) → bytes {
     panic "norma:crypta.cela is deferred pending Stage 2 dispatch"
 }
 
 # Decrypt (expects IV prepended to ciphertext)
-fn revela(string alg, bytes clavis, bytes data) → bytes {
+fn decrypt(string alg, bytes clavis, bytes data) → bytes {
     panic "norma:crypta.revela is deferred pending Stage 2 dispatch"
 }
 
@@ -380,12 +380,12 @@ fn revela(string alg, bytes clavis, bytes data) → bytes {
 # =========================================================================
 
 # Sign with private key
-fn signa(bytes arcana, bytes data) → bytes {
+fn sign(bytes arcana, bytes data) → bytes {
     panic "norma:crypta.signa is deferred pending Stage 2 dispatch"
 }
 
 # Verify with public key
-fn verifica(bytes aperta, bytes data, bytes signatura) → bool {
+fn verify(bytes aperta, bytes data, bytes signatura) → bool {
     panic "norma:crypta.verifica is deferred pending Stage 2 dispatch"
 }
 
@@ -394,12 +394,12 @@ fn verifica(bytes aperta, bytes data, bytes signatura) → bool {
 # =========================================================================
 
 # Generate symmetric key (aes-256)
-fn genera(string alg) → bytes {
+fn generate_key(string alg) → bytes {
     panic "norma:crypta.genera is deferred pending Stage 2 dispatch"
 }
 
 # Generate asymmetric key pair (ed25519, rsa-2048, rsa-4096)
-fn gemina(string alg) → ParClavium {
+fn generate_pair(string alg) → KeyPair {
     panic "norma:crypta.gemina is deferred pending Stage 2 dispatch"
 }
 
@@ -410,15 +410,15 @@ fn gemina(string alg) → ParClavium {
 # Derive key from password (pbkdf2, argon2id, scrypt)
 # Async because intentionally slow for security
 @ future
-fn derivabit(string alg, string password, bytes sal, int longitudo) → bytes {
+fn derive_key(string alg, string password, bytes sal, int longitudo) → bytes {
     panic "norma:crypta.derivabit is deferred pending Stage 2 dispatch"
 }
 
 # Asymmetric key pair
-interface ParClavium {
-    fn public() → bytes
+interface KeyPair {
+    fn public_key() → bytes
 
-    fn private() → bytes
+    fn private_key() → bytes
 
-    fn algorithmus() → string
+    fn algorithm() → string
 }
