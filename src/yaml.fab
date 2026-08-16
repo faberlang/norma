@@ -6,8 +6,8 @@ locale = "en"
 #
 # Etymology: "YAML" — YAML Ain't Markup Language (universal, kept as-is).
 #
-# Wire floor only: solve (text → valor), pange (valor → text), tempta
-# (lenient parse), necto (multi-doc bind), collige (multi-doc gather), all
+# Wire floor only: parse (text → valor), stringify (valor → text), try_parse
+# (lenient parse), stringify_all (multi-doc bind), parse_all (multi-doc gather), all
 # Faber-native Norma source (no residual Rust norma crate). Shared valor-tree navigation
 # (cape/carpe/inveni/exige/*ne) lives in norma:valor.
 
@@ -15,44 +15,44 @@ locale = "en"
 # =========================================================================
 # SERIALIZATION
 # =========================================================================
-# Verb: pange from "pangere" (to fasten, compose)
+# Verb: stringify from "pangere" (to fasten, compose)
 
 # Serialize value to YAML string
 @ public
-fn pange(value value) → string {
-    panic "norma:yaml.pange is deferred pending Stage 2 dispatch"
+fn stringify(value value) → string {
+    panic "norma:yaml.stringify is deferred pending Stage 2 dispatch"
 }
 
-# Verb: necto from "nectere" (to bind, tie together)
+# Verb: stringify_all from "nectere" (to bind, tie together)
 # Why: Binding multiple documents into a single YAML stream.
 
 # Bind multiple documents into multi-doc YAML string
-fn necto(list<value> documenta) → string {
-    panic "norma:yaml.necto is deferred pending Stage 2 dispatch"
+fn stringify_all(list<value> documenta) → string {
+    panic "norma:yaml.stringify_all is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
 # PARSING
 # =========================================================================
-# Verb: solve from "solvere" (to loosen, untangle)
+# Verb: parse from "solvere" (to loosen, untangle)
 
 # Parse YAML string to value (throws on error)
 @ public
-fn solve(string yaml) → value {
-    panic "norma:yaml.solve is deferred pending Stage 2 dispatch"
+fn parse(string yaml) → value {
+    panic "norma:yaml.parse is deferred pending Stage 2 dispatch"
 }
 
-# Verb: tempta from "temptare" (to try, attempt)
+# Verb: try_parse from "temptare" (to try, attempt)
 
 # Attempt to parse YAML string (returns null on error)
-fn tempta(string yaml) → value ∪ null {
-    panic "norma:yaml.tempta is deferred pending Stage 2 dispatch"
+fn try_parse(string yaml) → value ∪ null {
+    panic "norma:yaml.try_parse is deferred pending Stage 2 dispatch"
 }
 
-# Verb: collige from "colligere" (to collect, gather)
+# Verb: parse_all from "colligere" (to collect, gather)
 # Why: Gathering all documents from a multi-doc YAML stream.
 
 # Gather all documents from multi-doc YAML string
-fn collige(string yaml) → list<value> {
-    panic "norma:yaml.collige is deferred pending Stage 2 dispatch"
+fn parse_all(string yaml) → list<value> {
+    panic "norma:yaml.parse_all is deferred pending Stage 2 dispatch"
 }
