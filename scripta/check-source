@@ -14,6 +14,13 @@ status=0
 # Coverage: units landed so far; add a module's ledger names as its unit lands.
 #   (per-module patterns selected by a case below — no associative arrays,
 #    for bash-3 compatibility)
+# Param policy (reconciled 2026-08-16, audit f45225ec finding 2; pass-b-delivery
+# §12): these lists ban renamed MEMBERS only. Latin params are NOT in the
+# guard's scope — retained params (via, nomen, partes, limitem, clavis, arcana,
+# initium, longitudo, …) are sanctioned and must not be added to these lists.
+# A param is caught only incidentally, when its spelling is also a renamed
+# member in the same module (e.g. http modus/corpus/capita, caelum hospes/
+# portus) — that is correct and intended.
 PASS_B_RESERVED='^(fn|class|interface|union|enum|type)[[:space:]]+(fn|class|union|enum|type|const|let|var|import|from|as|public|private|optional|return|if|else|elif|then|for|while|match|case|break|continue|throw|catch|do|assert|panic|true|false|null|and|or|not|is|self|main|print|test|read|write|warn|debug|size|name|step|range|between|within|until|line|args|call|await|async|future|format|require|exit|string|int|bool|float|list|map|set|bytes|value|void|unknown|null_ty|instant|json|object|any|promise|iterator|tensor|vector|matrix|ascii|request|item|byte|bulk|done|error|cancel)\b'
 
 if [[ ! -d "$SRC" ]]; then

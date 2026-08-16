@@ -23,6 +23,15 @@ first unit that applies them (PB-CHORDA applies the mechanical-trio and async-tw
 > own type params (`creata<T>()`, `creata_ex<K, V>(…)`) with type-args-inferred `Fila { }`/`Ordinata { }`
 > bodies — call sites must use turbofish; PB-FILA/PB-ORDINATA/PB-CONSUMERS notes updated.
 
+> Param-policy amendment (2026-08-16, task c5ef64c7 — audit f45225ec finding 2): **params are not a
+> Pass B rename surface.** The auditor found §6 unit discipline promising Latin params "follow the §5
+> shared-verb table" while landed units closed complete with Latin params retained (`clavis`, `via`,
+> `nomen`, `partes`, `limitem`, …), http renamed a subset, and the F6 guard bans members only — delivery
+> text contradicted landed precedent. **Decision (a):** params follow the §5 shared-verb table ONLY, and
+> only incidentally where a module's member sweep renames the same identifier; every other Latin param is
+> retained by decision (F6/comment-pass territory, out of the guard's scope). Full policy, the landed
+> precedent census, and the gradus S2 note are in §12.
+
 ---
 
 ## 1. Goal-check summary (compact)
@@ -49,7 +58,8 @@ first unit that applies them (PB-CHORDA applies the mechanical-trio and async-tw
 
 Norma ships a Latin *identifier* surface (functions, genus/implendum types, fields, params) that Pass A's
 locale conversion does not move. Pass B converts that surface to English, per-module, on the **post-Pass-A
-English-surface files** (`locale = "en"` frontmatter + en keyword/type/intrinsic spellings). Import
+English-surface files** (`locale = "en"` frontmatter + en keyword/type/intrinsic spellings) — **members
+only; Latin params are not a rename target** (§12). Import
 coordinates (`norma:chorda`, …) stay. Pre-1.0 clean break, no shims, no forwarding aliases.
 
 ## 3. Normalized spec (delivery-sized outcome)
@@ -183,7 +193,9 @@ hosts) would need member-name updates — named follow-up, NOT this goal's compl
    …), `@ publica`/`@ privata`→`@ public`/`@ private`. Hands must not rename these; they are already en on
    the post-A surface.
 7. **Privata `_`-prefixed helpers are included** in the rename surface (clean break leaves no Latin
-   identifiers in `src/`); they are exempt from any api-reference-style coverage gate (norma has none).
+   **member** identifiers in `src/`); they are exempt from any api-reference-style coverage gate (norma
+   has none). This governs members (functions/types/fields/helpers) only — retained Latin **params** are
+   an explicit carve-out (see §6 unit discipline and §12).
 8. **Probe-first (each unit, on the first converted file of the module):**
    ```bash
    "$FABER_BIN" check src/<m>.fab     # post-A: package locale is en, no --locale en
@@ -224,8 +236,12 @@ land in the same merge wave as the first rename unit that touches a pack-rowed i
 
 **Unit discipline (all src units).** Each unit renames **its own module's** identifiers per its ledger and
 updates **every in-repo reference** to those identifiers — other `src/**/*.fab` files and its own proba —
-plus the module's header stem list. Param names that are Latin (`clavis`, `via`, `mensura`, `arcana`,
-`aperta`, `signatura`, `nomen`, …) follow the §5 shared-verb table; already-English params stay. It does
+plus the module's header stem list. **Params are not a rename surface** (reconciled 2026-08-16, audit
+f45225ec finding 2; §12): a Latin param is renamed only incidentally where the same spelling is swept by
+the module's member rename (caelum `hospes`/`portus`, http `modus`/`corpus`/`capita`, thesaurus
+`clavis`), with the English spelling taken from the §5 shared-verb table; every other Latin param (`via`,
+`nomen`, `partes`, `limitem`, `arcana`, `initium`, …) is retained by decision and belongs to
+comment-pass territory, never to a unit's done_when. Already-English params stay. It does
 **not** touch other modules' identifiers, the exempla corpus (PB-CONSUMERS), or packs (PB-PACKS). This
 keeps the norma package (`faber test .`) green after every unit.
 
@@ -498,10 +514,10 @@ exempla-red until PB-CONSUMERS — see §8 merge gate); `est_basis` per unit.
 
 #### PB-DOCS — module headers, AGENTS/README, check-source guards
 
-| outcome | live docs and source gates track the English surface |
+| outcome | live docs and source gates track the English surface; the guard rule text is scoped to members with the param carve-out documented |
 | --- | --- |
-| write_scope | `scripta/check-source` (add Pass B Latin-identifier guards: reserved escapes + the §7 verb rows), module headers in `src/**` (stem lists), `README.md`/`AGENTS.md` only where they quote member names |
-| done_when | `./scripta/check-source` green; `rg` guard for the ledger Latin names in `src/` code tokens clean |
+| write_scope | `scripta/check-source` (add Pass B Latin-identifier guards: reserved escapes + the §7 verb rows; **guard rule text: the per-module `latin_names` lists ban renamed *members* only — Latin *params* are out of guard scope by decision (audit f45225ec finding 2, §12), so retained params (`via`, `nomen`, `partes`, `clavis`, …) are sanctioned and must not be added to the lists**), module headers in `src/**` (stem lists), `README.md`/`AGENTS.md` only where they quote member names |
+| done_when | `./scripta/check-source` green; `rg` guard for the ledger Latin names in `src/` code tokens clean (params excluded per the §12 carve-out) |
 | non_goals | `docs/factory/*` prose, archived docs, comment-language refresh |
 | risk | low |
 | integrable | yes |
@@ -578,3 +594,60 @@ exempla-red until PB-CONSUMERS — see §8 merge gate); `est_basis` per unit.
   (PA-1 integrate + PA-2 manifests + PA-3 proba + PA-4 scripta gates; PA-5 pack completeness is the A2
   precondition). The 5 parity modules and the SEM006 visibility class are pre-existing residuals named in
   delivery.md §3–§4, not Pass B regressions.
+
+## 12. Param rename depth — reconciled (audit f45225ec finding 2)
+
+**Finding (auditor f45225ec, 2026-08-16).** The pre-amendment §6 unit discipline said Latin params
+"follow the §5 shared-verb table", and §5 rule 7's "no Latin identifiers in `src/`" implied params were
+in the rename surface. The landed wave contradicted both: units closed complete with Latin params still
+present (`clavis`, `via`, `nomen`, `partes`, `limitem`, `arcana`, `aperta`, `signatura`, `initium`,
+`longitudo`, …), http renamed a subset of its params, and the F6 guard bans members only.
+
+**Decision (a) — params follow the shared-verb table ONLY; retained Latin params are sanctioned.**
+Pass B renames **members** (functions, types, fields, privata helpers). A Latin **param** is renamed only
+incidentally, when its spelling is the same identifier swept by the module's member-rename ledger, and the
+English spelling comes from the §5 rule-2 table. Every other Latin param is retained by decision: it is
+F6/comment-pass territory (PB-DOCS may note it in module headers), never a rename unit, never part of any
+unit's done_when, and not guard-banned. The check-source guard bans the §7 member ledgers only; a param
+that reuses a renamed-member spelling in the same module is caught incidentally, which is correct.
+
+**Landed precedent (measured against live `src/`, 2026-08-16).**
+
+Renamed params (swept with member renames; all English spellings from §5 rule 2):
+
+| Module | Params renamed | Mechanism |
+| --- | --- | --- |
+| caelum | `hospes`→`host`, `portus`→`port` | member sweep (terminus/connexus/auscultator fields) |
+| http | `modus`→`method`, `corpus`→`body`, `capita`→`headers` | member sweep (Rogatio/Replicatio fields) |
+| thesaurus | `clavis`→`key` | §5 rule-2 row applied by the Hand (no `clavis` member) |
+
+Retained Latin params (sanctioned by this decision; per module):
+
+| Module | Retained params |
+| --- | --- |
+| chorda | `partes`, `vinculum`, `quaesitum`, `initium`, `limitem` |
+| crypta | `clavis`, `arcana`, `aperta`, `signatura`, `longitudo`, `sal` |
+| http | `nomen` (`header`/`param`) |
+| nuncius | `nuntius` |
+| processus | `directorium`, `ambitus`, `nomen`, `via` |
+| solum + solum/path | `via`, `initium`, `longitudo`, `exemplar`, `partes`, `radix` |
+| tempus | `initium`, `finis` (privata `_field`) |
+| thesaurus | `exemplar`, `nuntius`, `exemplaria` |
+| valor | `clavis`, `via` |
+
+**Rationale.** (1) The landed wave is the precedent: every unit that closed complete did so with retained
+Latin params; renaming ~50 param occurrences post-closeout is API churn for zero functional gain — params
+are positional, no named-argument call sites exist. (2) Params are not part of the goal's public member
+surface, and norma has no api-reference-style gate that would even report them. (3) A "rename every Latin
+param" rule cannot be enforced by the guard vocabulary without false positives (`via`, `radix`, `sal`,
+`cert` are English words), so the guard stays member-only. (4) The caelum/http/thesaurus param renames
+remain correct under this rule: sweeping a member identifier naturally carries same-spelling params, with
+the §5 table supplying the English.
+
+**Implication for the gradus S2 seed (recorded; no gradus action here).** Gradus's
+`docs/factory/english-locale/GOAL.md` line 14 lists "parameters" in the S2 identifier-rename surface, so
+the S2 seed's params face the same question norma Pass B did. Recommend the S2 delivery lowering adopt the
+same reconciled policy: params renamed only incidentally via member sweeps (English from the gradus seed
+table), retained Latin params sanctioned and out of guard scope — and amend the GOAL.md line 14
+"parameters" wording to the member-scoped reading at S2 lowering time. This is a note for the S2 planner,
+not a change to gradus docs or code here.
