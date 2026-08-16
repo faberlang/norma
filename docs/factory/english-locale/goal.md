@@ -1,6 +1,6 @@
 # GOAL: Norma English locale + English identifiers
 
-**Status**: active — Pass A conversion commit c006af5 on factory/hand-9; integrate decision INTEGRATE (delivery.md, PA-1..PA-5); Pass B lowered (pass-b-delivery.md, 29 units)
+**Status**: done — Pass A (PA-1..PA-5) + RA-1 + Pass B (F1-F6, 29 units incl. amendments) landed 2026-08-16; C1+/R1 deferred (residual, non-blocking); residual debt recorded in §Residuals
 **Created**: 2026-08-15
 **Campaign:** `—` (standalone; mirrors `gradus/docs/factory/english-locale/`)
 **Source:** operator request 2026-08-15 (batch 2) — same conversion as gradus
@@ -36,11 +36,11 @@ Mirror the gradus english-locale two-pass shape:
 
 | Unit | Scope | Depends | Hand evidence |
 | --- | --- | --- | --- |
-| A1 | convert `norma/src` + exempla; manifest flips; round-trip proof | — | — |
-| A2 | locale-pack completeness verification (en+la), file radix gaps | A1 | — |
-| B1+ | identifier renames per module (planner-lowered) | A1, A2 | — |
-| C1+ | proba coverage per module + faber-test fixes + dev-build verify | A1 | — |
-| R1 | formal tagged release (release lane v2, notes pre-written) | B, C complete | — |
+| A1 | convert `norma/src` + exempla; manifest flips; round-trip proof | — | `aad0d6a` (PA-1) |
+| A2 | locale-pack completeness verification (en+la), file radix gaps | A1 | `03e612b` (PA-5) |
+| B1+ | identifier renames per module (planner-lowered) | A1, A2 | 28 units — see Ledger |
+| C1+ | proba coverage per module + faber-test fixes + dev-build verify | A1 | deferred — residual (see §Residuals) |
+| R1 | formal tagged release (release lane v2, notes pre-written) | B, C complete | deferred — residual (see §Residuals) |
 
 ## Validation
 
@@ -52,9 +52,24 @@ Round-trip locale proof both directions; `faber test .` green per package post-c
 | --- | --- | --- | --- | --- |
 | A1 | done | hand-9 (PA-1) | `aad0d6a` (carries `c006af5`) | src (34) + exempla (24) la→en conversion, frontmatter en, `privata` marker removed; round-trip proof 3/3 byte-identical (arca, codex, toml) |
 | A2 | done | hand `7f3aa5ab` (PA-5) | `03e612b` | pack completeness verified on main: csv/valor/chorda check clean under en with rebuilt binary (hand-6 `71b0f6801` own-checkout-first; no radix pack gap); §3 measurement re-verified below |
-| B1+ | pending | — | — | identifier renames per module (pass-b-delivery.md) |
-| C1+ | pending | — | — | proba coverage + faber-test fixes |
-| R1 | pending | — | — | formal tagged release |
+| B1+ | done | Pass B hands (F1-F6) | 28 units — see Pass B receipts below | identifier renames per module (pass-b-delivery.md); all 29 Pass B units landed incl. radix PB-PACKS |
+| C1+ | deferred | — | — | proba coverage + faber-test fixes — residual, non-blocking (see §Residuals) |
+| R1 | deferred | — | — | formal tagged release — residual, non-blocking (see §Residuals) |
+
+### Pass B receipts (F1-F6, 29 units = 28 norma + 1 radix PB-PACKS)
+
+| Unit | Receipt |
+| --- | --- |
+| PB-CHORDA / PB-CSV / PB-VALOR (F1) | `f937469` / `5e8a764` / `3a76c9f` |
+| PB-CAELUM (F2) | `0fe4182` |
+| PB-ALEATOR / PB-ARCA / PB-CODEX / PB-CONSOLUM / PB-CRYPTA / PB-FILA / PB-HTTP / PB-JSON / PB-MATHESIS / PB-MODEL / PB-NUNCIUS / PB-ORDINATA / PB-PRESSURA / PB-PROCESSUS / PB-SOLUM / PB-TEMPUS / PB-TENSOR / PB-THESAURUS / PB-TOML / PB-VECTOR / PB-YAML (F3, 21 commits) | `aa84940` `171800d` `df7d9b5` `0812e5d` `2e116f7` `a039855` `0e65668` `13cdd13` `e638b2e` `983dab6` `a19f4e8` `c0bd560` `e930361` `4667682` `2b3cb19` `774df57` `0d17665` `138923b` `582a563` `66a5801` `a49a643` |
+| PB-OPTIMIZER (F3, verify-only) | no commit — already English, 0 renames |
+| PB-CONSUMERS (F4) | `126580c` |
+| PB-PACKS (F5, radix-coordinated) | radix `deef3cc72` + `45c828b10` (en/la pack rows; la pack now 87 `norma` rows) |
+| PB-DOCS (F6) | `4ed6e71` |
+| Amendments | `3914016` (RA-1 ledger amend), `225517f` (PB-HTTP ledger amend), `f7a5cc8` (param-policy amend) |
+| RA-1 parity repair | `d3d5931` |
+| la-surface export restore | `0d7b8e0` |
 
 ### Pass B ledger notes
 
@@ -91,6 +106,29 @@ Measured with the rebuilt `radix/target/debug/faber` (1.7.0 + hand-6 `71b0f6801`
 `src/caelum/connexus.fab`: 5 la-baseline errors → **0 post-A** (fixed by the privata-marker removal).
 
 **Round-trip oracle (PA-5 re-verified on main).** Byte-identity holds via the corpus locale pipeline reverse (`radix/scripta/convert-corpus-locale.py --from-locale en --to-locale la`): arca/codex/toml each reproduce the `d755ada` Latin original byte-identically, and the la→en direction reproduces the main en files — an exact bijection. `faber convert --to la` converts the keyword/type surface but is a normalizing emitter (drops section comments, expands type aliases `series`→`tabula<textus, valor>` / `cursor`→`cursor_t`, emits analytical `fiet`, normalizes `@ futura`→`@ futura { }`, does not rewrite frontmatter or reverse identifier identity rows) — consistent with the c006af5 commit note; it is the keyword-surface oracle, not the byte-identity oracle.
+
+## Residuals (recorded at closeout; do not block done)
+
+All residual classes below are pre-existing / baseline per the delivery
+(`delivery.md` §3-§4, `pass-b-delivery.md` §4.6) — none are Pass A/B
+regressions. Named so the closeout is honest and the follow-up has a home.
+
+| Residual | Class / detail | Wanted fix |
+| --- | --- | --- |
+| SEM006/SEM004 visibility residuals | `src/caelum.fab` (1×SEM006), `src/caelum/auscultator.fab` (2×SEM006), exempla SEM004/SEM006 private-member violations, crypta-sha2 SEM006×16 — visibility-model class, pre-existing | want `390d295c` — precondition now met, **undispatched** |
+| Stale verb headers | `src/**` module headers still quote Latin verb naming prose ("Latin stems chosen for motion…", "Verbs route over stream `ad` (Latin `solum:*` routes)…") — F6/comment-pass territory, members already en | want `db928be6` |
+| json la-row currency check | la-pack `norma:json` rows were added in PB-PACKS but need a currency re-check against the landed json renames | want `bb21dc95` class |
+| crypta-sha2 49-err baseline | package exemplum red under en: SEM006×16 + SEM010×33 pre-existing private-member calls (see §3 measurement table) | baseline — visibility-model class, same as first row |
+
+**Deferred units (recorded, not blocking):**
+
+- **C1+** proba coverage per module + faber-test fixes + dev-build verify — never
+  lowered in this wave (PA-3 converted the 4 Latin-surfaced `.proba` files; the
+  per-module coverage workstream remains). The `src/mathesis.proba` colocated
+  proof and the 3 caelum exempla proba are the shipped proba surface.
+- **R1** formal tagged release — norma has no standalone release process
+  (workspace release table: source repo, no standalone release); nothing was
+  tagged at closeout.
 
 ## Open questions
 
