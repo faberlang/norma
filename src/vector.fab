@@ -6,27 +6,27 @@ locale = "en"
 #
 # Public import: importa ex "norma:vector" privata vector
 
-fn addita<elem, size N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
+fn add<elem, size N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
     return a.added(b)
 }
 
-fn subtrahe<elem, size N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
+fn subtract<elem, size N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
     return a.subtract(b)
 }
 
-fn multiplica<elem, size N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
+fn multiply<elem, size N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
     return a.multiply(b)
 }
 
-fn divida<elem, size N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
+fn divide<elem, size N>(vector<elem, N> a, vector<elem, N> b) → vector<elem, N> {
     return a.divide(b)
 }
 
-fn productum<elem, size N>(vector<elem, N> a, vector<elem, N> b) → elem {
+fn dot<elem, size N>(vector<elem, N> a, vector<elem, N> b) → elem {
     return a.dot(b)
 }
 
-fn transversum<elem>(vector<elem, 3> a, vector<elem, 3> b) → vector<elem, 3> {
+fn cross<elem>(vector<elem, 3> a, vector<elem, 3> b) → vector<elem, 3> {
     return a.cross(b)
 }
 
