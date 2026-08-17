@@ -45,7 +45,7 @@ class FileStatus {
 # =========================================================================
 # READING - Text
 # =========================================================================
-# Verb: lege/leget from "legere" (to read, gather)
+# Verb: read_file/read_file_async from "legere" (to read, gather)
 # Maps to: fs.readFileSync(path, 'utf8') / fs.readFile(path, 'utf8')
 
 # Read entire file as text (sync)
@@ -66,7 +66,7 @@ fn read_file_async<T>(string via) → T {
 # =========================================================================
 # READING - Bytes
 # =========================================================================
-# Verb: hauri/hauriet from "haurire" (to draw up, draw water)
+# Verb: read_bytes/read_bytes_async from "haurire" (to draw up, draw water)
 # Why: Distinct from "reading" text - this is raw byte extraction.
 # Maps to: fs.readFileSync(path) / fs.readFile(path) returning Buffer
 
@@ -97,7 +97,7 @@ fn find(string via, string exemplar, int initium, int longitudo) → int {
 # =========================================================================
 # READING - Lines
 # =========================================================================
-# Verb: carpe/carpiet from "carpere" (to pluck, pick, harvest)
+# Verb: read_lines/read_lines_async from "carpere" (to pluck, pick, harvest)
 # Why: Different from bulk reading - implies iteration/selection.
 # Maps to: readline interface or line-by-line file reading
 
@@ -116,7 +116,7 @@ fn read_lines_async(string via) → list<string> {
 # =========================================================================
 # WRITING - Text
 # =========================================================================
-# Verb: scribe/scribet from "scribere" (to write)
+# Verb: write_file/write_file_async from "scribere" (to write)
 # Why: Also handles writing lines (text with newlines).
 # Maps to: fs.writeFileSync(path, data, 'utf8') / fs.writeFile(...)
 
@@ -135,8 +135,8 @@ fn write_file_async(string via, string data) → void {
 # =========================================================================
 # WRITING - Bytes
 # =========================================================================
-# Verb: funde/fundet from "fundere" (to pour, pour out)
-# Why: Counterpart to "hauri" (drawing out) - funde pours in.
+# Verb: write_bytes/write_bytes_async from "fundere" (to pour, pour out)
+# Why: Counterpart to read_bytes (drawing out) - write_bytes pours in.
 # Maps to: fs.writeFileSync(path, buffer) / fs.writeFile(path, buffer)
 
 # Pour bytes to file, overwrites existing (sync)
@@ -157,7 +157,7 @@ fn write_bytes_async(string via, bytes data) → void {
 # =========================================================================
 # WRITING - Append
 # =========================================================================
-# Verb: appone/apponet from "apponere" (to place near, add to)
+# Verb: append/append_async from "apponere" (to place near, add to)
 # Why: Not overwriting - appends to what is already there.
 # Maps to: fs.appendFileSync(path, data) / fs.appendFile(path, data)
 
@@ -175,7 +175,7 @@ fn append_async(string via, string data) → void {
 # =========================================================================
 # FILE INFO - Existence
 # =========================================================================
-# Verb: exstat/exstabit from "exstare" (to stand out, exist, be visible)
+# Verb: exists/exists_async from "exstare" (to stand out, exist, be visible)
 # Maps to: fs.existsSync(path) / fs.access(path)
 
 # Check if path exists (sync)
@@ -228,7 +228,7 @@ fn mode(string via) → int {
 # =========================================================================
 # FILE INFO - Details
 # =========================================================================
-# Verb: describe/describet from "describere" (to write down, delineate, describe)
+# Verb: stat/stat_async from "describere" (to write down, delineate, describe)
 # Why: Returns full metadata struct, not just existence.
 # Maps to: fs.statSync(path) / fs.stat(path) - uses lstat to not follow symlinks
 
@@ -252,7 +252,7 @@ fn stat_async(string via) → FileStatus {
 # =========================================================================
 # FILE INFO - Symlinks
 # =========================================================================
-# Verb: sequere/sequetur from "sequi" (to follow)
+# Verb: read_link/read_link_async from "sequi" (to follow)
 # Maps to: fs.readlinkSync(path) / fs.readlink(path)
 
 # Follow symlink to get target path (sync)
@@ -276,8 +276,8 @@ fn create_link(string fons, string destinatio) → void {
 # =========================================================================
 # FILE OPERATIONS - Delete
 # =========================================================================
-# Verb: dele/delet from "delere" (to destroy, delete, erase)
-# Files only - use amputa/amputabit for directories.
+# Verb: delete/delete_async from "delere" (to destroy, delete, erase)
+# Files only - use remove_tree/remove_tree_async for directories.
 # Maps to: fs.unlinkSync(path) / fs.unlink(path)
 
 # Delete file (sync)
@@ -295,7 +295,7 @@ fn delete_async(string via) → void {
 # =========================================================================
 # FILE OPERATIONS - Copy
 # =========================================================================
-# Verb: exscribe/exscribet from "exscribere" (to copy out, transcribe)
+# Verb: copy/copy_async from "exscribere" (to copy out, transcribe)
 # Maps to: fs.copyFileSync(src, dest) / fs.copyFile(src, dest)
 
 # Copy file (sync)
@@ -313,7 +313,7 @@ fn copy_async(string fons, string destinatio) → void {
 # =========================================================================
 # FILE OPERATIONS - Rename/Move
 # =========================================================================
-# Verb: renomina/renominabit from "renominare" (to rename)
+# Verb: rename/rename_async from "renominare" (to rename)
 # Why: Handles both rename and move (same underlying syscall).
 # Maps to: fs.renameSync(src, dest) / fs.rename(src, dest)
 
@@ -332,7 +332,7 @@ fn rename_async(string fons, string destinatio) → void {
 # =========================================================================
 # FILE OPERATIONS - Touch
 # =========================================================================
-# Verb: tange/tanget from "tangere" (to touch)
+# Verb: touch/touch_async from "tangere" (to touch)
 # Maps to: touch behavior (utimes or create empty file)
 
 # Touch file - create or update mtime (sync)
@@ -357,7 +357,7 @@ fn set_mode(string via, int mode) → void {
 # =========================================================================
 # DIRECTORY OPERATIONS - Create
 # =========================================================================
-# Verb: crea/creabit from "creare" (to create, bring forth)
+# Verb: create_dir/create_dir_async from "creare" (to create, bring forth)
 # Why: Always a directory; recursive by default (creates parent dirs as needed).
 # Maps to: fs.mkdirSync(path, {recursive: true}) / fs.mkdir(...)
 
@@ -376,7 +376,7 @@ fn create_dir_async(string via) → void {
 # =========================================================================
 # DIRECTORY OPERATIONS - List
 # =========================================================================
-# Verb: enumera/enumerabit from "enumerare" (to count out, enumerate)
+# Verb: list_dir/list_dir_async from "enumerare" (to count out, enumerate)
 # Maps to: fs.readdirSync(path) / fs.readdir(path)
 
 # List directory contents (sync)
@@ -393,7 +393,7 @@ fn list_dir_async(string via) → list<string> {
 # =========================================================================
 # DIRECTORY OPERATIONS - Prune/Remove
 # =========================================================================
-# Verb: amputa/amputabit from "amputare" (to cut off, prune)
+# Verb: remove_tree/remove_tree_async from "amputare" (to cut off, prune)
 # Why: Recursive deletion - removes directory and all contents.
 # Avoids "puto" which also means "to think".
 # Maps to: fs.rmSync(path, {recursive: true}) / fs.rm(...)

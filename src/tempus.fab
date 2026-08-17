@@ -11,8 +11,8 @@ locale = "en"
 #
 # Timer model: rather than Faber implementing the delay itself or registering
 # callbacks, timers open an `ad` route to the host, which holds the request
-# for the requested duration before responding. One-shot timers (expectet)
-# block on the materialized response; recurring timers (vigila) return a
+# for the requested duration before responding. One-shot timers (sleep)
+# block on the materialized response; recurring timers (interval) return a
 # cursor that drains indefinitely. This matches the HTTP server pattern —
 # the host is the event edge; Faber owns the iteration.
 
@@ -52,14 +52,14 @@ fn _wire(int year, int month, int day, int hour, int minute, int second) → str
 # WIRE ↔ INSTANS
 # =========================================================================
 
-# Verb: solve from "solvere" (to loosen, untangle)
+# Verb: parse from "solvere" (to loosen, untangle)
 # Why: Parse RFC3339 UTC wire text into instans via conversio.
 @ public
 fn parse(string wire) → instant {
     return wire ↦ instant
 }
 
-# Verb: exprimit from "exprimere" (to express, render outward)
+# Verb: render from "exprimere" (to express, render outward)
 # Why: Render instans as RFC3339 UTC wire text via conversio.
 @ public
 fn render(instant t) → string {
@@ -110,7 +110,7 @@ fn second(instant t) → int {
 # STRICT CIVIL CONSTRUCTION (UTC)
 # =========================================================================
 
-# Verb: structa from "struere" (to build, arrange)
+# Verb: construct from "struere" (to build, arrange)
 # Why: Construct midnight UTC instans from calendar date; invalid civil input throws.
 @ public
 fn construct(int year, int month, int day) → instant ⇥ string {
@@ -118,7 +118,7 @@ fn construct(int year, int month, int day) → instant ⇥ string {
     return wire ↦ instant
 }
 
-# Verb: structa_momenti — full civil moment (date + time)
+# Verb: construct_moment — full civil moment (date + time)
 # Why: Construct UTC instans from all civil components; invalid input throws.
 @ public
 fn construct_moment(int year, int month, int day, int hour, int minute, int second) → instant ⇥ string {
@@ -153,7 +153,7 @@ fn active() → int {
 # =========================================================================
 # SLEEP / DELAY (host-side timer — Faber blocks on the host response)
 # =========================================================================
-# Verb: dormit/dormiet from "dormire" (to sleep)
+# Verb: sleep/sleep_async from "dormire" (to sleep)
 # Why: The host holds the request for `ms` milliseconds before responding,
 # so the caller's materialization blocks for the delay. No callback
 # registration, no Faber-side timing — the host is the event edge.
@@ -177,7 +177,7 @@ fn sleep(int ms) → void {
 # =========================================================================
 # TIMER STREAMS (host pushes events; Faber drains via cursor)
 # =========================================================================
-# Verb: vigila from "vigilare" (to watch, stay awake)
+# Verb: interval from "vigilare" (to watch, stay awake)
 # Why: A recurring timer that fires every `ms` milliseconds. Opens an ad
 # route; the host pushes a frame each interval; Faber drains via cursor.
 # To stop, drop the cursor or rumpe out of the iteration.

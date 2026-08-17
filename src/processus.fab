@@ -12,7 +12,7 @@ locale = "en"
 # There is no `@ futura` — sync/async is a route-naming distinction, not a
 # Faber-side marker. Sync and async verbs name distinct `processus:*` routes.
 # `spawn` remains deferred: it returns the `Subprocess` genus, which the
-# ad materializer does not yet support (same blocker as solum.describe).
+# ad materializer does not yet support (same blocker as solum.stat).
 #
 # Design principles:
 # - Different verbs for different spawn semantics:
@@ -37,7 +37,7 @@ class Subprocess {
 # =========================================================================
 # SPAWN - Attached
 # =========================================================================
-# Verb: genera from "generare" (to generate, beget, bring forth)
+# Verb: spawn from "generare" (to generate, beget, bring forth)
 # Why: Creating/generating a new process. Caller maintains control -
 # can wait for exit, capture output via handle.
 # Maps to: Bun.spawn() with handle returned
@@ -56,10 +56,10 @@ fn spawn(list<string> args, string directorium optional, map<string, string> amb
 # =========================================================================
 # SPAWN - Detached
 # =========================================================================
-# Verb: dimitte from "dimittere" (to send away, dismiss, release)
+# Verb: detach from "dimittere" (to send away, dismiss, release)
 # Why: Dismissing the process to run on its own - fire and forget.
 # Process continues independently, survives parent exit.
-# Distinct verb from genera to indicate different lifecycle semantics.
+# Distinct verb from spawn to indicate different lifecycle semantics.
 # Maps to: Bun.spawn() with proc.unref(), stdio ignored
 
 # Dismiss process to run independently - returns PID
@@ -80,7 +80,7 @@ fn capture(list<string> args) → value {
 # =========================================================================
 # SHELL EXECUTION
 # =========================================================================
-# Verb: exsequi/exsequetur from "exsequi" (to follow out, execute, accomplish)
+# Verb: exec/exec_async from "exsequi" (to follow out, execute, accomplish)
 # Why: Executing a command through to completion. Shell features available
 # (pipes, redirects, &&, ||, etc). Returns stdout.
 # Maps to: sh -c "cmd" via Bun.spawnSync / Bun.spawn
@@ -99,7 +99,7 @@ fn exec_async(string command) → string {
 # =========================================================================
 # ENVIRONMENT - Read
 # =========================================================================
-# Verb: lege from "legere" (to read, gather)
+# Verb: read_env from "legere" (to read, gather)
 # Why: Reading a value from the process environment. Same verb as file
 # reading - context (processus vs solum) disambiguates.
 # Maps to: Bun.env[name] / process.env[name]
@@ -113,7 +113,7 @@ fn read_env(string nomen) → string {
 # =========================================================================
 # ENVIRONMENT - Write
 # =========================================================================
-# Verb: scribe from "scribere" (to write)
+# Verb: write_env from "scribere" (to write)
 # Why: Writing a value to the process environment. Same verb as file
 # writing - context disambiguates.
 # Maps to: Bun.env[name] = value / process.env[name] = value
@@ -140,7 +140,7 @@ fn cwd() → string {
 # =========================================================================
 # PROCESS INFO - Change Directory
 # =========================================================================
-# Verb: muta from "mutare" (to change, alter)
+# Verb: chdir from "mutare" (to change, alter)
 # Why: Changing/altering the working directory. Generic "change" verb
 # fits well - you're mutating process state.
 # Maps to: process.chdir(path)
@@ -178,7 +178,7 @@ fn argv() → list<string> {
 # =========================================================================
 # EXIT
 # =========================================================================
-# Verb: exi from "exire" (to go out, exit, depart)
+# Verb: exit_process from "exire" (to go out, exit, depart)
 # Why: Direct Latin root of English "exit". Process departs/goes out.
 # Returns numquam (never) - this call does not return.
 # Maps to: process.exit(code)
