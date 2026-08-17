@@ -64,6 +64,7 @@ fn join(list<string> partes, string vinculum) → string {
 # count rather than returning a transformed cord.
 # Why: Count non-overlapping occurrences of quaesitum in s.
 # Edge: Empty quaesitum is defined as zero matches, not every boundary.
+@ public
 fn count(string s, string quaesitum) → int {
     var int pos ← 0
     var int count ← 0
@@ -91,6 +92,7 @@ fn count(string s, string quaesitum) → int {
 # has reciprocal forward/backward reading.
 # Why: Public palindrome test built on reverse rather than duplicating the
 # reverse walk.
+@ public
 fn is_palindrome(string s) → bool {
     return s ≡ reverse(s)
 }
@@ -104,6 +106,7 @@ fn is_palindrome(string s) → bool {
 # segments rather than a newly inflected cord.
 # Why: Expose the scalar walk as data for callers that need explicit pieces.
 # Edge: v1 follows the same sectio index model used by textus intrinsics.
+@ public
 fn chars(string s) → list<string> {
     var list<string> out ← vacua
     var int i ← 0
@@ -176,6 +179,7 @@ fn keep_between(string s, string infimum optional, string supremum optional) →
 # rejected scalars purged from it.
 # Why: Predicate form for caller-defined removal logic.
 # Edge: pred(c) = verum means c is removed, not retained.
+@ public
 fn drop_if(string s, (string) → bool pred) → string {
     var list<string> kept ← vacua
     var int i ← 0
@@ -230,6 +234,7 @@ fn drop_between(string s, string infimum optional, string supremum optional) →
 # action performed on the cord.
 # Why: Return the suffix of s from initium through the end.
 # Edge: sectio owns out-of-range clamping behavior for initium.
+@ public
 fn suffix(string s, int initium) → string {
     return s.slice(initium, s.length())
 }
@@ -344,6 +349,7 @@ fn split_frontmatter(string documentum, string delimiter) → list<string> ⇥ s
 # the returned cord.
 # Why: Collapse runs of ASCII spaces to a single space. This is
 # normalization, not byte encoding.
+@ public
 fn collapse_spaces(string s) → string {
     panic "norma:chorda.collapse_spaces is deferred pending Stage 2 dispatch"
 }
@@ -353,6 +359,7 @@ fn collapse_spaces(string s) → string {
 # ascii when every scalar can be represented.
 # Why: Trust-boundary narrowing from textus to ascii.
 # Edge: Throws textus when any codepoint cannot be represented as ascii.
+@ public
 fn to_ascii(string s) → ascii ⇥ string {
     panic "norma:chorda.to_ascii is deferred pending Stage 2 dispatch"
 }
@@ -361,6 +368,7 @@ fn to_ascii(string s) → ascii ⇥ string {
 # Morphologia: Praesens active verb; it attempts narrowing and reports
 # absence with nihil instead of throwing.
 # Why: Trust-boundary twin of to_ascii, distinct from mechanical try_decode.
+@ public
 fn try_to_ascii(string s) → ascii ∪ null {
     panic "norma:chorda.try_to_ascii is deferred pending Stage 2 dispatch"
 }
@@ -404,6 +412,7 @@ fn decode(bytes data) → string {
 # Morphologia: Imperativus mechanical verb; try decode without alternate
 # exit propagation.
 # Why: Decode UTF-8 when possible and return nihil on invalid bytes.
+@ public
 fn try_decode(bytes data) → string ∪ null {
     panic "norma:chorda.try_decode is deferred pending Stage 2 dispatch"
 }
