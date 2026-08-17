@@ -14,12 +14,14 @@ locale = "en"
 
 # Verb: planata from "planare" (to flatten) — Perfectum
 # Why: Flatten grid to lista<T> via default conversio (row-major layout).
+@ public
 fn flatten<T, size Figura>(tensor<T, Figura> grid) → list<T> {
     return grid ↦ list<T>
 }
 
 # Verb: structa from "struere" (to build) — 1-d bridge
 # Why: Promote lista<T> to 1-d tensor via default conversio.
+@ public
 fn construct<T, size Figura>(list<T> data) → tensor<T, Figura> {
     return data ↦ tensor<T, Figura>
 }
@@ -36,6 +38,7 @@ fn construct<T, size Figura>(list<T> data) → tensor<T, Figura> {
 #   seed.strue(data, shape)
 
 # Why: Product of dimension sizes; empty shape → 1 (scalar degenerate).
+@ public
 fn product(list<int> shape) → int {
     var int product ← 1
     for from shape const dim {
@@ -50,6 +53,7 @@ fn product(list<int> shape) → int {
 
 # Verb: applicata from "applicare" (to apply) — Perfectum
 # Why: Map f over every element preserving shape (flatten → walk → reshape).
+@ public
 fn apply<T, size Figura>(tensor<T, Figura> grid, (T) → T f) → tensor<T, Figura> {
     const list<int> shape ← grid.shape()
     const list<T> flat ← grid ↦ list<T>
@@ -66,11 +70,13 @@ fn apply<T, size Figura>(tensor<T, Figura> grid, (T) → T f) → tensor<T, Figu
 # =========================================================================
 
 # Why: Total sum of integer tensor elements — delegates to grid.summa().
+@ public
 fn sum<size Figura>(tensor<int, Figura> grid) → int {
     return grid.sum()
 }
 
 # Why: Total sum of f32 fractus tensor elements — delegates to grid.summa().
+@ public
 fn sum_f32<size Figura>(tensor<float<f32>, Figura> grid) → float<f32> {
     return grid.sum()
 }
