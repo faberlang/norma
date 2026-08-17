@@ -54,12 +54,14 @@ fn _wire(int year, int month, int day, int hour, int minute, int second) → str
 
 # Verb: solve from "solvere" (to loosen, untangle)
 # Why: Parse RFC3339 UTC wire text into instans via conversio.
+@ public
 fn parse(string wire) → instant {
     return wire ↦ instant
 }
 
 # Verb: exprimit from "exprimere" (to express, render outward)
 # Why: Render instans as RFC3339 UTC wire text via conversio.
+@ public
 fn render(instant t) → string {
     return t ↦ string
 }
@@ -69,31 +71,37 @@ fn render(instant t) → string {
 # =========================================================================
 
 # Why: Four-digit calendar year from wire positions [0, 4).
+@ public
 fn year(instant t) → int {
     return _field(t, 0, 4)
 }
 
 # Why: Month of year (1-indexed) from wire positions [5, 7).
+@ public
 fn month(instant t) → int {
     return _field(t, 5, 7)
 }
 
 # Why: Day of month from wire positions [8, 10).
+@ public
 fn day(instant t) → int {
     return _field(t, 8, 10)
 }
 
 # Why: UTC hour from wire positions [11, 13).
+@ public
 fn hour(instant t) → int {
     return _field(t, 11, 13)
 }
 
 # Why: UTC minute from wire positions [14, 16).
+@ public
 fn minute(instant t) → int {
     return _field(t, 14, 16)
 }
 
 # Why: UTC second from wire positions [17, 19); sub-second wire tails are floored.
+@ public
 fn second(instant t) → int {
     return _field(t, 17, 19)
 }
@@ -104,6 +112,7 @@ fn second(instant t) → int {
 
 # Verb: structa from "struere" (to build, arrange)
 # Why: Construct midnight UTC instans from calendar date; invalid civil input throws.
+@ public
 fn construct(int year, int month, int day) → instant ⇥ string {
     const string wire ← _wire(year, month, day, 0, 0, 0)
     return wire ↦ instant
@@ -111,6 +120,7 @@ fn construct(int year, int month, int day) → instant ⇥ string {
 
 # Verb: structa_momenti — full civil moment (date + time)
 # Why: Construct UTC instans from all civil components; invalid input throws.
+@ public
 fn construct_moment(int year, int month, int day, int hour, int minute, int second) → instant ⇥ string {
     const string wire ← _wire(year, month, day, hour, minute, second)
     return wire ↦ instant
