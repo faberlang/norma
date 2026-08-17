@@ -26,36 +26,44 @@ import from "norma:chorda" chorda
 # matches!(v, Valor::Variant(_)). See sibling faber/runtime/rust/src/valor.rs for the
 # enum whose variants these check.
 
+@ public
 fn is_null(value v) → bool {
     return v is null
 }
 
+@ public
 fn is_bool(value v) → bool {
     return v is bool
 }
 
+@ public
 fn is_string(value v) → bool {
     return v is string
 }
 
+@ public
 fn is_int(value v) → bool {
     return v is int
 }
 
+@ public
 fn is_float(value v) → bool {
     return v is float
 }
 
+@ public
 fn is_list(value v) → bool {
     return v is list<value>
 }
 
+@ public
 fn is_map(value v) → bool {
     return v is map<string, value>
 }
 
 # Instans is the RFC3339 datetime wire form (Valor::Instans). Available to
 # all tree codecs — previously toml-only, now shared.
+@ public
 fn is_instant(value v) → bool {
     return v is instant
 }
@@ -84,6 +92,7 @@ fn get(value v, string clavis) → value {
 
 # Pluck value by index from a lista (returns nihil if out of bounds or
 # non-lista).
+@ public
 fn get_index(value v, int index) → value {
     if v is null then return null
     if v not is list<value> then return null
@@ -94,6 +103,7 @@ fn get_index(value v, int index) → value {
 
 # Find value by dotted path (e.g. "user.address.city"). Walks tabulae by
 # key; numeric segments index listae. Returns nihil if any segment misses.
+@ public
 fn find(value v, string via) → value {
     # chorda.split_n limited split: at most via.longitudo()+1 segments,
     # which is more than any dotted path can produce.
@@ -108,6 +118,7 @@ fn find(value v, string via) → value {
 
 # Walk one path segment. Tabula-keyed first; numeric segments fall through
 # to lista indexing. Non-collection variants return nihil.
+@ public
 fn find_part(value current, string part) → value {
     if current is null then return null
     if current is map<string, value> {
