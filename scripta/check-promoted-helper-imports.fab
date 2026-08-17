@@ -32,12 +32,21 @@ fn find_promoted_row(string via) → string {
 main {
     const string root ← processus.sedes() ↦ string
 
-    # FABER and FABER_LIBRARY_HOME overrides, matching ${VAR:-default}
+    # FABER and FABER_LIBRARY_HOME overrides, matching ${VAR:-default}.
+    # Default is the in-workspace radix binary (sibling, then container).
     const map<string, value> fr ← processus.captura(["sh", "-c", "printf '%s' \"$FABER\""]) ↦ map<string, value>
     const string faber_env ← fr["stdout"] ↦ string
-    var string faber ← root + "/../faber/target/debug/faber"
+    var string faber ← root + "/../radix/target/debug/faber"
     if faber_env.length() > 0 {
         faber ← faber_env
+    }
+    if faber_env.length() ≡ 0 {
+        if solum.exstat(faber) ↦ bool is false {
+            const string container ← root + "/../../../radix/target/debug/faber"
+            if solum.exstat(container) ↦ bool {
+                faber ← container
+            }
+        }
     }
     const map<string, value> lr ← processus.captura(["sh", "-c", "printf '%s' \"$FABER_LIBRARY_HOME\""]) ↦ map<string, value>
     const string lib_env ← lr["stdout"] ↦ string

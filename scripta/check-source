@@ -3,7 +3,19 @@ set -euo pipefail
 
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 SRC="$ROOT/src"
-FABER="${FABER:-$ROOT/../faber/target/debug/faber}"
+# Prefer the in-workspace radix binary. Sibling path is the direct checkout
+# (faberlang/norma → faberlang/radix). Container path is a worktree packet
+# (worktrees/<lane>/norma → faberlang/radix). FABER still wins when set.
+if [[ -z "${FABER:-}" ]]; then
+  if [[ -x "$ROOT/../radix/target/debug/faber" ]]; then
+    FABER="$ROOT/../radix/target/debug/faber"
+  elif [[ -x "$ROOT/../../../radix/target/debug/faber" ]]; then
+    FABER="$ROOT/../../../radix/target/debug/faber"
+  else
+    FABER="$ROOT/../radix/target/debug/faber"
+  fi
+fi
+export FABER
 status=0
 
 # Pass B Latin-identifier guards (english-locale goal). The §7 rename ledgers
