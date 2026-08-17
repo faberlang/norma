@@ -573,9 +573,9 @@ exempla-red until PB-CONSUMERS — see §8 merge gate); `est_basis` per unit.
 9. **RA-1 parity precondition** (delivery.md §4): land the 5 pre-existing-error repairs (mathesis, fila,
    ordinata, vector, json/pange) before PB-MATHESIS/PB-FILA/PB-ORDINATA/PB-VECTOR/PB-JSON, or amend those
    units' done_when to "no new errors; parity unchanged". Default: land first.
-10. **SEM006 visibility follow-up** (delivery.md §4, excluded from this delivery per task non-goals):
-   caelum family + exempla SEM004/SEM006 + crypta-sha2 private-member calls are pre-existing; the c006af5
-   author filed them. Confirm ownership/timing with Mind.
+10. **SEM006 visibility follow-up** (delivery.md §4): residual, not Pass B.
+   Lowered 2026-08-17 in [`visibility-residual-delivery.md`](visibility-residual-delivery.md).
+   Do not fold into a Pass B reopen.
 11. **FABER_BIN currency** (§4.6): verify the lane packet's dev build postdates radix hand-6 `71b0f6801`
     before Hands measure; the stale binary silently misreports csv/valor and importing-module checks.
 

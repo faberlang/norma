@@ -105,7 +105,7 @@ skews importing modules; caelum family numbers below are the honest ones).
 
 **RA-1 — (recommended) PARITY: repair the 5 pre-existing src error files** — mathesis, fila, ordinata, vector, json/pange. *Not caused by Pass A* (identical errors on the la baseline); **precondition** for the full-green Pass B done_when on PB-MATHESIS/PB-FILA/PB-ORDINATA/PB-VECTOR/PB-JSON (`faber check src/<m>.fab` exit 0). Dispatch decision → Mind: land before the affected Pass B units, or amend those units' done_when to "no new errors; parity unchanged" and file a separate hygiene wave.
 
-**Excluded follow-up (per task non-goals — SEM006-style visibility work, NOT lowered here):** caelum family SEM006, exempla SEM004/SEM006 private-member violations, crypta-sha2 SEM006/SEM010. Pre-existing; the c006af5 author filed them for follow-up (hand-9 thread, 2026-08-15). Named so the audit knows the post-A en surface will not be 100% green until they land.
+**Residual visibility (Pass A excluded this; lowered 2026-08-17):** caelum family SEM006, exempla SEM004/SEM006 private-member, crypta-sha2 SEM006/SEM010 — Hand units in [`visibility-residual-delivery.md`](visibility-residual-delivery.md) (task `03c9dd34`; want `390d295c`). Not a reopen of Pass A/B.
 
 ## 5. Pass B (refreshed)
 
@@ -126,7 +126,7 @@ skews importing modules; caelum family numbers below are the honest ones).
 ## 7. Open questions for Mind
 
 1. RA-1 dispatch: land the 5 parity repairs before the affected Pass B units, or amend those done_whens and file a separate hygiene wave? (Default: land first — keeps Pass B's `faber check` oracle honest.)
-2. SEM006 visibility follow-up (excluded from this delivery): who owns the caelum-family + exempla + crypta-sha2 visibility repairs, and when? (Named by the c006af5 author as filed.)
+2. SEM006 visibility follow-up — **answered 2026-08-17**: lowered as residual delivery [`visibility-residual-delivery.md`](visibility-residual-delivery.md) (task `03c9dd34`). Do not reopen Pass A/B; do not start C1 from that spec.
 3. FABER_BIN rebuild: the in-tree binary was stale (Aug-15, pre-hand-6). Confirm the rebuilt binary (or a lane packet dev build) is the verified oracle for Hands.
 4. `faber test` surface: norma root has no `faber.toml`; per-file `faber test` needs `--locale`/package context. Should Pass A add a root package manifest, or is per-file `faber check` + `faber test <file>` the standing oracle? (Default: no new manifest; per-file.)
 5. Carry-forward from pass-b-delivery.md §10 (mechanical trio, async-twin, `nomen` escape, pack-currency split, external-caller follow-up, `model.fab` pre-existing breakage, packet staleness).
