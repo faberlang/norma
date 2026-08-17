@@ -12,14 +12,14 @@ locale = "en"
 # BRIDGES (lista ↔ tensor via conversio)
 # =========================================================================
 
-# Verb: planata from "planare" (to flatten) — Perfectum
+# Verb: flatten from "planare" (to flatten) — Perfectum
 # Why: Flatten grid to lista<T> via default conversio (row-major layout).
 @ public
 fn flatten<T, size Figura>(tensor<T, Figura> grid) → list<T> {
     return grid ↦ list<T>
 }
 
-# Verb: structa from "struere" (to build) — 1-d bridge
+# Verb: construct from "struere" (to build) — 1-d bridge
 # Why: Promote lista<T> to 1-d tensor via default conversio.
 @ public
 fn construct<T, size Figura>(list<T> data) → tensor<T, Figura> {
@@ -51,7 +51,7 @@ fn product(list<int> shape) → int {
 # ELEMENT-WISE MAP (staging recipe)
 # =========================================================================
 
-# Verb: applicata from "applicare" (to apply) — Perfectum
+# Verb: apply from "applicare" (to apply) — Perfectum
 # Why: Map f over every element preserving shape (flatten → walk → reshape).
 @ public
 fn apply<T, size Figura>(tensor<T, Figura> grid, (T) → T f) → tensor<T, Figura> {

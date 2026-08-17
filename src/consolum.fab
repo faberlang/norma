@@ -25,7 +25,7 @@ locale = "en"
 # =========================================================================
 # STDIN - Bytes
 # =========================================================================
-# Verb: hauri/hauriet from "haurire" (to draw up, draw out)
+# Verb: read_bytes/read_bytes_async from "haurire" (to draw up, draw out)
 # Why: Drawing bytes from stdin like drawing water from a well.
 # Maps to: fs.readSync(0, buffer) / async stdin read
 
@@ -44,7 +44,7 @@ fn read_bytes_async(int byte_length) → bytes {
 # =========================================================================
 # STDIN - Text
 # =========================================================================
-# Verb: lege/leget from "legere" (to read, gather)
+# Verb: read_line/read_line_async from "legere" (to read, gather)
 # Why: Reading a line of text input from the user.
 # Maps to: readline or character-by-character until newline
 
@@ -63,7 +63,7 @@ fn read_line_async() → string {
 # =========================================================================
 # STDOUT - Bytes
 # =========================================================================
-# Verb: funde/fundet from "fundere" (to pour, pour out)
+# Verb: write_bytes/write_bytes_async from "fundere" (to pour, pour out)
 # Why: Pouring raw bytes to stdout.
 # Maps to: fs.writeSync(1, data) / process.stdout.write
 
@@ -84,7 +84,7 @@ fn write_bytes_async(bytes data) → void {
 # =========================================================================
 # STDOUT - Text with Newline
 # =========================================================================
-# Verb: scribe/scribet from "scribere" (to write)
+# Verb: write_line/write_line_async from "scribere" (to write)
 # Why: Writes a complete line to stdout through the consolum module.
 # Default behavior includes newline (most common use case).
 # Maps to: console.log / process.stdout.write + "\n"
@@ -104,7 +104,7 @@ fn write_line_async(string msg) → void {
 # =========================================================================
 # STDOUT - Text without Newline
 # =========================================================================
-# Verb: dic/dicet from "dicere" (to say, speak)
+# Verb: write_partial/write_partial_async from "dicere" (to say, speak)
 # Why: "Saying" partial output - progress dots, inline updates.
 # No newline - for building up output incrementally.
 # Maps to: process.stdout.write (no newline)
@@ -124,7 +124,7 @@ fn write_partial_async(string msg) → void {
 # =========================================================================
 # STDERR - Warning/Error Output
 # =========================================================================
-# Verb: mone/monet from "monere" (to warn, admonish)
+# Verb: warn_line/warn_line_async from "monere" (to warn, admonish)
 # Why: Aligns with language keyword "mone". Warnings go to stderr.
 # Includes newline (errors are typically complete messages).
 # Maps to: console.warn / process.stderr.write + "\n"
@@ -144,7 +144,7 @@ fn warn_line_async(string msg) → void {
 # =========================================================================
 # DEBUG Output
 # =========================================================================
-# Verb: vide/videbit from "videre" (to see, observe)
+# Verb: debug_line/debug_line_async from "videre" (to see, observe)
 # Why: Aligns with language keyword "vide". Debug/inspection output.
 # Includes newline. May be filtered by log level in production.
 # Maps to: console.debug / conditional stderr write
