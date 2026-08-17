@@ -12,16 +12,19 @@ locale = "en"
 # -------------------------------------------------------------------------
 
 # Why: Ratio of a circle's circumference to its diameter (f64 catalog constant).
+@ public
 fn PI() → float {
     return 3.141592653589793
 }
 
 # Why: Base of natural logarithms (f64 catalog constant).
+@ public
 fn E() → float {
     return 2.718281828459045
 }
 
 # Why: Full circle radians — 2π (composed from PI).
+@ public
 fn TAU() → float {
     return PI() * 2.0
 }
@@ -32,6 +35,7 @@ fn TAU() → float {
 
 # Verb: clamp from "constringere" (to bind tight) — present participle
 # Why: Clamp x to the closed interval [lo, hi] via maximus/minimus.
+@ public
 fn clamp(float x, float lo, float hi) → float {
     return (x.maximum(lo)).minimum(hi)
 }
@@ -41,31 +45,37 @@ fn clamp(float x, float lo, float hi) → float {
 # -------------------------------------------------------------------------
 
 # Why: Perfectum twin of `+` — returns a + b without mutating operands.
+@ public
 fn add(float a, float b) → float {
     return a + b
 }
 
 # Why: Perfectum twin of `−` — returns a − b.
+@ public
 fn subtract(float a, float b) → float {
     return a - b
 }
 
 # Why: Perfectum twin of `×` — returns a × b.
+@ public
 fn multiply(float a, float b) → float {
     return a * b
 }
 
 # Why: Perfectum twin of `÷` — returns a ÷ b.
+@ public
 fn divide(float a, float b) → float {
     return a / b
 }
 
 # Why: Perfectum twin of `%` — returns a mod b.
+@ public
 fn modulo(float a, float b) → float {
     return a % b
 }
 
 # Why: Perfectum twin of unary `−` — returns negated a.
+@ public
 fn negate(float a) → float {
     return -a
 }
@@ -75,21 +85,25 @@ fn negate(float a) → float {
 # -------------------------------------------------------------------------
 
 # Why: Perfectum twin of `<` — returns whether a is less than b.
+@ public
 fn less(float a, float b) → bool {
     return a < b
 }
 
 # Why: Perfectum twin of `>` — returns whether a is greater than b.
+@ public
 fn greater(float a, float b) → bool {
     return a > b
 }
 
 # Why: Perfectum twin of `≤` — returns whether a is at most b.
+@ public
 fn at_most(float a, float b) → bool {
     return a ≤ b
 }
 
 # Why: Perfectum twin of `≥` — returns whether a is at least b.
+@ public
 fn at_least(float a, float b) → bool {
     return a ≥ b
 }
@@ -99,21 +113,25 @@ fn at_least(float a, float b) → bool {
 # -------------------------------------------------------------------------
 
 # Why: Perfectum twin of `∧` — bitwise AND on integer numerus operands.
+@ public
 fn bit_and(int a, int b) → int {
     return a ∧ b
 }
 
 # Why: Perfectum twin of `∨` — bitwise OR on integer numerus operands.
+@ public
 fn bit_or(int a, int b) → int {
     return a ∨ b
 }
 
 # Why: Perfectum twin of `⊻` — bitwise XOR on integer numerus operands.
+@ public
 fn bit_xor(int a, int b) → int {
     return a ⊻ b
 }
 
 # Why: Perfectum twin of `¬` — bitwise complement of integer numerus a.
+@ public
 fn bit_not(int a) → int {
     return ¬a
 }
@@ -123,11 +141,13 @@ fn bit_not(int a) → int {
 # -------------------------------------------------------------------------
 
 # Why: Perfectum twin of `⇐` — left-shift a by b bit positions.
+@ public
 fn shift_left(int a, int b) → int {
     return a ⇐ b
 }
 
 # Why: Perfectum twin of `⇒` — right-shift a by b bit positions.
+@ public
 fn shift_right(int a, int b) → int {
     return a ⇒ b
 }
@@ -137,16 +157,19 @@ fn shift_right(int a, int b) → int {
 # -------------------------------------------------------------------------
 
 # Why: Sine of x radians via range reduction and Taylor series (self-hosted v1).
+@ public
 fn sin(float x) → float {
     return _sin_series(_reduce_angle(x))
 }
 
 # Why: Cosine of x radians via range reduction and Taylor series.
+@ public
 fn cos(float x) → float {
     return _cos_series(_reduce_angle(x))
 }
 
 # Why: Tangent of x radians — sin/cos ratio; near-zero cosine → 0.0.
+@ public
 fn tan(float x) → float {
     const float c ← cos(x)
     if c.abs() ≤ 0.000000000001 then return 0.0
@@ -155,11 +178,13 @@ fn tan(float x) → float {
 }
 
 # Why: Natural exponential e^x via Taylor series.
+@ public
 fn exp(float x) → float {
     return _exp_series(x)
 }
 
 # Why: Natural logarithm of x; non-positive x → 0.0 (v1 silent guard).
+@ public
 fn ln(float x) → float {
     if x ≤ 0.0 then return 0.0
 
@@ -167,11 +192,13 @@ fn ln(float x) → float {
 }
 
 # Why: Base-10 logarithm via natural log identity.
+@ public
 fn log10(float x) → float {
     return ln(x) / ln(10.0)
 }
 
 # Why: Square root of x via Newton iteration; negative x → 0.0 (v1 guard).
+@ public
 fn sqrt(float x) → float {
     if x < 0.0 then return 0.0
 
@@ -182,6 +209,7 @@ fn sqrt(float x) → float {
 
 # pow: ⋆ glyph not shipped — exp/log identity fallback (pow-glyph goal)
 # Why: Raise base to exponent via exp(exponent * ln(base)); non-positive base → 0.0.
+@ public
 fn pow(float base, float exponent) → float {
     if base ≤ 0.0 then return 0.0
 
