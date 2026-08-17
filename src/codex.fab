@@ -21,16 +21,19 @@ locale = "en"
 # =========================================================================
 
 # Encode bytes to base64 string
+@ public
 fn base64(bytes data) → string {
     panic "norma:codex.base64 is deferred pending Stage 2 dispatch"
 }
 
 # Decode base64 string to bytes (throws on invalid input)
+@ public
 fn decode_base64(string data) → bytes {
     panic "norma:codex.decode_base64 is deferred pending Stage 2 dispatch"
 }
 
 # Attempt to decode base64 (returns nihil on invalid input)
+@ public
 fn try_decode_base64(string data) → bytes ∪ null {
     panic "norma:codex.try_decode_base64 is deferred pending Stage 2 dispatch"
 }
@@ -40,16 +43,19 @@ fn try_decode_base64(string data) → bytes ∪ null {
 # =========================================================================
 
 # Encode bytes to lowercase hex string
+@ public
 fn hex(bytes data) → string {
     panic "norma:codex.hex is deferred pending Stage 2 dispatch"
 }
 
 # Decode hex string to bytes (throws on invalid input)
+@ public
 fn decode_hex(string data) → bytes {
     panic "norma:codex.decode_hex is deferred pending Stage 2 dispatch"
 }
 
 # Attempt to decode hex (returns nihil on invalid input)
+@ public
 fn try_decode_hex(string data) → bytes ∪ null {
     panic "norma:codex.try_decode_hex is deferred pending Stage 2 dispatch"
 }
@@ -59,21 +65,25 @@ fn try_decode_hex(string data) → bytes ∪ null {
 # =========================================================================
 
 # Encode text for URL (percent-encoding)
+@ public
 fn url(string data) → string {
     panic "norma:codex.url is deferred pending Stage 2 dispatch"
 }
 
 # Decode URL-encoded text
+@ public
 fn decode_url(string data) → string {
     panic "norma:codex.decode_url is deferred pending Stage 2 dispatch"
 }
 
 # Encode for URL query component (also encodes &, =, etc.)
+@ public
 fn encode_url_component(string data) → string {
     panic "norma:codex.encode_url_component is deferred pending Stage 2 dispatch"
 }
 
 # Decode URL query component
+@ public
 fn decode_url_component(string data) → string {
     panic "norma:codex.decode_url_component is deferred pending Stage 2 dispatch"
 }
