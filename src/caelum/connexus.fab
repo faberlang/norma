@@ -9,40 +9,48 @@ locale = "en"
 
 import from "norma:caelum/terminus" terminus
 
+@ public
 class Socket {
     int id = 0
 
     # Draw bytes (up to n if provided, otherwise whatever is available)
+    @ public
     fn read_bytes(int n optional) → bytes {
         panic "norma:caelum/connexus.read_bytes is deferred pending Stage 2 dispatch"
     }
 
+    @ public
     @ future
     fn read_bytes_async(int n optional) → bytes {
         panic "norma:caelum/connexus.read_bytes_async is deferred pending Stage 2 dispatch"
     }
 
     # Pour bytes
+    @ public
     fn write_bytes(bytes data) → void {
         panic "norma:caelum/connexus.write_bytes is deferred pending Stage 2 dispatch"
     }
 
+    @ public
     @ future
     fn write_bytes_async(bytes data) → void {
         panic "norma:caelum/connexus.write_bytes_async is deferred pending Stage 2 dispatch"
     }
 
     # Close connection
+    @ public
     fn close() → void {
         panic "norma:caelum/connexus.close is deferred pending Stage 2 dispatch"
     }
 
     # Remote endpoint
+    @ public
     fn remote() → terminus.Endpoint {
         panic "norma:caelum/connexus.remote is deferred pending Stage 2 dispatch"
     }
 
     # Local endpoint
+    @ public
     fn local() → terminus.Endpoint {
         panic "norma:caelum/connexus.local is deferred pending Stage 2 dispatch"
     }
