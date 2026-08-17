@@ -32,10 +32,12 @@ import from "norma:caelum/auscultator" auscultator
 # =========================================================================
 
 # Create TCP listener (TLS when cert/key provided)
+@ public
 fn listen(int port, string cert optional, string key optional) → auscultator.Listener {
     panic "norma:caelum.listen is deferred pending Stage 2 dispatch"
 }
 
+@ public
 @ future
 fn listen_async(int port, string cert optional, string key optional) → auscultator.Listener {
     panic "norma:caelum.listen_async is deferred pending Stage 2 dispatch"
@@ -46,10 +48,12 @@ fn listen_async(int port, string cert optional, string key optional) → auscult
 # =========================================================================
 
 # Connect to TCP server (TLS when tute=verum)
+@ public
 fn connect(string host, int port, bool tute optional coalesce false) → connexus.Socket {
     panic "norma:caelum.connect is deferred pending Stage 2 dispatch"
 }
 
+@ public
 @ future
 fn connect_async(string host, int port, bool tute optional coalesce false) → connexus.Socket {
     panic "norma:caelum.connect_async is deferred pending Stage 2 dispatch"

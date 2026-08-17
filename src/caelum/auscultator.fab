@@ -9,25 +9,30 @@ locale = "en"
 
 import from "norma:caelum/connexus" connexus
 
+@ public
 class Listener {
     int id = 0
 
     # Accept next incoming connection
+    @ public
     fn accept() → connexus.Socket {
         panic "norma:caelum/auscultator.accept is deferred pending Stage 2 dispatch"
     }
 
+    @ public
     @ future
     fn accept_async() → connexus.Socket {
         panic "norma:caelum/auscultator.accept_async is deferred pending Stage 2 dispatch"
     }
 
     # Stop listening
+    @ public
     fn close() → void {
         panic "norma:caelum/auscultator.close is deferred pending Stage 2 dispatch"
     }
 
     # Local port
+    @ public
     fn port() → int {
         panic "norma:caelum/auscultator.port is deferred pending Stage 2 dispatch"
     }
