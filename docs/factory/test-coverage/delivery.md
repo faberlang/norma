@@ -526,7 +526,7 @@ column names the PB public-surface family that the row must cover.
 | `crypta.fab` | `src/crypta.proba` | `COV-WIRE` | `PB-CRYPTA`: digest vectors and security error boundaries | new |
 | `csv.fab` | `src/csv.proba` | `COV-FND` | `PB-CSV`: parse/stringify rows and edge cases | new |
 | `fila.fab` | `src/fila.proba` | `COV-NUM` | `PB-FILA`: Deque constructors and operations | new |
-| `http.fab` | `src/http.proba` | `COV-SYS` | `PB-HTTP`: request/response and route contracts | new |
+| `http.fab` + `http/{headers,request,response,chunked,sse,server,client}.fab` | `exempla/http/{headers,request,response,facade}.proba` | `COV-SYS` | H1 directory form: import + construct; method bodies need colocated runner support | landed construct fixtures |
 | `json.fab` | `src/json.proba` | `COV-WIRE` | `PB-JSON`: facade parse/stringify/try-parse | new |
 | `json/cursor.fab` | `src/json.proba` (transitive row) | `COV-WIRE` | `PB-JSON`: `ScanResult` cursor shape through JSON parser | new/transitive |
 | `json/lexica.fab` | `src/json.proba` (transitive row) | `COV-WIRE` | `PB-JSON`: lexical helpers exercised through parse/stringify | new/transitive |

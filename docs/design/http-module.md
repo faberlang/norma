@@ -4,7 +4,7 @@ locale = "en"
 
 # Design: pro-level HTTP module (`norma:http`, directory form)
 
-**Status**: planned — design draft (head-cto, task ef33a750; uncommitted, mind routes)
+**Status**: active — H1 directory form landed (hand 3db5a792); H2–H6 remain
 
 **Driver**: Inferentia — token streaming via SSE over a loopback HTTP/1.1
 server is the load-bearing case. Non-goals: replacing the hosts provider with
@@ -412,7 +412,7 @@ consumes the new routes only through `http/server.fab`.
 
 | Unit | Repo / surface | Scope | Done-when |
 | --- | --- | --- | --- |
-| **H1 — scaffold (directory form)** | norma `src/http.fab` + `src/http/{headers,request,response}.fab` + `exempla/http/*.proba` | Facade + the three pure genera; old single-file surface replaced (clean break); killed leaves (router/middleware) recorded in the facade header; `@ public` hygiene on the whole surface | proba green for the three modules; `import from "norma:http"` resolves in a fixture package; no file named `src/http.fab`-only remains besides the facade |
+| **H1 — scaffold (directory form)** | norma `src/http.fab` + `src/http/{headers,request,response,chunked,sse,server,client}.fab` + `exempla/http/*.proba` | **Landed** (hand 3db5a792). Facade + seven validated leaves; old single-file surface replaced (clean break); killed leaves (router/middleware/body/url) recorded in the facade header; `@ public` hygiene on the whole surface | proba green for the three genera (import + construct); `import from "norma:http"` resolves in a fixture package; no file named `src/http.fab`-only remains besides the facade |
 | **H2 — pure codecs** | norma `src/http/{chunked,sse}.fab` + proba | Chunked encode/decode; SSE format/parse (multi-line data, comments, id/retry, split-boundary tolerance); golden round-trips | proba golden tests pass in-language with zero provider dependency |
 | **H3 — provider streaming contract** | hosts `crates/http` (needs the filed hosts need) | New routes `respond_open/respond_chunk/respond_finish`, per-connection pending state, keep-alive, `bind_host`, bounded backlog; manifest + `http_test.rs` coverage (stream, keep-alive reuse, backpressure-block, stop-during-stream) | hosts `cargo test -p http` green incl. new stream/keep-alive tests; manifest lists the new routes |
 | **H4 — server module** | norma `src/http/server.fab` + proba/exempla | Listener genus over the extended routes; keep-alive decision; one-shot + streaming respond; SSE serving helper composing `sse.fab` + `chunked.fab` | exemplum server streams N frames over one connection with O(1) in-language memory; backpressure proof (stalled reader stalls the write loop) |

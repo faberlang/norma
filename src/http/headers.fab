@@ -1,0 +1,119 @@
++++
+locale = "en"
++++
+
+# http/headers.fab — HTTP header map
+#
+# Public import: import from "norma:http/headers" headers
+# Grade D loanword (HTTP vocabulary is the standard name).
+#
+# Case-insensitive lookup over a multi-value list. The provider carrier is
+# `[{name,value}]`; this genus is the fold of that list. Token/value checks
+# follow RFC 7230 tchar / field-value (CR/LF rejected).
+
+# One stored header line. The original name casing is kept for emission;
+# lookup folds ASCII A–Z.
+@ public
+class Header {
+    string name = ""
+    string value = ""
+}
+
+@ public
+class Headers {
+    list<Header> entries = vacua
+
+    @ public
+    fn length() → int {
+        return self.entries.length()
+    }
+
+    # Returns false and leaves the map unchanged when name or value is illegal.
+    @ public
+    fn append(string name, string value) → bool {
+        if not _is_token(name) then return false
+        if not _is_field_value(value) then return false
+        self.entries.append(Header { name = name, value = value })
+        return true
+    }
+
+    # First value whose name matches under ASCII case-fold; nihil if absent.
+    @ public
+    fn get(string name) → string ∪ null {
+        const string folded ← _ascii_lower(name)
+        for from self.entries const entry {
+            if _ascii_lower(entry.name) ≡ folded {
+                return entry.value
+            }
+        }
+        return null
+    }
+
+    # Every value whose name matches under ASCII case-fold, in append order.
+    @ public
+    fn values(string name) → list<string> {
+        const string folded ← _ascii_lower(name)
+        var list<string> out ← vacua
+        for from self.entries const entry {
+            if _ascii_lower(entry.name) ≡ folded {
+                out.append(entry.value)
+            }
+        }
+        return out
+    }
+}
+
+@ public
+fn empty() → Headers {
+    return Headers { }
+}
+
+fn _ascii_lower(string s) → string {
+    var string out ← ""
+    var int i ← 0
+    while i < s.length() {
+        out ← out + _lower_char(s.slice(i, i + 1))
+        i ← i + 1
+    }
+    return out
+}
+
+fn _lower_char(string c) → string {
+    const string upper ← "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    const string lower ← "abcdefghijklmnopqrstuvwxyz"
+    var int i ← 0
+    while i < 26 {
+        if upper.slice(i, i + 1) ≡ c {
+            return lower.slice(i, i + 1)
+        }
+        i ← i + 1
+    }
+    return c
+}
+
+fn _is_token(string name) → bool {
+    if name.length() ≡ 0 then return false
+    var int i ← 0
+    while i < name.length() {
+        if not _is_tchar(name.slice(i, i + 1)) then return false
+        i ← i + 1
+    }
+    return true
+}
+
+fn _is_tchar(string c) → bool {
+    if "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789".contains(c) {
+        return true
+    }
+    return "!#$%&'*+-.^_`|~".contains(c)
+}
+
+fn _is_field_value(string value) → bool {
+    var int i ← 0
+    while i < value.length() {
+        const string c ← value.slice(i, i + 1)
+        if c ≡ "\r" or c ≡ "\n" then return false
+        i ← i + 1
+    }
+    return true
+}

@@ -1,0 +1,260 @@
++++
+locale = "en"
++++
+
+# http/request.fab — received HTTP request
+#
+# Public import: import from "norma:http/request" request
+# Depends on: norma:http/headers
+#
+# method / path / query / headers / body. `from_target` splits `path?query`
+# and `query_field` percent-decodes a single query key.
+
+import from "norma:http/headers" headers
+
+@ public
+class Request {
+    string method = ""
+    string path = ""
+    string query = ""
+    headers.Headers headers = headers.Headers { }
+    string body = ""
+
+    @ public
+    fn header(string nomen) → string ∪ null {
+        return self.headers.get(nomen)
+    }
+
+    @ public
+    fn query_field(string nomen) → string ∪ null {
+        return _query_field(self.query, nomen)
+    }
+}
+
+# Build a Request from a raw request-target (`path` or `path?query`).
+@ public
+fn from_target(string method, string target, headers.Headers headers, string body) → Request {
+    const string path ← _target_path(target)
+    const string query ← _target_query(target)
+    return Request { method = method, path = path, query = query, headers = headers, body = body }
+}
+
+fn _target_path(string target) → string {
+    var int i ← 0
+    while i < target.length() {
+        const string c ← target.slice(i, i + 1)
+        if c ≡ "?" or c ≡ "#" {
+            return target.slice(0, i)
+        }
+        i ← i + 1
+    }
+    return target
+}
+
+fn _target_query(string target) → string {
+    var int i ← 0
+    while i < target.length() {
+        const string c ← target.slice(i, i + 1)
+        if c ≡ "#" {
+            return ""
+        }
+        if c ≡ "?" {
+            const int start ← i + 1
+            var int j ← start
+            while j < target.length() {
+                if target.slice(j, j + 1) ≡ "#" {
+                    return target.slice(start, j)
+                }
+                j ← j + 1
+            }
+            return target.slice(start, target.length())
+        }
+        i ← i + 1
+    }
+    return ""
+}
+
+fn _query_field(string query, string nomen) → string ∪ null {
+    const string want ← _percent_decode(nomen)
+    var int i ← 0
+    while i ≤ query.length() {
+        var int amp ← i
+        while amp < query.length() and query.slice(amp, amp + 1) ≠ "&" {
+            amp ← amp + 1
+        }
+        const string pair ← query.slice(i, amp)
+        var int eq ← 0
+        var bool has_eq ← false
+        while eq < pair.length() {
+            if pair.slice(eq, eq + 1) ≡ "=" {
+                has_eq ← true
+                break
+            }
+            eq ← eq + 1
+        }
+        var string key ← pair
+        var string val ← ""
+        if has_eq {
+            key ← pair.slice(0, eq)
+            val ← pair.slice(eq + 1, pair.length())
+        }
+        if _percent_decode(key) ≡ want {
+            return _percent_decode(val)
+        }
+        if amp ≥ query.length() {
+            return null
+        }
+        i ← amp + 1
+    }
+    return null
+}
+
+fn _percent_decode(string s) → string {
+    var string out ← ""
+    var int i ← 0
+    while i < s.length() {
+        const string c ← s.slice(i, i + 1)
+        if c ≡ "+" {
+            out ← out + " "
+            i ← i + 1
+        }
+        elif c ≡ "%" and i + 2 < s.length() {
+            const int hi ← _hex_value(s.slice(i + 1, i + 2))
+            const int lo ← _hex_value(s.slice(i + 2, i + 3))
+            if hi < 0 or lo < 0 {
+                out ← out + c
+                i ← i + 1
+            }
+            else {
+                out ← out + _byte_char(hi * 16 + lo)
+                i ← i + 3
+            }
+        }
+        else {
+            out ← out + c
+            i ← i + 1
+        }
+    }
+    return out
+}
+
+fn _hex_value(string c) → int {
+    if c ≡ "0" then return 0
+    if c ≡ "1" then return 1
+    if c ≡ "2" then return 2
+    if c ≡ "3" then return 3
+    if c ≡ "4" then return 4
+    if c ≡ "5" then return 5
+    if c ≡ "6" then return 6
+    if c ≡ "7" then return 7
+    if c ≡ "8" then return 8
+    if c ≡ "9" then return 9
+    if c ≡ "a" or c ≡ "A" then return 10
+    if c ≡ "b" or c ≡ "B" then return 11
+    if c ≡ "c" or c ≡ "C" then return 12
+    if c ≡ "d" or c ≡ "D" then return 13
+    if c ≡ "e" or c ≡ "E" then return 14
+    if c ≡ "f" or c ≡ "F" then return 15
+    return -1
+}
+
+# ASCII byte → length-1 textus. Query decoding is an ASCII-percent floor;
+# bytes outside the printable ASCII range are left as `?`.
+fn _byte_char(int n) → string {
+    if n ≡ 32 then return " "
+    if n ≡ 33 then return "!"
+    if n ≡ 34 then return "\""
+    if n ≡ 35 then return "#"
+    if n ≡ 36 then return "$"
+    if n ≡ 37 then return "%"
+    if n ≡ 38 then return "&"
+    if n ≡ 39 then return "'"
+    if n ≡ 40 then return "("
+    if n ≡ 41 then return ")"
+    if n ≡ 42 then return "*"
+    if n ≡ 43 then return "+"
+    if n ≡ 44 then return ","
+    if n ≡ 45 then return "-"
+    if n ≡ 46 then return "."
+    if n ≡ 47 then return "/"
+    if n ≡ 48 then return "0"
+    if n ≡ 49 then return "1"
+    if n ≡ 50 then return "2"
+    if n ≡ 51 then return "3"
+    if n ≡ 52 then return "4"
+    if n ≡ 53 then return "5"
+    if n ≡ 54 then return "6"
+    if n ≡ 55 then return "7"
+    if n ≡ 56 then return "8"
+    if n ≡ 57 then return "9"
+    if n ≡ 58 then return ":"
+    if n ≡ 59 then return ";"
+    if n ≡ 60 then return "<"
+    if n ≡ 61 then return "="
+    if n ≡ 62 then return ">"
+    if n ≡ 63 then return "?"
+    if n ≡ 64 then return "@"
+    if n ≡ 65 then return "A"
+    if n ≡ 66 then return "B"
+    if n ≡ 67 then return "C"
+    if n ≡ 68 then return "D"
+    if n ≡ 69 then return "E"
+    if n ≡ 70 then return "F"
+    if n ≡ 71 then return "G"
+    if n ≡ 72 then return "H"
+    if n ≡ 73 then return "I"
+    if n ≡ 74 then return "J"
+    if n ≡ 75 then return "K"
+    if n ≡ 76 then return "L"
+    if n ≡ 77 then return "M"
+    if n ≡ 78 then return "N"
+    if n ≡ 79 then return "O"
+    if n ≡ 80 then return "P"
+    if n ≡ 81 then return "Q"
+    if n ≡ 82 then return "R"
+    if n ≡ 83 then return "S"
+    if n ≡ 84 then return "T"
+    if n ≡ 85 then return "U"
+    if n ≡ 86 then return "V"
+    if n ≡ 87 then return "W"
+    if n ≡ 88 then return "X"
+    if n ≡ 89 then return "Y"
+    if n ≡ 90 then return "Z"
+    if n ≡ 91 then return "["
+    if n ≡ 92 then return "\\"
+    if n ≡ 93 then return "]"
+    if n ≡ 94 then return "^"
+    if n ≡ 95 then return "_"
+    if n ≡ 96 then return "`"
+    if n ≡ 97 then return "a"
+    if n ≡ 98 then return "b"
+    if n ≡ 99 then return "c"
+    if n ≡ 100 then return "d"
+    if n ≡ 101 then return "e"
+    if n ≡ 102 then return "f"
+    if n ≡ 103 then return "g"
+    if n ≡ 104 then return "h"
+    if n ≡ 105 then return "i"
+    if n ≡ 106 then return "j"
+    if n ≡ 107 then return "k"
+    if n ≡ 108 then return "l"
+    if n ≡ 109 then return "m"
+    if n ≡ 110 then return "n"
+    if n ≡ 111 then return "o"
+    if n ≡ 112 then return "p"
+    if n ≡ 113 then return "q"
+    if n ≡ 114 then return "r"
+    if n ≡ 115 then return "s"
+    if n ≡ 116 then return "t"
+    if n ≡ 117 then return "u"
+    if n ≡ 118 then return "v"
+    if n ≡ 119 then return "w"
+    if n ≡ 120 then return "x"
+    if n ≡ 121 then return "y"
+    if n ≡ 122 then return "z"
+    if n ≡ 123 then return "{"
+    if n ≡ 124 then return "|"
+    if n ≡ 125 then return "}"
+    if n ≡ 126 then return "~"
+    return "?"
+}
