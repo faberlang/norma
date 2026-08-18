@@ -1,0 +1,38 @@
++++
+locale = "en"
++++
+
+# http/server.fab — HTTP/1.1 listener over provider http:* routes
+#
+# Public import: import from "norma:http/server" server
+#
+# The server provider is a generic pull loop. `args` carries the provider's
+# target-neutral listen options; the returned number is an opaque listener
+# handle. Faber packages own request routing and response policy around
+# these calls. H4 owns keep-alive, streaming respond, and the Listener genus.
+
+# Bind a listener. The returned number is an opaque handle.
+@ public
+fn listen(list<value> args) → int {
+    return call 'http:listen' (args) ↦ int
+}
+
+# Accept one request record from a listener. The returned valor contains the
+# provider request id plus method, path, headers, and body fields.
+@ public
+fn accept(int handle) → value {
+    return call 'http:accept' (handle) ↦ value
+}
+
+# Send one response using the request id and target-neutral status, headers,
+# and body values carried in `args`.
+@ public
+fn respond(list<value> args) → void {
+    return call 'http:respond' (args) ↦ void
+}
+
+# Stop a listener and release its pending request state.
+@ public
+fn stop(int handle) → void {
+    return call 'http:stop' (handle) ↦ void
+}

@@ -51,9 +51,9 @@ Three facts decide it:
 
 ## 2. Census — the rename checklist
 
-### 2.1 Module inventory (`norma/src/`, 31 module files) — known
+### 2.1 Module inventory (`norma/src/`, 38 module files) — known
 
-26 top-level + 5 nested under `caelum/` (3), `json/` (4), `solum/` (1).
+26 top-level + 12 nested under `caelum/` (3), `json/` (4), `solum/` (1), `http/` (7).
 Latin-named: 17 top-level + 4 nested. Proposed English names (role from each
 file's header comment; **operator-amendable table — ratify or amend before
 units dispatch**):
@@ -85,7 +85,9 @@ units dispatch**):
 | `norma:json/pange` | `norma:json/serialize` | serialization facade |
 
 Already English/neutral — **unchanged**: `csv`, `http`, `json`, `model`,
-`optimizer`, `tensor`, `toml`, `vector`, `yaml`, `json/cursor`, `json/solve`.
+`optimizer`, `tensor`, `toml`, `vector`, `yaml`, `json/cursor`, `json/solve`,
+`http/headers`, `http/request`, `http/response`, `http/chunked`, `http/sse`,
+`http/server`, `http/client`.
 
 Naming notes: `chorda → string` was rejected for collision with the `string`
 type name; `text` matches the type's en surface role without occupying the

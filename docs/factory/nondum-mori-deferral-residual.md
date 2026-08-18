@@ -43,6 +43,7 @@ Current grouping:
 | `src/codex.fab` | 10 |
 | `src/crypta.fab` | 9 |
 | `src/http.fab` | 6 |
+| `src/http/client.fab` | 6 |
 | `src/nuncius.fab` | 5 |
 | `src/pressura.fab` | 4 |
 | `src/processus.fab` | 1 |
