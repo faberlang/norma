@@ -1,0 +1,55 @@
++++
+locale = "en"
++++
+
+# http/response.fab — HTTP response
+#
+# Public import: import from "norma:http/response" response
+# Depends on: norma:http/headers
+#
+# status / headers / body plus status-class predicates. Built by the server
+# and read by the client — must not live in either file.
+
+import from "norma:http/headers" headers
+
+@ public
+class Response {
+    int status = 0
+    headers.Headers headers = headers.Headers { }
+    string body = ""
+
+    @ public
+    fn header(string nomen) → string ∪ null {
+        return self.headers.get(nomen)
+    }
+
+    @ public
+    fn is_informational() → bool {
+        return self.status ≥ 100 and self.status < 200
+    }
+
+    @ public
+    fn is_ok() → bool {
+        return self.status ≥ 200 and self.status < 300
+    }
+
+    @ public
+    fn is_redirect() → bool {
+        return self.status ≥ 300 and self.status < 400
+    }
+
+    @ public
+    fn is_client_error() → bool {
+        return self.status ≥ 400 and self.status < 500
+    }
+
+    @ public
+    fn is_server_error() → bool {
+        return self.status ≥ 500 and self.status < 600
+    }
+}
+
+@ public
+fn of(int status, headers.Headers headers, string body) → Response {
+    return Response { status = status, headers = headers, body = body }
+}

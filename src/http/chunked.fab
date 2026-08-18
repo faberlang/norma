@@ -1,0 +1,20 @@
++++
+locale = "en"
++++
+
+# http/chunked.fab — chunked transfer codec
+#
+# Public import: import from "norma:http/chunked" chunked
+#
+# Pure encode/decode over bytes. No I/O (json/lexica role). H2 owns the
+# working codec; this file is the H1 structural leaf.
+
+@ public
+fn encode(bytes data) → bytes {
+    panic "norma:http/chunked.encode is deferred pending the H2 codec wave"
+}
+
+@ public
+fn decode(bytes data) → bytes {
+    panic "norma:http/chunked.decode is deferred pending the H2 codec wave"
+}

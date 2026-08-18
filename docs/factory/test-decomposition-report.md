@@ -145,9 +145,11 @@
 - **Coverage gaps:** `Fila<T>` genus (10 methods) + 2 constructors. TARGET form — will not compile today.
 - **Severity:** Low. Module is blocked on compiler work. But the design is committed; when the compiler lands, exempla are needed for: empty-queue pop, single-element push/pop cycle, rebalance edge cases (many head-pushes then tail-pops, and vice versa), `collecta` ordering, `primus`/`ultimus` on empty queue.
 
-### `src/http.fab` → exempla: NONE
-- **Coverage gaps:** 6 client methods (`petet`, `mittet`, `ponet`, `delet`, `mutabit`, `rogabit`) + 4 server methods (`listen`, `accept`, `respond`, `stop`) + `Replicatio` implendum (7 methods) + `Rogatio` implendum (6 methods). All deferred or `ad`-routed.
-- **Severity:** Medium. HTTP is the primary application protocol. Deferred is understandable for Stage 1, but server-side listen/accept/respond should have route-contract exempla.
+### `src/http.fab` + `src/http/*.fab` → exempla: `exempla/http/{headers,request,response,facade}.proba`
+- **Shape (H1):** facade + seven leaves (`headers`, `request`, `response`, `chunked`, `sse`, `server`, `client`). Killed: router/middleware/body/url.
+- **Coverage:** import + genus construction for the three pure genera and the facade. MIR runner treats imported `norma:http/*` members as provider routes, so method bodies are not executed from exempla (same residual as `src/mathesis.proba` on the current binary).
+- **Coverage gaps:** client verbs still `mori`; chunked/sse are H2 stubs; server wrappers are unexercised `http:*` routes.
+- **Severity:** Medium. H2–H5 own the remaining executable surface.
 
 ### `src/json.fab` + `src/json/*.fab` → exempla: NONE
 - **Coverage gaps:** `json.pange`, `json.solve`, `json.tempta` are facades over compiler conversio. The sub-modules (`cursor.fab`, `lexica.fab`, `pange.fab`, `solve.fab`) are internal. No dedicated json exemplum exists.

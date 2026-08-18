@@ -1,0 +1,29 @@
++++
+locale = "en"
++++
+
+# http/sse.fab — Server-Sent Events codec
+#
+# Public import: import from "norma:http/sse" sse
+#
+# Pure format/parse of text/event-stream (field names, multi-line data,
+# comment lines, \\n\\n boundaries). H2 owns the working codec; this file
+# is the H1 structural leaf.
+
+@ public
+class Event {
+    string name = ""
+    string data = ""
+    string id = ""
+    string retry = ""
+}
+
+@ public
+fn stringify(Event event) → string {
+    panic "norma:http/sse.stringify is deferred pending the H2 codec wave"
+}
+
+@ public
+fn parse(string wire) → Event {
+    panic "norma:http/sse.parse is deferred pending the H2 codec wave"
+}
