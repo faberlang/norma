@@ -14,7 +14,8 @@ locale = "en"
 #   norma:http/response — Response genus (status classes)
 #   norma:http/chunked  — chunked transfer codec (H2)
 #   norma:http/sse      — Server-Sent Events codec (H2)
-#   norma:http/server   — listen/accept/respond/stop over http:*
+#   norma:http/server   — Listener genus, keep-alive, one-shot + streaming
+#                         respond, SSE helper over http:* routes
 #   norma:http/client   — URL split, Client agent reuse, verb surface over
 #                         http:get|post|put|delete|patch|request, and
 #                         incremental receive via http:request_open / http:read
@@ -35,7 +36,7 @@ locale = "en"
 # - Faber packages own request routing and response policy around the handle loop.
 
 import from "norma:http/headers" headers
-import from "norma:http/request" request
+import from "norma:http/request" httpreq
 import from "norma:http/response" response
 import from "norma:http/chunked" chunked
 import from "norma:http/sse" sse
@@ -113,8 +114,33 @@ fn respond(list<value> args) → void {
 }
 
 @ public
+fn respond_open(list<value> args) → int {
+    return server.respond_open(args)
+}
+
+@ public
+fn respond_chunk(list<value> args) → void {
+    return server.respond_chunk(args)
+}
+
+@ public
+fn respond_finish(list<value> args) → void {
+    return server.respond_finish(args)
+}
+
+@ public
 fn stop(int handle) → void {
     return server.stop(handle)
+}
+
+@ public
+fn bind(int port) → server.Listener {
+    return server.bind(port)
+}
+
+@ public
+fn keep_alive(headers.Headers headers) → bool {
+    return server.keep_alive(headers)
 }
 
 
@@ -128,8 +154,8 @@ fn empty_headers() → headers.Headers {
 }
 
 @ public
-fn request_from_target(string method, string target, headers.Headers headers, string body) → request.Request {
-    return request.from_target(method, target, headers, body)
+fn request_from_target(string method, string target, headers.Headers headers, string body) → httpreq.Request {
+    return httpreq.from_target(method, target, headers, body)
 }
 
 @ public
