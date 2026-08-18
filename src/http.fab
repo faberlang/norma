@@ -15,7 +15,9 @@ locale = "en"
 #   norma:http/chunked  — chunked transfer codec (H2)
 #   norma:http/sse      — Server-Sent Events codec (H2)
 #   norma:http/server   — listen/accept/respond/stop over http:*
-#   norma:http/client   — client verbs (H5 owns Agent reuse)
+#   norma:http/client   — URL split + Client genus; I/O verbs wait on
+#                         missing http:get|post|put|delete|patch|request
+#                         (and incremental http:request_open / http:read)
 #
 # Killed leaves (no second caller — do not add):
 #   router      — inferentia dispatches by path equality
@@ -25,8 +27,10 @@ locale = "en"
 #
 # Design notes:
 # - Facade holds constructors + re-exports (caelum.fab role).
-# - Client verbs are @ public @ future stubs on the facade (same-file
-#   `response.Response`). Server verbs proxy the server leaf.
+# - Client I/O verbs stay @ future stubs on the facade (same-file
+#   `response.Response`) until http:get|post|put|delete|patch|request
+#   exist. URL split is re-exported from the client leaf. Server verbs
+#   proxy the server leaf.
 # - Drifted annotation state is not preserved: the whole surface is @ public.
 # - v1 server is plaintext loopback; TLS is explicit-never for the server.
 # - Faber packages own request routing and response policy around the handle loop.
@@ -44,41 +48,43 @@ import from "norma:http/client" client
 # HTTP CLIENT
 # =========================================================================
 # Stubs live here so the return type is this file's `response.Response`.
+# Leaf I/O verbs cannot be returned from these `@ future` wrappers
+# (Future<Response> vs Response). URL split is re-exported below.
 
 @ public
 @ future
 fn get(string url) → response.Response {
-    panic "norma:http.get is deferred pending Stage 2 dispatch"
+    panic "norma:http.get is deferred pending http:get"
 }
 
 @ public
 @ future
 fn post(string url, string body) → response.Response {
-    panic "norma:http.post is deferred pending Stage 2 dispatch"
+    panic "norma:http.post is deferred pending http:post"
 }
 
 @ public
 @ future
 fn put(string url, string body) → response.Response {
-    panic "norma:http.put is deferred pending Stage 2 dispatch"
+    panic "norma:http.put is deferred pending http:put"
 }
 
 @ public
 @ future
 fn delete(string url) → response.Response {
-    panic "norma:http.delete is deferred pending Stage 2 dispatch"
+    panic "norma:http.delete is deferred pending http:delete"
 }
 
 @ public
 @ future
 fn patch(string url, string body) → response.Response {
-    panic "norma:http.patch is deferred pending Stage 2 dispatch"
+    panic "norma:http.patch is deferred pending http:patch"
 }
 
 @ public
 @ future
 fn send_request(string method, string url, map<string, string> headers, string body) → response.Response {
-    panic "norma:http.send_request is deferred pending Stage 2 dispatch"
+    panic "norma:http.send_request is deferred pending http:request"
 }
 
 
@@ -129,4 +135,29 @@ fn response_of(int status, headers.Headers headers, string body) → response.Re
 @ public
 fn encode_chunked(bytes data) → bytes {
     return chunked.encode(data)
+}
+
+@ public
+fn split_url(string url) → client.Url {
+    return client.split(url)
+}
+
+@ public
+fn url_is_absolute(client.Url url) → bool {
+    return client.is_absolute(url)
+}
+
+@ public
+fn empty_client() → client.Client {
+    return client.empty()
+}
+
+@ public
+fn host_header(client.Url url) → string {
+    return client.host_header(url)
+}
+
+@ public
+fn request_target(client.Url url) → string {
+    return client.request_target(url)
 }

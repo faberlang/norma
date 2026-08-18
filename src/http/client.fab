@@ -5,45 +5,415 @@ locale = "en"
 # http/client.fab — HTTP client verbs
 #
 # Public import: import from "norma:http/client" client
-# Depends on: norma:http/response
+# Depends on: norma:http/headers, norma:http/response
 #
-# Verb surface lives here. H5 owns URL split, Agent reuse, and streaming
-# receive. The facade re-exports these verbs for `import from "norma:http"`.
+# URL split, header assembly, and the Client genus live here. I/O verbs
+# stay @ future stubs: the hosts http manifest lists only
+# http:listen|accept|respond|stop. client.rs (petet/mittet/ponet/delet/
+# mutabit/rogabit) is a Rust helper, not a dispatched route, and always
+# read_to_end. Missing routes this leaf would call:
+#   http:get, http:post, http:put, http:delete, http:patch, http:request
+#   http:request_open, http:read (incremental receive; never read_to_end)
+#   an Agent/handle reuse route (client.rs builds a new ureq::Agent per call)
+# Do not invent those call sites until the manifest lists them.
 
+import from "norma:http/headers" headers
 import from "norma:http/response" response
+
+# Minimal origin-form split (scheme/host/port/path/query). No standalone
+# URL genus elsewhere — design killed that leaf for v1.
+@ public
+class Url {
+    string scheme = ""
+    string host = ""
+    int port = 0
+    string path = ""
+    string query = ""
+}
+
+# Reuse point for a future provider Agent handle. The current provider
+# does not expose one (new ureq::Agent per request).
+@ public
+class Client {
+}
+
+@ public
+fn empty() → Client {
+    return Client { }
+}
+
+# Split an absolute URL. Invalid input yields an empty scheme (no host).
+# Default ports: http 80, https 443. Empty path becomes `/`. Fragment
+# is dropped. Port, when present, must be between 1 and 65535.
+@ public
+fn split(string url) → Url {
+    const int sep ← _find_scheme_sep(url)
+    if sep < 0 then return Url { }
+    const string scheme ← _ascii_lower(url.slice(0, sep))
+    if not _is_scheme(scheme) then return Url { }
+    const string rest ← url.slice(sep + 3, url.length())
+    const int auth_end ← _authority_end(rest)
+    if auth_end < 0 then return Url { }
+    const string authority ← rest.slice(0, auth_end)
+    const string remainder ← rest.slice(auth_end, rest.length())
+    const string hostport ← _strip_userinfo(authority)
+    const string host ← _ascii_lower(_host_of(hostport))
+    if host.length() ≡ 0 then return Url { }
+    if not _is_host(host) then return Url { }
+    const int ∪ null port ← _port_of(hostport, scheme)
+    if port is null then return Url { }
+    const string path ← _remainder_path(remainder)
+    const string query ← _remainder_query(remainder)
+    return Url {
+        scheme = scheme,
+        host = host,
+        port = port ↦ int,
+        path = path,
+        query = query
+    }
+}
+
+@ public
+fn is_absolute(Url url) → bool {
+    return url.scheme.length() > 0 and url.host.length() > 0
+}
+
+# Host header value: omit the port when it is the scheme default.
+@ public
+fn host_header(Url url) → string {
+    if _is_default_port(url.scheme, url.port) {
+        return _host_literal(url.host)
+    }
+    return "§:§"(_host_literal(url.host), url.port ↦ string)
+}
+
+# Origin-form request target (`/path` or `/path?query`).
+@ public
+fn request_target(Url url) → string {
+    if url.query.length() ≡ 0 {
+        return url.path
+    }
+    return "§?§"(url.path, url.query)
+}
+
+# Fold a name→value map into the shared Headers genus (illegal lines dropped).
+@ public
+fn headers_from_map(map<string, string> pairs) → headers.Headers {
+    var headers.Headers out ← headers.empty()
+    const list<string> names ← pairs.keys()
+    for from names const name {
+        const string ∪ null value ← pairs.get(name)
+        if value not is null {
+            if out.append(name, value ↦ string) {
+            }
+        }
+    }
+    return out
+}
 
 @ public
 @ future
 fn get(string url) → response.Response {
-    panic "norma:http.get is deferred pending Stage 2 dispatch"
+    const Url parsed ← split(url)
+    if not is_absolute(parsed) {
+        panic "norma:http/client.get: invalid URL"
+    }
+    panic "norma:http/client.get: missing provider route http:get"
 }
 
 @ public
 @ future
 fn post(string url, string body) → response.Response {
-    panic "norma:http.post is deferred pending Stage 2 dispatch"
+    const Url parsed ← split(url)
+    if not is_absolute(parsed) {
+        panic "norma:http/client.post: invalid URL"
+    }
+    panic "norma:http/client.post: missing provider route http:post"
 }
 
 @ public
 @ future
 fn put(string url, string body) → response.Response {
-    panic "norma:http.put is deferred pending Stage 2 dispatch"
+    const Url parsed ← split(url)
+    if not is_absolute(parsed) {
+        panic "norma:http/client.put: invalid URL"
+    }
+    panic "norma:http/client.put: missing provider route http:put"
 }
 
 @ public
 @ future
 fn delete(string url) → response.Response {
-    panic "norma:http.delete is deferred pending Stage 2 dispatch"
+    const Url parsed ← split(url)
+    if not is_absolute(parsed) {
+        panic "norma:http/client.delete: invalid URL"
+    }
+    panic "norma:http/client.delete: missing provider route http:delete"
 }
 
 @ public
 @ future
 fn patch(string url, string body) → response.Response {
-    panic "norma:http.patch is deferred pending Stage 2 dispatch"
+    const Url parsed ← split(url)
+    if not is_absolute(parsed) {
+        panic "norma:http/client.patch: invalid URL"
+    }
+    panic "norma:http/client.patch: missing provider route http:patch"
 }
 
 @ public
 @ future
 fn send_request(string method, string url, map<string, string> headers, string body) → response.Response {
-    panic "norma:http.send_request is deferred pending Stage 2 dispatch"
+    const Url parsed ← split(url)
+    if not is_absolute(parsed) {
+        panic "norma:http/client.send_request: invalid URL"
+    }
+    panic "norma:http/client.send_request: missing provider route http:request"
+}
+
+fn _find_scheme_sep(string url) → int {
+    var int i ← 0
+    while i + 2 < url.length() {
+        if url.slice(i, i + 3) ≡ "://" {
+            return i
+        }
+        i ← i + 1
+    }
+    return -1
+}
+
+fn _is_scheme(string scheme) → bool {
+    if scheme.length() ≡ 0 then return false
+    if not _is_alpha(scheme.slice(0, 1)) then return false
+    var int i ← 1
+    while i < scheme.length() {
+        const string c ← scheme.slice(i, i + 1)
+        if not _is_alpha(c) and not _is_digit(c) and c ≠ "+" and c ≠ "-" and c ≠ "." {
+            return false
+        }
+        i ← i + 1
+    }
+    return true
+}
+
+fn _authority_end(string rest) → int {
+    if rest.length() ≡ 0 then return -1
+    var int i ← 0
+    var bool v6 ← false
+    while i < rest.length() {
+        const string c ← rest.slice(i, i + 1)
+        if c ≡ "[" {
+            v6 ← true
+        }
+        elif c ≡ "]" {
+            v6 ← false
+        }
+        elif not v6 and (c ≡ "/" or c ≡ "?" or c ≡ "#") {
+            return i
+        }
+        i ← i + 1
+    }
+    return rest.length()
+}
+
+fn _strip_userinfo(string authority) → string {
+    var int at ← -1
+    var int i ← 0
+    var bool v6 ← false
+    while i < authority.length() {
+        const string c ← authority.slice(i, i + 1)
+        if c ≡ "[" {
+            v6 ← true
+        }
+        elif c ≡ "]" {
+            v6 ← false
+        }
+        elif c ≡ "@" and not v6 {
+            at ← i
+        }
+        i ← i + 1
+    }
+    if at < 0 then return authority
+    return authority.slice(at + 1, authority.length())
+}
+
+fn _host_of(string hostport) → string {
+    if hostport.length() ≡ 0 then return ""
+    if hostport.slice(0, 1) ≡ "[" {
+        var int i ← 1
+        while i < hostport.length() {
+            if hostport.slice(i, i + 1) ≡ "]" {
+                return hostport.slice(1, i)
+            }
+            i ← i + 1
+        }
+        return ""
+    }
+    var int i ← 0
+    while i < hostport.length() {
+        if hostport.slice(i, i + 1) ≡ ":" {
+            return hostport.slice(0, i)
+        }
+        i ← i + 1
+    }
+    return hostport
+}
+
+fn _port_of(string hostport, string scheme) → int ∪ null {
+    if hostport.length() ≡ 0 then return null
+    var string digits ← ""
+    if hostport.slice(0, 1) ≡ "[" {
+        var int i ← 1
+        var bool closed ← false
+        while i < hostport.length() {
+            if hostport.slice(i, i + 1) ≡ "]" {
+                closed ← true
+                i ← i + 1
+                break
+            }
+            i ← i + 1
+        }
+        if not closed then return null
+        if i ≡ hostport.length() {
+            return _default_port(scheme)
+        }
+        if hostport.slice(i, i + 1) ≠ ":" then return null
+        digits ← hostport.slice(i + 1, hostport.length())
+    }
+    else {
+        var int colon ← -1
+        var int i ← 0
+        while i < hostport.length() {
+            if hostport.slice(i, i + 1) ≡ ":" {
+                if colon ≥ 0 then return null
+                colon ← i
+            }
+            i ← i + 1
+        }
+        if colon < 0 {
+            return _default_port(scheme)
+        }
+        digits ← hostport.slice(colon + 1, hostport.length())
+    }
+    if digits.length() ≡ 0 then return null
+    var int i ← 0
+    while i < digits.length() {
+        if not _is_digit(digits.slice(i, i + 1)) then return null
+        i ← i + 1
+    }
+    do {
+        const int n ← digits ↦ int
+        if n < 1 or n > 65535 then return null
+        return n
+    }
+    catch err {
+        return null
+    }
+}
+
+fn _default_port(string scheme) → int {
+    if scheme ≡ "http" then return 80
+    if scheme ≡ "https" then return 443
+    return 0
+}
+
+fn _is_default_port(string scheme, int port) → bool {
+    if scheme ≡ "http" then return port ≡ 80
+    if scheme ≡ "https" then return port ≡ 443
+    return false
+}
+
+fn _is_host(string host) → bool {
+    if host.length() ≡ 0 then return false
+    var int i ← 0
+    while i < host.length() {
+        const string c ← host.slice(i, i + 1)
+        if c ≡ " " or c ≡ "/" or c ≡ "?" or c ≡ "#" or c ≡ "@" or c ≡ "[" or c ≡ "]" {
+            return false
+        }
+        i ← i + 1
+    }
+    return true
+}
+
+fn _host_literal(string host) → string {
+    var int i ← 0
+    while i < host.length() {
+        if host.slice(i, i + 1) ≡ ":" {
+            return "[§]"(host)
+        }
+        i ← i + 1
+    }
+    return host
+}
+
+fn _remainder_path(string remainder) → string {
+    if remainder.length() ≡ 0 then return "/"
+    const string first ← remainder.slice(0, 1)
+    if first ≡ "?" or first ≡ "#" then return "/"
+    var int i ← 0
+    while i < remainder.length() {
+        const string c ← remainder.slice(i, i + 1)
+        if c ≡ "?" or c ≡ "#" {
+            const string path ← remainder.slice(0, i)
+            if path.length() ≡ 0 then return "/"
+            return path
+        }
+        i ← i + 1
+    }
+    return remainder
+}
+
+fn _remainder_query(string remainder) → string {
+    var int i ← 0
+    while i < remainder.length() {
+        const string c ← remainder.slice(i, i + 1)
+        if c ≡ "#" {
+            return ""
+        }
+        if c ≡ "?" {
+            const int start ← i + 1
+            var int j ← start
+            while j < remainder.length() {
+                if remainder.slice(j, j + 1) ≡ "#" {
+                    return remainder.slice(start, j)
+                }
+                j ← j + 1
+            }
+            return remainder.slice(start, remainder.length())
+        }
+        i ← i + 1
+    }
+    return ""
+}
+
+fn _ascii_lower(string s) → string {
+    var string out ← ""
+    var int i ← 0
+    while i < s.length() {
+        out ← out + _lower_char(s.slice(i, i + 1))
+        i ← i + 1
+    }
+    return out
+}
+
+fn _lower_char(string c) → string {
+    const string upper ← "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+    const string lower ← "abcdefghijklmnopqrstuvwxyz"
+    var int i ← 0
+    while i < 26 {
+        if upper.slice(i, i + 1) ≡ c {
+            return lower.slice(i, i + 1)
+        }
+        i ← i + 1
+    }
+    return c
+}
+
+fn _is_alpha(string c) → bool {
+    return "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".contains(c)
+}
+
+fn _is_digit(string c) → bool {
+    return "0123456789".contains(c)
 }
