@@ -1,0 +1,24 @@
+# http/client.proba — import-resolution fixture for norma:http/client
+#
+# The MIR runner treats imported norma members as provider routes (same
+# residual as exempla/http/headers.proba). Behavior cases live in
+# src/http/client.proba (relative import).
+
+import from "norma:http/client" client
+
+describe "client_import" {
+    test "Url and Client construct" {
+        const client.Url url ← client.Url {
+            scheme = "http",
+            host = "127.0.0.1",
+            port = 9,
+            path = "/test",
+            query = ""
+        }
+        const client.Client session ← client.Client { }
+        assert url.host ≡ "127.0.0.1"
+        assert url.port ≡ 9
+        assert url.path ≡ "/test"
+        print "client constructed"
+    }
+}
