@@ -7,15 +7,16 @@ locale = "en"
 # Public import: import from "norma:http/client" client
 # Depends on: norma:http/headers, norma:http/response
 #
-# URL split, header assembly, and the Client genus live here. I/O verbs
-# stay @ future stubs: the hosts http manifest lists only
-# http:listen|accept|respond|stop. client.rs (petet/mittet/ponet/delet/
-# mutabit/rogabit) is a Rust helper, not a dispatched route, and always
-# read_to_end. Missing routes this leaf would call:
-#   http:get, http:post, http:put, http:delete, http:patch, http:request
-#   http:request_open, http:read (incremental receive; never read_to_end)
-#   an Agent/handle reuse route (client.rs builds a new ureq::Agent per call)
-# Do not invent those call sites until the manifest lists them.
+# URL split, header assembly, Client agent reuse, and I/O verbs over
+# dispatched http:* client routes:
+#   http:agent           [] or [timeout_ms] → handle
+#   http:get|delete      [url] | [url, headers] | [agent, url] | [agent, url, headers]
+#   http:post|put|patch  [url, body] | [url, headers, body] | [agent, …]
+#   http:request         [method, url, headers, body] | [agent, method, url, headers, body]
+#   http:request_open    same arity as http:request → {reader, status, headers}
+#   http:read            [reader] | [reader, max_bytes] → {bytes, done}
+# Streaming receive pulls one bounded chunk per call (never read_to_end)
+# so an SSE consumer can parse events as they arrive.
 
 import from "norma:http/headers" headers
 import from "norma:http/response" response
@@ -31,15 +32,59 @@ class Url {
     string query = ""
 }
 
-# Reuse point for a future provider Agent handle. The current provider
-# does not expose one (new ureq::Agent per request).
+# Reuse holder. `agent` is the http:agent handle; 0 means ephemeral
+# (the provider builds a one-shot agent for that call).
 @ public
 class Client {
+    int agent = 0
+}
+
+# Incremental receive handle from http:request_open. `next` / `next_n`
+# pull one chunk via http:read; they never drain the remainder.
+@ public
+class Receive {
+    int reader = 0
+    int status = 0
+    headers.Headers headers = headers.Headers { }
+
+    @ public
+    fn next() → Chunk {
+        return receive(self)
+    }
+
+    @ public
+    fn next_n(int max_bytes) → Chunk {
+        return receive_n(self, max_bytes)
+    }
+}
+
+# One incremental body chunk. `text` is the UTF-8 decode of this read
+# (empty when the bytes are not UTF-8). `done` is true only on the
+# terminal read; a later receive after done fails at the provider.
+@ public
+class Chunk {
+    string text = ""
+    bool done = false
 }
 
 @ public
 fn empty() → Client {
     return Client { }
+}
+
+# Create a reusable agent (provider default timeout).
+@ public
+fn session() → Client {
+    const list<value> none ← vacua
+    const int handle ← call 'http:agent' (none) ↦ int
+    return Client { agent = handle }
+}
+
+# Create a reusable agent with an explicit timeout in milliseconds.
+@ public
+fn session_timeout(int timeout_ms) → Client {
+    const int handle ← call 'http:agent' ([timeout_ms ↦ value]) ↦ int
+    return Client { agent = handle }
 }
 
 # Split an absolute URL. Invalid input yields an empty scheme (no host).
@@ -112,63 +157,254 @@ fn headers_from_map(map<string, string> pairs) → headers.Headers {
 }
 
 @ public
-@ future
 fn get(string url) → response.Response {
-    const Url parsed ← split(url)
-    if not is_absolute(parsed) {
-        panic "norma:http/client.get: invalid URL"
-    }
-    panic "norma:http/client.get: missing provider route http:get"
+    return _no_body("http:get", 0, url, headers.empty())
 }
 
 @ public
-@ future
+fn get_with(string url, headers.Headers headers) → response.Response {
+    return _no_body("http:get", 0, url, headers)
+}
+
+@ public
+fn get_on(Client client, string url) → response.Response {
+    return _no_body("http:get", client.agent, url, headers.empty())
+}
+
+@ public
 fn post(string url, string body) → response.Response {
-    const Url parsed ← split(url)
-    if not is_absolute(parsed) {
-        panic "norma:http/client.post: invalid URL"
-    }
-    panic "norma:http/client.post: missing provider route http:post"
+    return _with_body("http:post", 0, url, headers.empty(), body)
 }
 
 @ public
-@ future
+fn post_with(string url, headers.Headers headers, string body) → response.Response {
+    return _with_body("http:post", 0, url, headers, body)
+}
+
+@ public
+fn post_on(Client client, string url, string body) → response.Response {
+    return _with_body("http:post", client.agent, url, headers.empty(), body)
+}
+
+@ public
 fn put(string url, string body) → response.Response {
-    const Url parsed ← split(url)
-    if not is_absolute(parsed) {
-        panic "norma:http/client.put: invalid URL"
-    }
-    panic "norma:http/client.put: missing provider route http:put"
+    return _with_body("http:put", 0, url, headers.empty(), body)
 }
 
 @ public
-@ future
+fn put_with(string url, headers.Headers headers, string body) → response.Response {
+    return _with_body("http:put", 0, url, headers, body)
+}
+
+@ public
+fn put_on(Client client, string url, string body) → response.Response {
+    return _with_body("http:put", client.agent, url, headers.empty(), body)
+}
+
+@ public
 fn delete(string url) → response.Response {
-    const Url parsed ← split(url)
-    if not is_absolute(parsed) {
-        panic "norma:http/client.delete: invalid URL"
-    }
-    panic "norma:http/client.delete: missing provider route http:delete"
+    return _no_body("http:delete", 0, url, headers.empty())
 }
 
 @ public
-@ future
+fn delete_with(string url, headers.Headers headers) → response.Response {
+    return _no_body("http:delete", 0, url, headers)
+}
+
+@ public
+fn delete_on(Client client, string url) → response.Response {
+    return _no_body("http:delete", client.agent, url, headers.empty())
+}
+
+@ public
 fn patch(string url, string body) → response.Response {
-    const Url parsed ← split(url)
-    if not is_absolute(parsed) {
-        panic "norma:http/client.patch: invalid URL"
-    }
-    panic "norma:http/client.patch: missing provider route http:patch"
+    return _with_body("http:patch", 0, url, headers.empty(), body)
 }
 
 @ public
-@ future
-fn send_request(string method, string url, map<string, string> headers, string body) → response.Response {
+fn patch_with(string url, headers.Headers headers, string body) → response.Response {
+    return _with_body("http:patch", 0, url, headers, body)
+}
+
+@ public
+fn patch_on(Client client, string url, string body) → response.Response {
+    return _with_body("http:patch", client.agent, url, headers.empty(), body)
+}
+
+@ public
+fn send_request(string method, string url, map<string, string> pairs, string body) → response.Response {
+    return send(method, url, headers_from_map(pairs), body)
+}
+
+@ public
+fn send(string method, string url, headers.Headers headers, string body) → response.Response {
+    return _generic("http:request", 0, method, url, headers, body)
+}
+
+@ public
+fn send_on(Client client, string method, string url, headers.Headers headers, string body) → response.Response {
+    return _generic("http:request", client.agent, method, url, headers, body)
+}
+
+# Open a streaming receive. The body is not buffered; pull chunks with
+# receive / Receive.next. Designed for text/event-stream consumption.
+@ public
+fn open(string method, string url, headers.Headers headers, string body) → Receive {
+    return _open(0, method, url, headers, body)
+}
+
+@ public
+fn open_on(Client client, string method, string url, headers.Headers headers, string body) → Receive {
+    return _open(client.agent, method, url, headers, body)
+}
+
+@ public
+fn receive(Receive stream) → Chunk {
+    const list<value> args ← [stream.reader ↦ value]
+    return _chunk_of(call 'http:read' (args) ↦ value)
+}
+
+@ public
+fn receive_n(Receive stream, int max_bytes) → Chunk {
+    const list<value> args ← [stream.reader ↦ value, max_bytes ↦ value]
+    return _chunk_of(call 'http:read' (args) ↦ value)
+}
+
+fn _require_url(string url, string verb) → void {
     const Url parsed ← split(url)
     if not is_absolute(parsed) {
-        panic "norma:http/client.send_request: invalid URL"
+        panic "norma:http/client.§: invalid URL"(verb)
     }
-    panic "norma:http/client.send_request: missing provider route http:request"
+    return
+}
+
+fn _no_body(string route, int agent, string url, headers.Headers headers) → response.Response {
+    _require_url(url, route)
+    var list<value> args ← vacua
+    if agent > 0 {
+        args.append(agent ↦ value)
+    }
+    args.append(url ↦ value)
+    if headers.length() > 0 {
+        args.append(_headers_carrier(headers) ↦ value)
+    }
+    if route ≡ "http:get" {
+        return _response_of(call 'http:get' (args) ↦ value)
+    }
+    return _response_of(call 'http:delete' (args) ↦ value)
+}
+
+fn _with_body(string route, int agent, string url, headers.Headers headers, string body) → response.Response {
+    _require_url(url, route)
+    var list<value> args ← vacua
+    if agent > 0 {
+        args.append(agent ↦ value)
+    }
+    args.append(url ↦ value)
+    if headers.length() > 0 {
+        args.append(_headers_carrier(headers) ↦ value)
+    }
+    args.append(body ↦ value)
+    if route ≡ "http:post" {
+        return _response_of(call 'http:post' (args) ↦ value)
+    }
+    if route ≡ "http:put" {
+        return _response_of(call 'http:put' (args) ↦ value)
+    }
+    return _response_of(call 'http:patch' (args) ↦ value)
+}
+
+fn _generic(string route, int agent, string method, string url, headers.Headers headers, string body) → response.Response {
+    _require_url(url, route)
+    const value raw ← _dispatch_generic(route, agent, method, url, headers, body)
+    return _response_of(raw)
+}
+
+fn _open(int agent, string method, string url, headers.Headers headers, string body) → Receive {
+    _require_url(url, "http:request_open")
+    const value raw ← _dispatch_generic("http:request_open", agent, method, url, headers, body)
+    const map<string, value> fields ← raw ↦ map<string, value>
+    return Receive {
+        reader = fields["reader"] ↦ int,
+        status = fields["status"] ↦ int,
+        headers = _headers_from_carrier(fields["headers"])
+    }
+}
+
+fn _dispatch_generic(string route, int agent, string method, string url, headers.Headers headers, string body) → value {
+    var list<value> args ← vacua
+    if agent > 0 {
+        args.append(agent ↦ value)
+    }
+    args.append(method ↦ value)
+    args.append(url ↦ value)
+    args.append(_headers_carrier(headers) ↦ value)
+    args.append(body ↦ value)
+    if route ≡ "http:request_open" {
+        return call 'http:request_open' (args) ↦ value
+    }
+    return call 'http:request' (args) ↦ value
+}
+
+fn _response_of(value raw) → response.Response {
+    const map<string, value> fields ← raw ↦ map<string, value>
+    return response.of(
+        fields["status"] ↦ int,
+        _headers_from_carrier(fields["headers"]),
+        _body_text(fields["body"])
+    )
+}
+
+fn _chunk_of(value raw) → Chunk {
+    const map<string, value> fields ← raw ↦ map<string, value>
+    return Chunk {
+        text = _body_text(fields["bytes"]),
+        done = fields["done"] ↦ bool
+    }
+}
+
+fn _headers_carrier(headers.Headers headers) → list<value> {
+    var list<value> out ← vacua
+    for from headers.entries const entry {
+        var map<string, value> row ← vacua
+        row.put("name", entry.name ↦ value)
+        row.put("value", entry.value ↦ value)
+        out.append(row ↦ value)
+    }
+    return out
+}
+
+fn _headers_from_carrier(value raw) → headers.Headers {
+    var headers.Headers out ← headers.empty()
+    if raw not is list<value> then return out
+    const list<value> items ← raw ↦ list<value>
+    for from items const item {
+        if item is map<string, value> {
+            const map<string, value> row ← item ↦ map<string, value>
+            const string name ← row["name"] ↦ string
+            const string header_value ← row["value"] ↦ string
+            if out.append(name, header_value) {
+            }
+        }
+    }
+    return out
+}
+
+fn _body_text(value raw) → string {
+    if raw is null then return ""
+    if raw is string then return raw ↦ string
+    do {
+        const bytes data ← raw ↦ bytes
+        do {
+            return data ↦ string
+        }
+        catch err {
+            return ""
+        }
+    }
+    catch err {
+        return ""
+    }
 }
 
 fn _find_scheme_sep(string url) → int {
