@@ -28,7 +28,7 @@ fn encode(bytes data) → bytes {
 # illegal extensions, missing CRLF, and trailing bytes after the last-chunk.
 @ public
 fn decode(bytes data) → bytes ⇥ string {
-    var list<int<u8>> body ← vacua
+    var list<int<u8>> body ← empty
     var int i ← 0
     const int n ← data.length()
     while i < n {
@@ -69,7 +69,7 @@ fn _hex_string(int n) → string {
 }
 
 fn _bytes_list(bytes src) → list<int<u8>> {
-    var list<int<u8>> out ← vacua
+    var list<int<u8>> out ← empty
     var int i ← 0
     while i < src.length() {
         out.append(src.get(i) coalesce (0 ∷ int<u8>))

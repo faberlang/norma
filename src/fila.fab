@@ -42,8 +42,8 @@ locale = "en"
 class Deque<T> {
     # head plays the role of "the ante buffer" (head-side storage). `ante`
     # itself is a reserved keyword and cannot be a field name.
-    list<T> head = vacua
-    list<T> tail = vacua
+    list<T> head = empty
+    list<T> tail = empty
 
     # =========================================================================
     # STATE (nominal / present predicate)
@@ -137,7 +137,7 @@ class Deque<T> {
     # Materialize the queue as a lista in head-to-tail order. Does not
     # consume the queue.
     fn to_list() → list<T> {
-        var list<T> out ← vacua
+        var list<T> out ← empty
         # head is stored reversed (its tail is the queue head), so walk it
         # tail-first to emit in head order.
         var int i ← self.head.length()
