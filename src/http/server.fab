@@ -362,10 +362,10 @@ fn _lower_char(string c) → string {
 
 describe "server" {
     test "http11 default keep-alive" {
-        const headers.Headers empty ← headers.Headers { entries = empty }
-        assert keep_alive(empty)
-        assert keep_alive_version("HTTP/1.1", empty)
-        assert keep_alive_version("1.1", empty)
+        const headers.Headers blank ← headers.Headers { entries = empty }
+        assert keep_alive(blank)
+        assert keep_alive_version("HTTP/1.1", blank)
+        assert keep_alive_version("1.1", blank)
     }
 
     test "http11 honors connection close" {
@@ -387,9 +387,9 @@ describe "server" {
     }
 
     test "http10 default off unless keep-alive named" {
-        const headers.Headers empty ← headers.Headers { entries = empty }
-        assert not keep_alive_version("HTTP/1.0", empty)
-        assert not keep_alive_version("1.0", empty)
+        const headers.Headers blank ← headers.Headers { entries = empty }
+        assert not keep_alive_version("HTTP/1.0", blank)
+        assert not keep_alive_version("1.0", blank)
         const headers.Headers named ← headers.Headers {
             entries = [headers.Header { name = "Connection", value = "Keep-Alive" }]
         }
