@@ -24,7 +24,7 @@ fn expect(bytes got, bytes want, string label) → void ⇥ string {
 }
 
 fn _repeat(int n, int<u8> b) → bytes {
-    var list<int<u8>> out ← vacua
+    var list<int<u8>> out ← empty
     for range 0‥n const i {
         out.append(b)
     }
@@ -35,7 +35,7 @@ fn _repeat(int n, int<u8> b) → bytes {
 main {
     do {
         const bytes abc ← |61 62 63|
-        const list<int<u8>> empty_bytes ← vacua
+        const list<int<u8>> empty_bytes ← empty
         const bytes empty ← empty_bytes
         const bytes zeros ← |61 00 62 00 63|
 
@@ -73,7 +73,7 @@ main {
     # API contract — invalid algorithm names must fail with the exact error text
     const string ALG_ERROR ← "norma:crypta.digest: algorithm must be sha256, sha384, or sha512"
 
-    var list<string> failed ← vacua
+    var list<string> failed ← empty
     for from ["", "md5", "SHA256", "Sha384", "sha-256"] const alg {
         do {
             const bytes result ← crypta.digest(alg, |61 62 63|)
