@@ -57,11 +57,11 @@ fn product(list<int> shape) → int {
 fn apply<T, size Figura>(tensor<T, Figura> grid, (T) → T f) → tensor<T, Figura> {
     const list<int> shape ← grid.shape()
     const list<T> flat ← grid ↦ list<T>
-    var list<T> mapped ← empty
+    var list<T> mapped ← []
     for from flat const elem {
         mapped.append(f(elem))
     }
-    const tensor<T, []> seed ← empty
+    const tensor<T, []> seed ← [] ∷ tensor<T, []>
     return seed.from_flat(mapped, shape)
 }
 
