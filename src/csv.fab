@@ -28,7 +28,7 @@ fn parse(string wire) → list<list<string>> {
     if wire.length() ≡ 0 then return empty
 
     const list<string> rows ← chorda.split_n(wire, "\n", wire.length() + 1)
-    var list<list<string>> map ← empty
+    var list<list<string>> map ← []
     for from rows const row {
         const string normalized ← _normalize_row(row)
         map.append(chorda.split_n(normalized, ",", normalized.length() + 1))
@@ -40,7 +40,7 @@ fn parse(string wire) → list<list<string>> {
 # Why: Compose rows of fields into comma-separated, LF-joined wire text.
 @ public
 fn stringify(list<list<string>> map) → string {
-    var list<string> rows ← empty
+    var list<string> rows ← []
     for from map const fields {
         rows.append(chorda.join(fields, ","))
     }

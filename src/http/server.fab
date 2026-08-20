@@ -303,9 +303,9 @@ fn _line_has_token(string line, string folded_want) → bool {
 }
 
 fn _headers_carrier(headers.Headers headers) → list<value> {
-    var list<value> out ← empty
+    var list<value> out ← []
     for from headers.entries const entry {
-        var map<string, value> row ← empty
+        var map<string, value> row ← [] ∷ map<string, value>
         row.put("name", entry.name ↦ value)
         row.put("value", entry.value ↦ value)
         out.append(row ↦ value)
@@ -362,7 +362,7 @@ fn _lower_char(string c) → string {
 
 describe "server" {
     test "http11 default keep-alive" {
-        const headers.Headers blank ← headers.Headers { entries = empty }
+        const headers.Headers blank ← headers.Headers { entries = [] }
         assert keep_alive(blank)
         assert keep_alive_version("HTTP/1.1", blank)
         assert keep_alive_version("1.1", blank)
@@ -387,7 +387,7 @@ describe "server" {
     }
 
     test "http10 default off unless keep-alive named" {
-        const headers.Headers blank ← headers.Headers { entries = empty }
+        const headers.Headers blank ← headers.Headers { entries = [] }
         assert not keep_alive_version("HTTP/1.0", blank)
         assert not keep_alive_version("1.0", blank)
         const headers.Headers named ← headers.Headers {
