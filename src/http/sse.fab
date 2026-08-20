@@ -47,7 +47,7 @@ fn parse(string wire) → list<Event> ⇥ string {
     if src.length() > 0 and src.slice(0, 1) ≡ bom {
         src ← src.slice(1, src.length())
     }
-    var list<Event> events ← vacua
+    var list<Event> events ← empty
     var string last_id ← ""
     var string name ← ""
     var string data ← ""
@@ -126,7 +126,7 @@ fn parse(string wire) → list<Event> ⇥ string {
 }
 
 fn _data_lines(string data) → list<string> {
-    var list<string> lines ← vacua
+    var list<string> lines ← empty
     var int start ← 0
     var int i ← 0
     while i < data.length() {
@@ -207,7 +207,7 @@ fn _finish_event(string name, string data, string id, string retry, string last_
 }
 
 fn _must_parse(string wire) → list<Event> {
-    var list<Event> out ← vacua
+    var list<Event> out ← empty
     var bool ok ← false
     do {
         out ← parse(wire)

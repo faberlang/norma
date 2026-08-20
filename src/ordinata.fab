@@ -46,8 +46,8 @@ locale = "en"
 # (tabula get) while ordered iteration is O(n) over an already-sorted
 # lista, instead of O(n log n) sort-on-each-iteration.
 class SortedMap<K, V> {
-    list<K> index = vacua
-    map<K, V> entries = vacua
+    list<K> index = empty
+    map<K, V> entries = empty
 
     # =========================================================================
     # STATE (nominal / present predicate)
@@ -112,7 +112,7 @@ class SortedMap<K, V> {
 
     # Values in key-ascending order. Nominal projection.
     fn values() → list<V> {
-        var list<V> out ← vacua
+        var list<V> out ← empty
         for from self.index const k {
             # has verified by construction; get cannot miss.
             const V ∪ null v ← self.entries.get(k)
@@ -198,7 +198,7 @@ fn _equals<K>(K a, K b) → bool {
 # reassigned (SEM020), so the original is drained and refilled.
 @ private
 fn _remove_at<K>(list<K> index, int positio) → void {
-    var list<K> out ← vacua
+    var list<K> out ← empty
     var int i ← 0
     while i < index.length() {
         const K ∪ null extans ← index.get(i)

@@ -481,7 +481,7 @@ fn glob(string radix, string exemplar) → list<string> ⇥ string {
             throw "empty path segment in solum.glob exemplar"
         }
 
-        var list<string> proximos ← vacua
+        var list<string> proximos ← empty
         if segmentum ≡ "*" {
             for from candidatos const base {
                 const list<string> entries ← list_dir(base)

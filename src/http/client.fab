@@ -75,7 +75,7 @@ fn empty() → Client {
 # Create a reusable agent (provider default timeout).
 @ public
 fn session() → Client {
-    const list<value> none ← vacua
+    const list<value> none ← empty
     const int handle ← call 'http:agent' (none) ↦ int
     return Client { agent = handle }
 }
@@ -280,7 +280,7 @@ fn _require_url(string url, string verb) → void {
 
 fn _no_body(string route, int agent, string url, headers.Headers headers) → response.Response {
     _require_url(url, route)
-    var list<value> args ← vacua
+    var list<value> args ← empty
     if agent > 0 {
         args.append(agent ↦ value)
     }
@@ -296,7 +296,7 @@ fn _no_body(string route, int agent, string url, headers.Headers headers) → re
 
 fn _with_body(string route, int agent, string url, headers.Headers headers, string body) → response.Response {
     _require_url(url, route)
-    var list<value> args ← vacua
+    var list<value> args ← empty
     if agent > 0 {
         args.append(agent ↦ value)
     }
@@ -332,7 +332,7 @@ fn _open(int agent, string method, string url, headers.Headers headers, string b
 }
 
 fn _dispatch_generic(string route, int agent, string method, string url, headers.Headers headers, string body) → value {
-    var list<value> args ← vacua
+    var list<value> args ← empty
     if agent > 0 {
         args.append(agent ↦ value)
     }
@@ -364,9 +364,9 @@ fn _chunk_of(value raw) → Chunk {
 }
 
 fn _headers_carrier(headers.Headers headers) → list<value> {
-    var list<value> out ← vacua
+    var list<value> out ← empty
     for from headers.entries const entry {
-        var map<string, value> row ← vacua
+        var map<string, value> row ← empty
         row.put("name", entry.name ↦ value)
         row.put("value", entry.value ↦ value)
         out.append(row ↦ value)

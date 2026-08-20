@@ -87,7 +87,7 @@ fn _word32(list<int<u8>> buf, int off) → uint<u32> {
 
 @ private
 fn _schedule32(list<int<u8>> buf, int init) → list<uint<u32>> {
-    var list<uint<u32>> w ← vacua
+    var list<uint<u32>> w ← empty
     for range 0‥16 const i {
         w.append(_word32(buf, init + i * 4))
     }
@@ -125,7 +125,7 @@ fn _compress32(list<uint<u32>> statusus, list<uint<u32>> w, list<uint<u32>> k) �
         b ← a
         a ← t1 + t2
     }
-    var list<uint<u32>> result ← vacua
+    var list<uint<u32>> result ← empty
     result.append(a + statusus[0])
     result.append(b + statusus[1])
     result.append(c + statusus[2])
@@ -139,7 +139,7 @@ fn _compress32(list<uint<u32>> statusus, list<uint<u32>> w, list<uint<u32>> k) �
 
 @ private
 fn _serialize32(list<uint<u32>> h) → list<int<u8>> {
-    var list<int<u8>> out ← vacua
+    var list<int<u8>> out ← empty
     for range 0‥8 const i {
         const uint<u32> word ← h[i]
         out.append((word ⇒ 24) ↦ int<u8>)
@@ -153,7 +153,7 @@ fn _serialize32(list<uint<u32>> h) → list<int<u8>> {
 @ private
 fn _pad32(bytes data) → list<int<u8>> {
     const int bit_len ← data.length() * 8
-    var list<int<u8>> padded ← vacua
+    var list<int<u8>> padded ← empty
     for range 0‥data.length() const i {
         padded.append(data.get(i) coalesce (0 ∷ int<u8>))
     }
@@ -230,7 +230,7 @@ fn _word64(list<int<u8>> buf, int off) → uint<u64> {
 
 @ private
 fn _schedule64(list<int<u8>> buf, int init) → list<uint<u64>> {
-    var list<uint<u64>> w ← vacua
+    var list<uint<u64>> w ← empty
     for range 0‥16 const i {
         w.append(_word64(buf, init + i * 8))
     }
@@ -268,7 +268,7 @@ fn _compress64(list<uint<u64>> statusus, list<uint<u64>> w, list<uint<u64>> k) �
         b ← a
         a ← t1 + t2
     }
-    var list<uint<u64>> result ← vacua
+    var list<uint<u64>> result ← empty
     result.append(a + statusus[0])
     result.append(b + statusus[1])
     result.append(c + statusus[2])
@@ -283,7 +283,7 @@ fn _compress64(list<uint<u64>> statusus, list<uint<u64>> w, list<uint<u64>> k) �
 # n_words is 8 for SHA-512 and 6 for SHA-384 truncation.
 @ private
 fn _serialize64(list<uint<u64>> h, int n_words) → list<int<u8>> {
-    var list<int<u8>> out ← vacua
+    var list<int<u8>> out ← empty
     for range 0‥n_words const i {
         const uint<u64> word ← h[i]
         out.append((word ⇒ 56) ↦ int<u8>)
@@ -301,7 +301,7 @@ fn _serialize64(list<uint<u64>> h, int n_words) → list<int<u8>> {
 @ private
 fn _pad64(bytes data) → list<int<u8>> {
     const int bit_len ← data.length() * 8
-    var list<int<u8>> padded ← vacua
+    var list<int<u8>> padded ← empty
     for range 0‥data.length() const i {
         padded.append(data.get(i) coalesce (0 ∷ int<u8>))
     }
