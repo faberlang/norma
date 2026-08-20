@@ -295,18 +295,18 @@ fn delete_async(string via) → void {
 # =========================================================================
 # FILE OPERATIONS - Copy
 # =========================================================================
-# Verb: copy/copy_async from "exscribere" (to copy out, transcribe)
+# Verb: exscribe/exscribet from "exscribere" (to copy out, transcribe)
 # Maps to: fs.copyFileSync(src, dest) / fs.copyFile(src, dest)
 
 # Copy file (sync)
 @ public
-fn copy(string fons, string destinatio) → void {
+fn exscribe(string fons, string destinatio) → void {
     return call 'solum:exscribe' ([fons, destinatio]) ↦ void
 }
 
 # Copy file (async route; Faber blocks)
 @ future
-fn copy_async(string fons, string destinatio) → void {
+fn exscribet(string fons, string destinatio) → void {
     return call 'solum:exscribet' ([fons, destinatio]) ↦ void
 }
 
