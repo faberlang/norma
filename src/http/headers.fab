@@ -21,7 +21,7 @@ class Header {
 
 @ public
 class Headers {
-    list<Header> entries = empty
+    list<Header> entries = []
 
     @ public
     fn length() → int {
@@ -53,7 +53,7 @@ class Headers {
     @ public
     fn values(string name) → list<string> {
         const string folded ← _ascii_lower(name)
-        var list<string> out ← empty
+        var list<string> out ← []
         for from self.entries const entry {
             if _ascii_lower(entry.name) ≡ folded {
                 out.append(entry.value)
