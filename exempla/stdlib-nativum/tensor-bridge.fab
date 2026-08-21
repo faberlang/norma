@@ -30,7 +30,7 @@ main {
         3.0,
         4.0,
         5.0,
-        6.0,
+        6.0
     ]
     const tensor<float<f32>, [2, 3]> shaped ← tensor.construct<tensor<float<f32>, [2, 3]>>(data)
     const tensor<float<f32>, [2, 3]> filled ← tensor.creata<tensor<float<f32>, [2, 3]>>(0.0 ∷ float<f32>)
