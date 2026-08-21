@@ -7,24 +7,20 @@ locale = "en"
 # Shared surface for the tree-shaped codecs under the flat codec modules (json, toml, yaml).
 # Each codec owns its wire floor; this module owns the operations on the
 # valor tree shape they all produce. CSV is excluded — it produces a flat
-# lista<lista<textus>>, not a valor tree.
+# list<list<string>>, not a valor tree.
 #
-# No Rust backing. Variant discrimination uses `est` (tag check without
-# extraction, per docs/factory/est-variant-check) and typed read uses `↦`
-# (extraction). The conversio-cascade pattern that previously lived in
-# json.fab and toml.fab is retired here in favor of the flat est dispatch.
-#
-# Same-file calls use bare helpers. Internal callers use the private `_get`
-# helper while the public `get` export preserves the external namespace surface.
+# No Rust backing. Variant discrimination uses `is` (tag check without
+# extraction) and typed read uses `↦` (extraction). The conversio-cascade
+# pattern that previously lived in json.fab and toml.fab is retired here
+# in favor of the flat `is` dispatch.
 
 import from "norma:chorda" chorda
 
 # =========================================================================
-# SHAPE PREDICATES (est variant checks — all 8 Valor variants)
+# SHAPE PREDICATES
 # =========================================================================
-# Each predicate is a one-line variant tag check via `est`, lowering to
-# matches!(v, Valor::Variant(_)). See sibling faber/runtime/rust/src/valor.rs for the
-# enum whose variants these check.
+# One-line `is` tag checks. The runtime enum is sibling
+# faber/runtime/rust/src/valor.rs.
 
 @ public
 fn is_null(value v) → bool {
@@ -71,11 +67,11 @@ fn is_instant(value v) → bool {
 # =========================================================================
 # VALUE ACCESS
 # =========================================================================
-# All accessors return nihil for missing keys, out-of-bounds indices, and
+# All accessors return null for missing keys, out-of-bounds indices, and
 # non-collection variants. Callers distinguish "absent" from "wrong shape"
 # via the predicates above if they care.
 
-# Get value by key from a tabula (returns nihil if missing or non-tabula).
+# Get value by key from a map (returns null if missing or non-map).
 @ private
 fn _get(value v, string clavis) → value {
     if v is null then return null
@@ -90,8 +86,8 @@ fn get(value v, string clavis) → value {
     return _get(v, clavis)
 }
 
-# Pluck value by index from a lista (returns nihil if out of bounds or
-# non-lista).
+# Pluck value by index from a list (returns null if out of bounds or
+# non-list).
 @ public
 fn get_index(value v, int index) → value {
     if v is null then return null
@@ -101,11 +97,11 @@ fn get_index(value v, int index) → value {
     return got
 }
 
-# Find value by dotted path (e.g. "user.address.city"). Walks tabulae by
-# key; numeric segments index listae. Returns nihil if any segment misses.
+# Find value by dotted path (e.g. "user.address.city"). Walks maps by
+# key; numeric segments index lists. Returns null if any segment misses.
 @ public
 fn find(value v, string via) → value {
-    # chorda.split_n limited split: at most via.longitudo()+1 segments,
+    # chorda.split_n limited split: at most via.length()+1 segments,
     # which is more than any dotted path can produce.
     const list<string> partes ← chorda.split_n(via, ".", via.length() + 1) ↦ list<string>
     var value current ← v
@@ -116,15 +112,14 @@ fn find(value v, string via) → value {
     return current
 }
 
-# Walk one path segment. Tabula-keyed first; numeric segments fall through
-# to lista indexing. Non-collection variants return nihil.
+# Walk one path segment. Map-keyed first; numeric segments fall through
+# to list indexing. Non-collection variants return null.
 @ public
 fn find_part(value current, string part) → value {
     if current is null then return null
     if current is map<string, value> {
         const map<string, value> tab ← current ↦ map<string, value>
         const value got ← tab.get(part)
-        if got is null then return null
         return got
     }
     if current is list<value> {
@@ -143,7 +138,7 @@ fn find_part(value current, string part) → value {
 # STRICT EXTRACTION
 # =========================================================================
 
-# Require a textus child at clavis; throw on missing or non-textus.
+# Require a string child at clavis; throw on missing or non-string.
 @ public
 fn require_string(value v, string clavis) → string ⇥ string {
     const value child ← _get(v, clavis)
@@ -152,14 +147,12 @@ fn require_string(value v, string clavis) → string ⇥ string {
     return child ↦ string
 }
 
-# Require multiple textus children; throws on the first missing or
-# non-textus key. Used by codec callers that validate a schema shape.
+# Require multiple string children; throws on the first missing or
+# non-string key. Used by codec callers that validate a schema shape.
 @ public
 fn require_strings(value v, list<string> claves) → void ⇥ string {
     for from claves const clavis {
-        const value child ← _get(v, clavis)
-        if child is null then throw "missing key: §"(clavis)
-        if child not is string then throw "key not textus: §"(clavis)
+        const string _ ← require_string(v, clavis)
     }
     return
 }
