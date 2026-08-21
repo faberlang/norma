@@ -8,17 +8,8 @@ locale = "en"
 # For raw TCP/UDP sockets, see caelum.fab. This module imports nothing
 # from norma:caelum — they are siblings in the host-effect family.
 #
-# Sub-modules:
-#   norma:http/headers  — Headers genus (case-insensitive, multi-value)
-#   norma:http/request  — Request genus (path?query + query decode)
-#   norma:http/response — Response genus (status classes)
-#   norma:http/chunked  — chunked transfer codec (H2)
-#   norma:http/sse      — Server-Sent Events codec (H2)
-#   norma:http/server   — Listener genus, keep-alive, one-shot + streaming
-#                         respond, SSE helper over http:* routes
-#   norma:http/client   — URL split, Client agent reuse, verb surface over
-#                         http:get|post|put|delete|patch|request, and
-#                         incremental receive via http:request_open / http:read
+# Leaves: headers, request, response, chunked, sse, server, client.
+# SSE is `norma:http/sse` only — the facade does not re-export it.
 #
 # Killed leaves (no second caller — do not add):
 #   router      — inferentia dispatches by path equality
@@ -26,21 +17,22 @@ locale = "en"
 #   body        — folded into server/client; chunked + sse are the shared codecs
 #   url         — minimal split lives in client + request; no standalone genus
 #
-# Design notes:
-# - Facade holds constructors + re-exports (caelum.fab role).
-# - Client I/O verbs are @ future wrappers over the sync client leaf
-#   (same `response.Response`). Callers await `http.get`; the leaf
-#   performs the `http:*` dispatch. URL split is re-exported from the
-#   client leaf. Server verbs proxy the server leaf.
-# - Drifted annotation state is not preserved: the whole surface is @ public.
-# - v1 server is plaintext loopback; TLS is explicit-never for the server.
-# - Faber packages own request routing and response policy around the handle loop.
+# Facade holds constructors + re-exports (caelum.fab role).
+# Client I/O verbs are @ future wrappers over the sync client leaf
+# (same `response.Response`). Callers await `http.get`; the leaf
+# performs the `http:*` dispatch. URL split is re-exported from the
+# client leaf. Server verbs proxy the server leaf.
+# The whole surface is @ public.
+# v1 server is plaintext loopback; TLS is explicit-never for the server.
+# Faber packages own request routing and response policy around the handle loop.
 
 import from "norma:http/headers" headers
+# Alias cannot be `request`: a field type `request.Request` makes that
+# prefix a non-namespace (SEM005/SEM002). Same alias as http/server.fab
+# so PKG001 does not fire.
 import from "norma:http/request" httpreq
 import from "norma:http/response" response
 import from "norma:http/chunked" chunked
-import from "norma:http/sse" sse
 import from "norma:http/server" server
 import from "norma:http/client" client
 
