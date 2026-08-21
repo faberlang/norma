@@ -17,6 +17,13 @@ locale = "en"
 #   http:read            [reader] | [reader, max_bytes] → {bytes, done}
 # Streaming receive pulls one bounded chunk per call (never read_to_end)
 # so an SSE consumer can parse events as they arrive.
+#
+# Stems (Grade D HTTP loanwords) and open cells:
+#   get, delete — finite: bare | _with headers | _on Client
+#   post, put, patch — finite: url+body | _with headers | _on Client
+#   send — finite generic (send_request folds a map; send_on reuses Client)
+#   open — streaming start (bare | _on Client)
+#   receive — one chunk (receive_n bounds the read)
 
 import from "norma:http/headers" headers
 import from "norma:http/response" response
@@ -72,7 +79,6 @@ fn empty() → Client {
     return Client { }
 }
 
-# Create a reusable agent (provider default timeout).
 @ public
 fn session() → Client {
     const list<value> none ← []
@@ -80,7 +86,6 @@ fn session() → Client {
     return Client { agent = handle }
 }
 
-# Create a reusable agent with an explicit timeout in milliseconds.
 @ public
 fn session_timeout(int timeout_ms) → Client {
     const int handle ← call 'http:agent' ([timeout_ms ↦ value]) ↦ int
@@ -238,12 +243,12 @@ fn send_request(string method, string url, map<string, string> pairs, string bod
 
 @ public
 fn send(string method, string url, headers.Headers headers, string body) → response.Response {
-    return _generic("http:request", 0, method, url, headers, body)
+    return _generic(0, method, url, headers, body)
 }
 
 @ public
 fn send_on(Client client, string method, string url, headers.Headers headers, string body) → response.Response {
-    return _generic("http:request", client.agent, method, url, headers, body)
+    return _generic(client.agent, method, url, headers, body)
 }
 
 # Open a streaming receive. The body is not buffered; pull chunks with
@@ -314,9 +319,9 @@ fn _with_body(string route, int agent, string url, headers.Headers headers, stri
     return _response_of(call 'http:patch' (args) ↦ value)
 }
 
-fn _generic(string route, int agent, string method, string url, headers.Headers headers, string body) → response.Response {
-    _require_url(url, route)
-    const value raw ← _dispatch_generic(route, agent, method, url, headers, body)
+fn _generic(int agent, string method, string url, headers.Headers headers, string body) → response.Response {
+    _require_url(url, "http:request")
+    const value raw ← _dispatch_generic("http:request", agent, method, url, headers, body)
     return _response_of(raw)
 }
 
@@ -554,9 +559,8 @@ fn _default_port(string scheme) → int {
 }
 
 fn _is_default_port(string scheme, int port) → bool {
-    if scheme ≡ "http" then return port ≡ 80
-    if scheme ≡ "https" then return port ≡ 443
-    return false
+    const int def ← _default_port(scheme)
+    return def > 0 and port ≡ def
 }
 
 fn _is_host(string host) → bool {
