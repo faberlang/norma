@@ -234,7 +234,7 @@ fn _reduce_angle(float x) → float {
 fn _sin_series(float x) → float {
     var float term ← x
     var float sum ← x
-    var float x2 ← x * x
+    const float x2 ← x * x
     var float n ← 1
     while n < 12 {
         term ← (term * (-x2)) / ((2.0 * n) * (2.0 * n + 1.0))
@@ -249,7 +249,7 @@ fn _sin_series(float x) → float {
 fn _cos_series(float x) → float {
     var float term ← 1.0
     var float sum ← 1.0
-    var float x2 ← x * x
+    const float x2 ← x * x
     var float n ← 1
     while n < 12 {
         term ← (term * (-x2)) / ((2.0 * n - 1.0) * (2.0 * n))
@@ -277,7 +277,7 @@ fn _exp_series(float x) → float {
 @ private
 fn _ln_series(float x) → float {
     const float y ← (x - 1.0) / (x + 1.0)
-    var float y2 ← y * y
+    const float y2 ← y * y
     var float term ← y
     var float sum ← y
     var float n ← 1
