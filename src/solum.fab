@@ -6,17 +6,12 @@ locale = "en"
 #
 # Etymology: "solum" - ground, floor, base. Local/ground I/O (vs caelum/sky/network).
 #
-# Verbs route over stream `ad` (Latin `solum:*` routes); stat/stat_async are
-# deferred `mori` stubs pending the Stage 2 materializer (see below).
-# Path operations are proxied here for surface compatibility; their canonical
-# home is norma:solum/path.
+# Operations route over `ad`; stat/stat_async remain explicit panic stubs until
+# Stage 2 can materialize FileStatus values.
+# Top-level path operations proxy norma:solum/path for compatibility.
 #
-# Design principles:
-# - Sync and async wrappers share the same `ad` route contract; `@ futura`
-# marks the caller posture, and Radix selects async materialization.
-# - Verb conjugation names the public API posture, not a second host route.
-# - Different verbs for different data types (text vs bytes vs lines)
-# - No "Latin as paint" - verbs chosen for semantic fit, not translation
+# Sync and async wrappers use the same `ad` frame contract; `@ future` marks the
+# async caller posture. Text, bytes, and lines use distinct public operations.
 
 
 # =============================================================================
@@ -45,7 +40,6 @@ class FileStatus {
 # =========================================================================
 # READING - Text
 # =========================================================================
-# Verb: read_file/read_file_async from "legere" (to read, gather)
 # Maps to: fs.readFileSync(path, 'utf8') / fs.readFile(path, 'utf8')
 
 # Read entire file as text (sync)
@@ -66,8 +60,6 @@ fn read_file_async<T>(string via) → T {
 # =========================================================================
 # READING - Bytes
 # =========================================================================
-# Verb: read_bytes/read_bytes_async from "haurire" (to draw up, draw water)
-# Why: Distinct from "reading" text - this is raw byte extraction.
 # Maps to: fs.readFileSync(path) / fs.readFile(path) returning Buffer
 
 # Draw entire file as bytes (sync)
@@ -97,8 +89,6 @@ fn find(string via, string exemplar, int initium, int longitudo) → int {
 # =========================================================================
 # READING - Lines
 # =========================================================================
-# Verb: read_lines/read_lines_async from "carpere" (to pluck, pick, harvest)
-# Why: Different from bulk reading - implies iteration/selection.
 # Maps to: readline interface or line-by-line file reading
 
 # Pluck lines from file (sync)
@@ -116,8 +106,6 @@ fn read_lines_async(string via) → list<string> {
 # =========================================================================
 # WRITING - Text
 # =========================================================================
-# Verb: write_file/write_file_async from "scribere" (to write)
-# Why: Also handles writing lines (text with newlines).
 # Maps to: fs.writeFileSync(path, data, 'utf8') / fs.writeFile(...)
 
 # Write text to file, overwrites existing (sync)
@@ -135,8 +123,6 @@ fn write_file_async(string via, string data) → void {
 # =========================================================================
 # WRITING - Bytes
 # =========================================================================
-# Verb: write_bytes/write_bytes_async from "fundere" (to pour, pour out)
-# Why: Counterpart to read_bytes (drawing out) - write_bytes pours in.
 # Maps to: fs.writeFileSync(path, buffer) / fs.writeFile(path, buffer)
 
 # Pour bytes to file, overwrites existing (sync)
@@ -157,8 +143,6 @@ fn write_bytes_async(string via, bytes data) → void {
 # =========================================================================
 # WRITING - Append
 # =========================================================================
-# Verb: append/append_async from "apponere" (to place near, add to)
-# Why: Not overwriting - appends to what is already there.
 # Maps to: fs.appendFileSync(path, data) / fs.appendFile(path, data)
 
 # Append text to file (sync)
@@ -175,7 +159,6 @@ fn append_async(string via, string data) → void {
 # =========================================================================
 # FILE INFO - Existence
 # =========================================================================
-# Verb: exists/exists_async from "exstare" (to stand out, exist, be visible)
 # Maps to: fs.existsSync(path) / fs.access(path)
 
 # Check if path exists (sync)
@@ -228,8 +211,6 @@ fn mode(string via) → int {
 # =========================================================================
 # FILE INFO - Details
 # =========================================================================
-# Verb: stat/stat_async from "describere" (to write down, delineate, describe)
-# Why: Returns full metadata struct, not just existence.
 # Maps to: fs.statSync(path) / fs.stat(path) - uses lstat to not follow symlinks
 
 # Get file details (sync)
@@ -252,7 +233,6 @@ fn stat_async(string via) → FileStatus {
 # =========================================================================
 # FILE INFO - Symlinks
 # =========================================================================
-# Verb: read_link/read_link_async from "sequi" (to follow)
 # Maps to: fs.readlinkSync(path) / fs.readlink(path)
 
 # Follow symlink to get target path (sync)
@@ -276,7 +256,6 @@ fn create_link(string fons, string destinatio) → void {
 # =========================================================================
 # FILE OPERATIONS - Delete
 # =========================================================================
-# Verb: delete/delete_async from "delere" (to destroy, delete, erase)
 # Files only - use remove_tree/remove_tree_async for directories.
 # Maps to: fs.unlinkSync(path) / fs.unlink(path)
 
@@ -295,7 +274,6 @@ fn delete_async(string via) → void {
 # =========================================================================
 # FILE OPERATIONS - Copy
 # =========================================================================
-# Verb: exscribe/exscribet from "exscribere" (to copy out, transcribe)
 # Maps to: fs.copyFileSync(src, dest) / fs.copyFile(src, dest)
 
 # Copy file (sync)
@@ -313,8 +291,6 @@ fn exscribet(string fons, string destinatio) → void {
 # =========================================================================
 # FILE OPERATIONS - Rename/Move
 # =========================================================================
-# Verb: rename/rename_async from "renominare" (to rename)
-# Why: Handles both rename and move (same underlying syscall).
 # Maps to: fs.renameSync(src, dest) / fs.rename(src, dest)
 
 # Rename or move file (sync)
@@ -332,7 +308,6 @@ fn rename_async(string fons, string destinatio) → void {
 # =========================================================================
 # FILE OPERATIONS - Touch
 # =========================================================================
-# Verb: touch/touch_async from "tangere" (to touch)
 # Maps to: touch behavior (utimes or create empty file)
 
 # Touch file - create or update mtime (sync)
@@ -357,8 +332,6 @@ fn set_mode(string via, int mode) → void {
 # =========================================================================
 # DIRECTORY OPERATIONS - Create
 # =========================================================================
-# Verb: create_dir/create_dir_async from "creare" (to create, bring forth)
-# Why: Always a directory; recursive by default (creates parent dirs as needed).
 # Maps to: fs.mkdirSync(path, {recursive: true}) / fs.mkdir(...)
 
 # Create directory (sync)
@@ -376,7 +349,6 @@ fn create_dir_async(string via) → void {
 # =========================================================================
 # DIRECTORY OPERATIONS - List
 # =========================================================================
-# Verb: list_dir/list_dir_async from "enumerare" (to count out, enumerate)
 # Maps to: fs.readdirSync(path) / fs.readdir(path)
 
 # List directory contents (sync)
@@ -393,9 +365,6 @@ fn list_dir_async(string via) → list<string> {
 # =========================================================================
 # DIRECTORY OPERATIONS - Prune/Remove
 # =========================================================================
-# Verb: remove_tree/remove_tree_async from "amputare" (to cut off, prune)
-# Why: Recursive deletion - removes directory and all contents.
-# Avoids "puto" which also means "to think".
 # Maps to: fs.rmSync(path, {recursive: true}) / fs.rm(...)
 
 # Prune directory tree (sync)
@@ -413,11 +382,8 @@ fn remove_tree_async(string via) → void {
 # =========================================================================
 # PATH UTILITIES (proxies — canonical definitions live in norma:solum/path)
 # =========================================================================
-# These proxy the path operations so the solum public surface is preserved
-# for the kernel manifest, MIR stepper dispatch, and existing callers. The
-# canonical Faber definitions live in norma:solum/path; both surfaces route
-# to the same solum:* ad route handlers. New code should
-# prefer the norma:solum/path import; these remain for surface compatibility.
+# These top-level proxies preserve the facade while sharing the canonical
+# solum:* routes with norma:solum/path.
 
 # Join path segments
 @ public
