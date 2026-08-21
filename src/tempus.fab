@@ -4,8 +4,8 @@ locale = "en"
 
 # tempus.fab — public Faber datetime library (native Faber catalog)
 #
-# Public import: importa ex "norma:tempus" privata tempus
-# Method ledger: docs/stdlib/tempus-methods.md
+# Public import: import from "norma:tempus" tempus
+# Method ledger: sibling radix docs/stdlib/tempus-methods.md
 # Layering: wire/civil native; clock read and timer verbs over stream `ad`
 # (`tempus:*` routes). Duration constants are pure numeric literals.
 #
@@ -49,18 +49,16 @@ fn _wire(int year, int month, int day, int hour, int minute, int second) → str
 }
 
 # =========================================================================
-# WIRE ↔ INSTANS
+# WIRE ↔ INSTANT
 # =========================================================================
 
 # Verb: parse from "solvere" (to loosen, untangle)
-# Why: Parse RFC3339 UTC wire text into instans via conversio.
 @ public
 fn parse(string wire) → instant {
     return wire ↦ instant
 }
 
 # Verb: render from "exprimere" (to express, render outward)
-# Why: Render instans as RFC3339 UTC wire text via conversio.
 @ public
 fn render(instant t) → string {
     return t ↦ string
@@ -111,7 +109,7 @@ fn second(instant t) → int {
 # =========================================================================
 
 # Verb: construct from "struere" (to build, arrange)
-# Why: Construct midnight UTC instans from calendar date; invalid civil input throws.
+# Why: midnight UTC from calendar date; invalid civil input throws.
 @ public
 fn construct(int year, int month, int day) → instant ⇥ string {
     const string wire ← _wire(year, month, day, 0, 0, 0)
@@ -119,7 +117,7 @@ fn construct(int year, int month, int day) → instant ⇥ string {
 }
 
 # Verb: construct_moment — full civil moment (date + time)
-# Why: Construct UTC instans from all civil components; invalid input throws.
+# Why: UTC instant from all civil components; invalid input throws.
 @ public
 fn construct_moment(int year, int month, int day, int hour, int minute, int second) → instant ⇥ string {
     const string wire ← _wire(year, month, day, hour, minute, second)
@@ -157,18 +155,15 @@ fn active() → int {
 # Why: The host holds the request for `ms` milliseconds before responding,
 # so the caller's materialization blocks for the delay. No callback
 # registration, no Faber-side timing — the host is the event edge.
-# This is the one-shot timer pattern: ad + materialize, host delays.
+# Both postures share `tempus:dormiet`; `@ future` is caller posture, not a
+# second route.
 
-# Sleep for `ms` milliseconds with async caller materialization.
 @ public
 @ future
 fn sleep_async(int ms) → void {
     return call 'tempus:dormiet' (ms) ↦ void
 }
 
-# Sleep (block) for `ms` milliseconds. Sync one-shot timer: blocks the
-# calling thread on the host response. Same route as dormiet; the
-# difference is sync vs async posture, mirroring the lege/leget split.
 @ public
 fn sleep(int ms) → void {
     return call 'tempus:dormiet' (ms) ↦ void
@@ -178,21 +173,12 @@ fn sleep(int ms) → void {
 # TIMER STREAMS (host pushes events; Faber drains via cursor)
 # =========================================================================
 # Verb: interval from "vigilare" (to watch, stay awake)
-# Why: A recurring timer that fires every `ms` milliseconds. Opens an ad
-# route; the host pushes a frame each interval; Faber drains via cursor.
-# To stop, drop the cursor or rumpe out of the iteration.
-# WHY: returns cursor<TempusPulsus> rather than registering a callback —
-# the cursor model gives Faber ownership of the iteration loop, matching
-# the HTTP server pattern (host pushes, Faber drains).
-
-# Recurring timer cursor. Each frame marks one interval elapse.
-# WHY: deferred cursor route rather than native Faber `ad` body because the
-# runtime does not yet allow returning live inbound cursor values from
-# functions ("live tuus cursor values cannot be returned from functions
-# yet"). Matches the thesaurus.nuntiabunt precedent. The Rust backing
-# opens the ad route, drains the sermo, and yields frames as a generator.
-# A native-Faber form becomes possible once cursor-return-from-function
-# ships.
+# Why: Recurring timer; host pushes one frame per interval; Faber drains
+# the cursor. Stop by dropping the cursor or breaking the iteration.
+# Deferred as a panic stub: the runtime cannot yet return live inbound
+# cursor values from functions ("live tuus cursor values cannot be returned
+# from functions yet"). Matches thesaurus.messages. A native Faber `ad`
+# body becomes possible once cursor-return-from-function ships.
 @ cursor
 fn interval(int ms) → cursor<instant> {
     panic "norma:tempus.interval is deferred pending Stage 2 dispatch"
