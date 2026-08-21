@@ -2,7 +2,7 @@
 locale = "en"
 +++
 
-# copula/fila.fab — double-ended queue (deque)
+# fila.fab — double-ended queue (deque)
 #
 # Etymology: "fila" — thread, string, strand. A sequence drawn from either end.
 # Counterpart to lista (ordered random access) and acervus (heap-priority).
@@ -30,7 +30,7 @@ locale = "en"
 # is identical (append, pop_front, pop_back) so users cross-walking between
 # lista and deque see the same verbs; deque adds prepend (head push) because
 # lista has no head-push intrinsic. Imperativus throughout for mutation
-# (varia receiver required); nominal for projections (length, first,
+# (var receiver required); nominal for projections (length, first,
 # last); present-predicate for state (is_empty); Perfectum for copy-out
 # (to_list).
 
@@ -40,8 +40,6 @@ locale = "en"
 
 # Double-ended queue over T. See module header for the two-lista scheme.
 class Deque<T> {
-    # head plays the role of "the ante buffer" (head-side storage). `ante`
-    # itself is a reserved keyword and cannot be a field name.
     list<T> head = []
     list<T> tail = []
 
@@ -49,40 +47,26 @@ class Deque<T> {
     # STATE (nominal / present predicate)
     # =========================================================================
 
-    # Total element count across both halves. Nominal projection, matches
-    # lista.length() and tabula.length().
     fn length() → int {
         return self.head.length() + self.tail.length()
     }
 
-    # Whether the queue holds no elements. Present predicate; matches
-    # lista.is_empty() and tabula.is_empty() — returns bivalens from a bare adjective.
     fn is_empty() → bool {
         return self.head.is_empty() and self.tail.is_empty()
     }
 
     # =========================================================================
-    # MUTATION (Imperativus — in-place on a varia receiver)
+    # MUTATION (Imperativus — in-place on a var receiver)
     # =========================================================================
-    # All mutation methods require the receiver to be bound `varia`. They
-    # mirror builtin lista stems where the operation is identical so the
-    # learning surface transfers between lista and deque.
 
-    # Push to the tail of the queue. Reuses the lista tail-push stem.
     fn append(T v) → void {
         self.tail.append(v)
     }
 
-    # Push to the head of the queue. lista has no head-push intrinsic, so
-    # deque names it with `prepend` (to place in front). Distinct stem from
-    # `append` because the operation is structurally different at the
-    # builtin level.
     fn prepend(T v) → void {
         self.head.append(v)
     }
 
-    # Pop from the tail of the queue. Returns nihil if empty.
-    # Reuses the lista tail-pop stem.
     fn pop_back() → T ∪ null {
         if not self.tail.is_empty() then return self.tail.remove_last()
         if not self.head.is_empty() {
@@ -96,8 +80,6 @@ class Deque<T> {
         return null
     }
 
-    # Pop from the head of the queue. Returns nihil if empty.
-    # Reuses the lista head-pop stem.
     fn pop_front() → T ∪ null {
         if not self.head.is_empty() then return self.head.remove_last()
         if not self.tail.is_empty() {
@@ -115,7 +97,6 @@ class Deque<T> {
     # ACCESS (nominal — read without mutation)
     # =========================================================================
 
-    # Read the head element without removing it. Returns nihil if empty.
     # `head` stores the head-side reversed, so its tail is the queue head.
     fn first() → T ∪ null {
         if not self.head.is_empty() then return self.head.last()
@@ -123,7 +104,6 @@ class Deque<T> {
         return null
     }
 
-    # Read the tail element without removing it. Returns nihil if empty.
     fn last() → T ∪ null {
         if not self.tail.is_empty() then return self.tail.last()
         if not self.head.is_empty() then return self.head.first()
@@ -134,8 +114,7 @@ class Deque<T> {
     # COPY-OUT (Perfectum — return a new value, do not mutate)
     # =========================================================================
 
-    # Materialize the queue as a lista in head-to-tail order. Does not
-    # consume the queue.
+    # Head-to-tail copy; does not consume the queue.
     fn to_list() → list<T> {
         var list<T> out ← []
         # head is stored reversed (its tail is the queue head), so walk it
@@ -159,13 +138,11 @@ class Deque<T> {
 # Deque<T> rather than operating on an existing one. `is_empty` is reserved
 # for the emptiness predicate above.
 
-# Empty queue constructor.
 fn empty<T>() → Deque<T> {
     return Deque { }
 }
 
-# Build a queue from a lista, preserving order. The first element of the
-# source becomes the head of the queue.
+# First element of the source becomes the queue head (`tail = res` with empty `head`).
 fn from_list<T>(list<T> res) → Deque<T> {
     return Deque { tail = res }
 }
