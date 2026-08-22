@@ -328,7 +328,7 @@ fn _generic(int agent, string method, string url, headers.Headers headers, strin
 fn _open(int agent, string method, string url, headers.Headers headers, string body) → Receive {
     _require_url(url, "http:request_open")
     const value raw ← _dispatch_generic("http:request_open", agent, method, url, headers, body)
-    const map<string, value> fields ← raw ↦ map<string, value>
+    const map<string, value> fields ↤ raw
     return Receive {
         reader = fields["reader"] ↦ int,
         status = fields["status"] ↦ int,
@@ -352,7 +352,7 @@ fn _dispatch_generic(string route, int agent, string method, string url, headers
 }
 
 fn _response_of(value raw) → response.Response {
-    const map<string, value> fields ← raw ↦ map<string, value>
+    const map<string, value> fields ↤ raw
     return response.of(
         fields["status"] ↦ int,
         _headers_from_carrier(fields["headers"]),
@@ -361,7 +361,7 @@ fn _response_of(value raw) → response.Response {
 }
 
 fn _chunk_of(value raw) → Chunk {
-    const map<string, value> fields ← raw ↦ map<string, value>
+    const map<string, value> fields ↤ raw
     return Chunk {
         text = _body_text(fields["bytes"]),
         done = fields["done"] ↦ bool
@@ -382,12 +382,12 @@ fn _headers_carrier(headers.Headers headers) → list<value> {
 fn _headers_from_carrier(value raw) → headers.Headers {
     var headers.Headers out ← headers.empty()
     if raw not is list<value> then return out
-    const list<value> items ← raw ↦ list<value>
+    const list<value> items ↤ raw
     for from items const item {
         if item is map<string, value> {
-            const map<string, value> row ← item ↦ map<string, value>
-            const string name ← row["name"] ↦ string
-            const string header_value ← row["value"] ↦ string
+            const map<string, value> row ↤ item
+            const string name ↤ row["name"]
+            const string header_value ↤ row["value"]
             if out.append(name, header_value) {
             }
         }
@@ -399,7 +399,7 @@ fn _body_text(value raw) → string {
     if raw is null then return ""
     if raw is string then return raw ↦ string
     do {
-        const bytes data ← raw ↦ bytes
+        const bytes data ↤ raw
         do {
             return data ↦ string
         }
@@ -543,7 +543,7 @@ fn _port_of(string hostport, string scheme) → int ∪ null {
         i ← i + 1
     }
     do {
-        const int n ← digits ↦ int
+        const int n ↤ digits
         if n < 1 or n > 65535 then return null
         return n
     }

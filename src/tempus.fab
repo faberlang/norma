@@ -28,7 +28,7 @@ fn _pad2(int n) → string {
 # Why: Pad a year (or similar) to four decimal digits on the wire.
 @ private
 fn _pad4(int n) → string {
-    var string out ← n ↦ string
+    var string out ↤ n
     while out.length() < 4 {
         out ← "0§"(out)
     }
@@ -38,7 +38,7 @@ fn _pad4(int n) → string {
 # Why: Slice a fixed wire substring and parse it as a civil integer field.
 @ private
 fn _field(instant t, int initium, int finis) → int {
-    const string wire ← t ↦ string
+    const string wire ↤ t
     return wire.slice(initium, finis) ↦ int
 }
 

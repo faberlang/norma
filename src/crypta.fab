@@ -75,7 +75,7 @@ fn _Sigma1_32(uint<u32> x) → uint<u32> {
 
 @ private
 fn _word32(list<int<u8>> buf, int off) → uint<u32> {
-    var uint<u32> w ← buf[off] ↦ uint<u32>
+    var uint<u32> w ↤ buf[off]
     w ← w ⇐ 8
     w ← w ∨ (buf[off + 1] ↦ uint<u32>)
     w ← w ⇐ 8
@@ -210,7 +210,7 @@ fn _Sigma1_64(uint<u64> x) → uint<u64> {
 
 @ private
 fn _word64(list<int<u8>> buf, int off) → uint<u64> {
-    var uint<u64> w ← buf[off] ↦ uint<u64>
+    var uint<u64> w ↤ buf[off]
     w ← w ⇐ 8
     w ← w ∨ (buf[off + 1] ↦ uint<u64>)
     w ← w ⇐ 8

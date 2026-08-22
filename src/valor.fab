@@ -76,7 +76,7 @@ fn is_instant(value v) → bool {
 fn _get(value v, string clavis) → value {
     if v is null then return null
     if v not is map<string, value> then return null
-    const map<string, value> tab ← v ↦ map<string, value>
+    const map<string, value> tab ↤ v
     const value got ← tab.get(clavis)
     return got
 }
@@ -92,7 +92,7 @@ fn get(value v, string clavis) → value {
 fn get_index(value v, int index) → value {
     if v is null then return null
     if v not is list<value> then return null
-    const list<value> items ← v ↦ list<value>
+    const list<value> items ↤ v
     const value got ← items.get(index)
     return got
 }
@@ -118,13 +118,13 @@ fn find(value v, string via) → value {
 fn find_part(value current, string part) → value {
     if current is null then return null
     if current is map<string, value> {
-        const map<string, value> tab ← current ↦ map<string, value>
+        const map<string, value> tab ↤ current
         const value got ← tab.get(part)
         return got
     }
     if current is list<value> {
         do {
-            const int idx ← part ↦ int
+            const int idx ↤ part
             return get_index(current, idx)
         }
         catch err {

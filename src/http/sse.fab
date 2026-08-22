@@ -43,7 +43,7 @@ fn stringify(Event event) → string {
 @ public
 fn parse(string wire) → list<Event> ⇥ string {
     var string src ← wire
-    const string bom ← |ef bb bf| ↦ string
+    const string bom ↤ |ef bb bf|
     if src.length() > 0 and src.slice(0, 1) ≡ bom {
         src ← src.slice(1, src.length())
     }
@@ -64,7 +64,7 @@ fn parse(string wire) → list<Event> ⇥ string {
         if line.length() ≡ 0 {
             const Event ∪ null ev ← _finish_event(name, data, id, retry, last_id, has_data, has_id)
             if ev not is null {
-                const Event ready ← ev ↦ Event
+                const Event ready ↤ ev
                 events.append(ready)
             }
             if has_id {
@@ -118,7 +118,7 @@ fn parse(string wire) → list<Event> ⇥ string {
     if has_data {
         const Event ∪ null ev ← _finish_event(name, data, id, retry, last_id, has_data, has_id)
         if ev not is null {
-            const Event ready ← ev ↦ Event
+            const Event ready ↤ ev
             events.append(ready)
         }
     }
@@ -307,7 +307,7 @@ describe "sse" {
     }
 
     test "parse leading bom stripped" {
-        const string bom ← |ef bb bf| ↦ string
+        const string bom ↤ |ef bb bf|
         const list<Event> evs ← _must_parse(bom + "data: hello\n\n")
         assert evs.length() ≡ 1
         assert evs[0].data ≡ "hello"
@@ -349,7 +349,7 @@ describe "sse" {
     }
 
     test "rejects nul in id" {
-        const string nul ← |00| ↦ string
+        const string nul ↤ |00|
         assert _parse_msg("id: a" + nul + "b\ndata: hello\n\n") ≡ "norma:http/sse.parse: illegal id"
     }
 }

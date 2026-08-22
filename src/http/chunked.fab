@@ -246,7 +246,7 @@ fn _bytes_eq(bytes a, bytes b) → bool {
 }
 
 fn _must_decode(bytes data) → bytes {
-    var bytes out ← "" ↦ bytes
+    var bytes out ↤ ""
     var bool ok ← false
     do {
         out ← decode(data)
@@ -288,7 +288,7 @@ describe "chunked" {
     }
 
     test "roundtrip empty" {
-        const bytes raw ← "" ↦ bytes
+        const bytes raw ↤ ""
         assert _bytes_eq(_must_decode(encode(raw)), raw)
         assert _bytes_eq(encode(raw), |30 0d 0a 0d 0a|)
     }

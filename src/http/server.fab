@@ -152,7 +152,7 @@ fn bind_full(int port, int max_body_bytes, string host) → Listener {
 
 @ public
 fn incoming_of(value raw) → Incoming {
-    const map<string, value> fields ← raw ↦ map<string, value>
+    const map<string, value> fields ↤ raw
     return Incoming {
         id = fields["id"] ↦ string,
         connection = fields["connection"] ↦ int,
@@ -316,12 +316,12 @@ fn _headers_carrier(headers.Headers headers) → list<value> {
 fn _headers_from_carrier(value raw) → headers.Headers {
     var headers.Headers out ← headers.empty()
     if raw not is list<value> then return out
-    const list<value> items ← raw ↦ list<value>
+    const list<value> items ↤ raw
     for from items const item {
         if item is map<string, value> {
-            const map<string, value> row ← item ↦ map<string, value>
-            const string name ← row["name"] ↦ string
-            const string header_value ← row["value"] ↦ string
+            const map<string, value> row ↤ item
+            const string name ↤ row["name"]
+            const string header_value ↤ row["value"]
             if out.append(name, header_value) {
             }
         }
