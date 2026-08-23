@@ -30,9 +30,9 @@ main {
     assert value.is_int(value.get(doc, "version"))
     assert value.is_null(doc) ≡ false
 
-    const string name ← value.get(doc, "name") ↦ string ⇥ "missing"
-    const int version ← value.get(doc, "version") ↦ int ⇥ 0
-    const string id ← value.find(doc, "id") ↦ string ⇥ "missing"
+    const string name ↤ value.get(doc, "name") ⇥ "missing"
+    const int version ↤ value.get(doc, "version") ⇥ 0
+    const string id ↤ value.find(doc, "id") ⇥ "missing"
 
     do {
         const string required ← value.require_string(doc, "id")

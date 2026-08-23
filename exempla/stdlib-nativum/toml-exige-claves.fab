@@ -26,8 +26,8 @@ main {
 
     do {
         value.require_strings(doc, ["id", "name"])
-        const string name ← value.get(doc, "name") ↦ string ⇥ "missing"
-        const string id ← value.get(doc, "id") ↦ string ⇥ "missing"
+        const string name ↤ value.get(doc, "name") ⇥ "missing"
+        const string id ↤ value.get(doc, "id") ⇥ "missing"
         print name, id
     }
     catch err {

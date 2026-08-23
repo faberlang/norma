@@ -46,8 +46,8 @@ fn stall_frame() → bytes {
 
 main {
     const string mode ← arg_at(0, "sse")
-    const int port ← arg_at(1, "18766") ↦ int
-    const int n ← arg_at(2, "8") ↦ int
+    const int port ↤ arg_at(1, "18766")
+    const int n ↤ arg_at(2, "8")
 
     const server.Listener listener ← server.bind(port)
     print "listening"

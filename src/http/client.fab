@@ -82,13 +82,13 @@ fn empty() → Client {
 @ public
 fn session() → Client {
     const list<value> none ← []
-    const int handle ← call 'http:agent' (none) ↦ int
+    const int handle ↤ call 'http:agent' (none)
     return Client { agent = handle }
 }
 
 @ public
 fn session_timeout(int timeout_ms) → Client {
-    const int handle ← call 'http:agent' ([timeout_ms ↦ value]) ↦ int
+    const int handle ↤ call 'http:agent' ([timeout_ms ↦ value])
     return Client { agent = handle }
 }
 
@@ -265,13 +265,13 @@ fn open_on(Client client, string method, string url, headers.Headers headers, st
 
 @ public
 fn receive(Receive stream) → Chunk {
-    const list<value> args ← [stream.reader ↦ value]
+    const list<value> args ↤ [stream.reader ↦ value]
     return _chunk_of(call 'http:read' (args) ↦ value)
 }
 
 @ public
 fn receive_n(Receive stream, int max_bytes) → Chunk {
-    const list<value> args ← [stream.reader ↦ value, max_bytes ↦ value]
+    const list<value> args ↤ [stream.reader ↦ value, max_bytes ↦ value]
     return _chunk_of(call 'http:read' (args) ↦ value)
 }
 
