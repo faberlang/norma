@@ -138,9 +138,9 @@ fn empty<K, V>() → SortedMap<K, V> {
 # Build a sorted map from a tabula, sorting keys once at construction.
 # WHY: One sort at build time is cheaper than re-sorting on every ordered
 # iteration, which is the common ordinata use case.
-fn from_map<K, V>(map<K, V> res) → SortedMap<K, V> {
-    var SortedMap<K, V> out ← SortedMap { entries = res }
-    var list<K> keys ← res.keys()
+fn from_map<K, V>(map<K, V> source_map) → SortedMap<K, V> {
+    var SortedMap<K, V> out ← SortedMap { entries = source_map }
+    var list<K> keys ← source_map.keys()
     keys.sort()
     out.index ← keys
     return out
