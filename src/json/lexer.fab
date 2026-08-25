@@ -2,7 +2,7 @@
 locale = "en"
 +++
 
-# json/lexica.fab — shared lexical floor for the JSON wire library
+# json/lexer.fab — shared lexical floor for the JSON wire library
 #
 # Internal to norma:json. Imported by solve.fab (parser) and pange.fab (serializer).
 # No Rust backing: pure Faber character classification and escape tables.

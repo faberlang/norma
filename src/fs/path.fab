@@ -2,9 +2,9 @@
 locale = "en"
 +++
 
-# solum/path.fab — pure pathname operations
+# fs/path.fab — pure pathname operations
 #
-# Etymology: "path" is conventional English loanword for filesystem path
+# Etymology: fs/path — pathname operations; Latin module spelling `solum/path`.
 # manipulation, matching stdlib naming in every language (Rust std::path,
 # Go path/filepath, Python pathlib, Node path). Grade D loanword under
 # morphologia — the standard name is the point.
@@ -23,7 +23,7 @@ locale = "en"
 # module directly; the proxies are compatibility surface.
 #
 # Import: file-namespace-imports shipped; import this module directly as
-# norma:solum/path.
+# norma:fs/path.
 #
 # Morphologia: nominal projections throughout (parens, nomen, suffixum are
 # stable facts about a path string; domus and temporarium are stable facts
@@ -39,8 +39,8 @@ locale = "en"
 # Join path segments into a single path string.
 # Maps to: Rust PathBuf::push, Go path.Join, Node path.join.
 # Imperativus — produces a joined path from parts.
-fn join(list<string> partes) → string {
-    return call 'solum:iunge' (partes) ↦ string
+fn join(list<string> parts) → string {
+    return call 'solum:iunge' (parts) ↦ string
 }
 
 # =============================================================================
@@ -49,22 +49,22 @@ fn join(list<string> partes) → string {
 
 # Parent directory of a path. Returns "" for paths with no parent.
 # Maps to: Rust Path::parent, Go path.Dir, Node path.dirname.
-fn parent(string via) → string {
-    return call 'solum:parens' (via) ↦ string
+fn parent(string path) → string {
+    return call 'solum:parens' (path) ↦ string
 }
 
 # Final path segment (the filename). Returns "" for paths ending in "..".
 # Maps to: Rust Path::file_name, Go path.Base, Node path.basename.
 @ public
-fn file_name(string via) → string {
-    return call 'solum:nomen' (via) ↦ string
+fn file_name(string path) → string {
+    return call 'solum:nomen' (path) ↦ string
 }
 
 # File extension, including the leading dot (e.g. ".txt"). Returns "" if
 # there is no extension.
 # Maps to: Rust Path::extension, Go path.Ext, Node path.extname.
-fn extension(string via) → string {
-    return call 'solum:suffixum' (via) ↦ string
+fn extension(string path) → string {
+    return call 'solum:suffixum' (path) ↦ string
 }
 
 # =============================================================================
@@ -77,8 +77,8 @@ fn extension(string via) → string {
 # WHY: this one does touch the filesystem (canonicalize) — it lives here
 # because it is path resolution, but it can fail on non-existent paths and
 # falls back to cwd-join rather than throwing.
-fn resolve(string via) → string {
-    return call 'solum:absolve' (via) ↦ string
+fn resolve(string path) → string {
+    return call 'solum:absolve' (path) ↦ string
 }
 
 # =============================================================================

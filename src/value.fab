@@ -1,12 +1,13 @@
 +++
 locale = "en"
 +++
+# Canonical module: norma:value; Latin locale spelling: valor.
 
-# valor.fab — codec-agnostic valor tree navigation
+# value.fab — codec-agnostic value tree navigation
 #
 # Shared surface for the tree-shaped codecs under the flat codec modules (json, toml, yaml).
 # Each codec owns its wire floor; this module owns the operations on the
-# valor tree shape they all produce. CSV is excluded — it produces a flat
+# value tree shape they all produce. CSV is excluded — it produces a flat
 # list<list<string>>, not a valor tree.
 #
 # No Rust backing. Variant discrimination uses `is` (tag check without
@@ -14,7 +15,7 @@ locale = "en"
 # pattern that previously lived in json.fab and toml.fab is retired here
 # in favor of the flat `is` dispatch.
 
-import from "norma:chorda" chorda
+import from "norma:text" text
 
 # =========================================================================
 # SHAPE PREDICATES
@@ -73,17 +74,17 @@ fn is_instant(value v) → bool {
 
 # Get value by key from a map (returns null if missing or non-map).
 @ private
-fn _get(value v, string clavis) → value {
+fn _get(value v, string key) → value {
     if v is null then return null
     if v not is map<string, value> then return null
     const map<string, value> tab ↤ v
-    const value got ← tab.get(clavis)
+    const value got ← tab.get(key)
     return got
 }
 
 @ public
-fn get(value v, string clavis) → value {
-    return _get(v, clavis)
+fn get(value v, string key) → value {
+    return _get(v, key)
 }
 
 # Pluck value by index from a list (returns null if out of bounds or
@@ -100,12 +101,12 @@ fn get_index(value v, int index) → value {
 # Find value by dotted path (e.g. "user.address.city"). Walks maps by
 # key; numeric segments index lists. Returns null if any segment misses.
 @ public
-fn find(value v, string via) → value {
+fn find(value v, string path) → value {
     # chorda.split_n limited split: at most via.length()+1 segments,
     # which is more than any dotted path can produce.
-    const list<string> partes ← chorda.split_n(via, ".", via.length() + 1) ↦ list<string>
+    const list<string> parts ← text.split_n(path, ".", path.length() + 1) ↦ list<string>
     var value current ← v
-    for from partes const pars {
+    for from parts const pars {
         current ← find_part(current, pars)
         if current is null then return null
     }
@@ -140,19 +141,19 @@ fn find_part(value current, string part) → value {
 
 # Require a string child at clavis; throw on missing or non-string.
 @ public
-fn require_string(value v, string clavis) → string ⇥ string {
-    const value child ← _get(v, clavis)
-    if child is null then throw "missing key: §"(clavis)
-    if child not is string then throw "key not textus: §"(clavis)
+fn require_string(value v, string key) → string ⇥ string {
+    const value child ← _get(v, key)
+    if child is null then throw "missing key: §"(key)
+    if child not is string then throw "key not textus: §"(key)
     return child ↦ string
 }
 
 # Require multiple string children; throws on the first missing or
 # non-string key. Used by codec callers that validate a schema shape.
 @ public
-fn require_strings(value v, list<string> claves) → void ⇥ string {
-    for from claves const clavis {
-        const string _ ← require_string(v, clavis)
+fn require_strings(value v, list<string> keys) → void ⇥ string {
+    for from keys const key {
+        const string _ ← require_string(v, key)
     }
     return
 }

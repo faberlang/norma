@@ -2,9 +2,9 @@
 locale = "en"
 +++
 
-# fila.fab — double-ended queue (deque)
+# deque.fab — double-ended queue (deque)
 #
-# Etymology: "fila" — thread, string, strand. A sequence drawn from either end.
+# Etymology: deque — thread / strand, drawn from either end; Latin locale spelling `fila`.
 # Counterpart to lista (ordered random access) and acervus (heap-priority).
 #
 # NOTE: Generic record construction (`Deque<T> { ... }`) is not yet supported by
@@ -21,7 +21,7 @@ locale = "en"
 # reserved Faber keyword — TokenKind::Ante — so `head` is used instead.)
 #
 # Import: the file-namespace-imports goal (docs/factory/file-namespace-imports)
-# shipped; this file is imported directly as norma:fila. The genus lives at
+# shipped; this file is imported directly as norma:deque. The genus lives at
 # file top level.
 #
 # Morphologia: receiver methods on the Deque<T> genus (implicit ego), matching
@@ -143,6 +143,6 @@ fn empty<T>() → Deque<T> {
 }
 
 # First element of the source becomes the queue head (`tail = res` with empty `head`).
-fn from_list<T>(list<T> res) → Deque<T> {
-    return Deque { tail = res }
+fn from_list<T>(list<T> items) → Deque<T> {
+    return Deque { tail = items }
 }

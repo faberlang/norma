@@ -2,16 +2,16 @@
 locale = "en"
 +++
 
-# json/pange.fab — JSON serialization facade
+# json/serialize.fab — JSON serialization facade
 #
 # The compiler/runtime-owned formal `json` conversio is the single codec
-# authority. This module exists so direct `norma:json/pange` imports share the
+# authority. This module exists so direct `norma:json/serialize` imports share the
 # same path as the top-level `norma:json.stringify` facade.
 #
 # The direct `json ↦ string` conversion is rejected by the compiler (SEM016);
 # the runtime-backed codec mirrors the `json.stringify` facade, deferred pending
 # runtime codec dispatch.
 
-fn stringify(json documentum) → string {
-    panic "norma:json/pange.stringify is deferred pending runtime codec dispatch"
+fn stringify(json document) → string {
+    panic "norma:json/serialize.stringify is deferred pending runtime codec dispatch"
 }

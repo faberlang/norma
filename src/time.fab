@@ -1,10 +1,11 @@
 +++
 locale = "en"
 +++
+# Canonical module: norma:time; Latin locale spelling: tempus.
 
-# tempus.fab — public Faber datetime library (native Faber catalog)
+# time.fab — public Faber datetime library (native Faber catalog)
 #
-# Public import: import from "norma:tempus" tempus
+# Public import: import from "norma:time" time
 # Method ledger: sibling radix docs/stdlib/tempus-methods.md
 # Layering: wire/civil native; clock read and timer verbs over stream `ad`
 # (`tempus:*` routes). Duration constants are pure numeric literals.
@@ -37,9 +38,9 @@ fn _pad4(int n) → string {
 
 # Why: Slice a fixed wire substring and parse it as a civil integer field.
 @ private
-fn _field(instant t, int initium, int finis) → int {
+fn _field(instant t, int start, int end) → int {
     const string wire ↤ t
-    return wire.slice(initium, finis) ↦ int
+    return wire.slice(start, end) ↦ int
 }
 
 # Why: Build canonical UTC RFC3339 wire from civil components (always ends with Z).
@@ -181,7 +182,7 @@ fn sleep(int ms) → void {
 # body becomes possible once cursor-return-from-function ships.
 @ cursor
 fn interval(int ms) → cursor<instant> {
-    panic "norma:tempus.interval is deferred pending Stage 2 dispatch"
+    panic "norma:time.interval is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================

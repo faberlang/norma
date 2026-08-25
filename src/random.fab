@@ -2,9 +2,9 @@
 locale = "en"
 +++
 
-# aleator.fab - Entropy Device (random number generation)
+# random.fab - Entropy Device (random number generation)
 #
-# Etymology: "aleator" - dice player, gambler. Games of chance.
+# Etymology: random — entropy and random-number generation; Latin locale spelling `aleator`.
 #
 # Effect verbs: native Faber bodies over stream `ad` (`aleator:*` routes).
 #

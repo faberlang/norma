@@ -1,13 +1,14 @@
 +++
 locale = "en"
 +++
+# Canonical module: norma:net/listener; Latin locale spelling: auscultator.
 
-# caelum/auscultator.fab — TCP listener
+# net/listener.fab — TCP listener
 #
-# Public import: importa ex "norma:caelum/auscultator" privata auscultator
-# Depends on: norma:caelum/connexus (for Socket type in accept())
+# Public import: importa ex "norma:net/listener" private listener
+# Depends on: norma:net/connection (for Socket type in accept())
 
-import from "norma:caelum/connexus" connexus
+import from "norma:net/connection" connection
 
 @ public
 class Listener {
@@ -15,25 +16,25 @@ class Listener {
 
     # Accept next incoming connection
     @ public
-    fn accept() → connexus.Socket {
-        panic "norma:caelum/auscultator.accept is deferred pending Stage 2 dispatch"
+    fn accept() → connection.Socket {
+        panic "norma:net/listener.accept is deferred pending Stage 2 dispatch"
     }
 
     @ public
     @ future
-    fn accept_async() → connexus.Socket {
-        panic "norma:caelum/auscultator.accept_async is deferred pending Stage 2 dispatch"
+    fn accept_async() → connection.Socket {
+        panic "norma:net/listener.accept_async is deferred pending Stage 2 dispatch"
     }
 
     # Stop listening
     @ public
     fn close() → void {
-        panic "norma:caelum/auscultator.close is deferred pending Stage 2 dispatch"
+        panic "norma:net/listener.close is deferred pending Stage 2 dispatch"
     }
 
     # Local port
     @ public
     fn port() → int {
-        panic "norma:caelum/auscultator.port is deferred pending Stage 2 dispatch"
+        panic "norma:net/listener.port is deferred pending Stage 2 dispatch"
     }
 }

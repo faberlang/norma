@@ -9,7 +9,7 @@ locale = "en"
 # Wire floor only: parse (text → valor), stringify (valor → text), try_parse
 # (lenient parse), stringify_all (multi-doc bind), parse_all (multi-doc gather), all
 # Faber-native Norma source (no residual Rust norma crate). Shared valor-tree navigation
-# (cape/carpe/inveni/exige/*ne) lives in norma:valor.
+# (cape/carpe/inveni/exige/*ne) lives in norma:value.
 
 
 # =========================================================================
@@ -27,7 +27,7 @@ fn stringify(value value) → string {
 # Why: Binding multiple documents into a single YAML stream.
 
 # Bind multiple documents into multi-doc YAML string
-fn stringify_all(list<value> documenta) → string {
+fn stringify_all(list<value> documents) → string {
     panic "norma:yaml.stringify_all is deferred pending Stage 2 dispatch"
 }
 

@@ -2,17 +2,17 @@
 locale = "en"
 +++
 
-# caelum.fab - Network Socket Device (TCP/UDP)
+# net.fab - Network Socket Device (TCP/UDP)
 #
-# Public import: importa ex "norma:caelum" privata caelum
+# Public import: importa ex "norma:net" private net
 # Method ledger: docs/design/caelum-methods.md
 # Sub-modules:
-#   norma:caelum/terminus    — TCP endpoint type
-#   norma:caelum/connexus    — connected socket (depends on terminus)
-#   norma:caelum/auscultator — listener (depends on connexus)
+#   norma:net/endpoint    — TCP endpoint type
+#   norma:net/connection — connected socket (depends on endpoint)
+#   norma:net/listener — listener (depends on connection)
 #
-# Etymology: "caelum" - sky, ether. The transport layer beneath HTTP.
-# Counterpart to solum (ground/local I/O).
+# Etymology: net — sky / ether; Latin locale spelling `caelum` for the transport layer.
+# Counterpart to fs (ground/local I/O).
 #
 # Design notes:
 # - Verb conjugation encodes sync/async:
@@ -22,9 +22,9 @@ locale = "en"
 # - TCP: listen/listen_async, connect/connect_async
 # - Sockets are bidirectional byte streams
 
-import from "norma:caelum/terminus" terminus
-import from "norma:caelum/connexus" connexus
-import from "norma:caelum/auscultator" auscultator
+import from "norma:net/endpoint" endpoint
+import from "norma:net/connection" connection
+import from "norma:net/listener" listener
 
 
 # =========================================================================
@@ -33,14 +33,14 @@ import from "norma:caelum/auscultator" auscultator
 
 # Create TCP listener (TLS when cert/key provided)
 @ public
-fn listen(int port, string cert optional, string key optional) → auscultator.Listener {
-    panic "norma:caelum.listen is deferred pending Stage 2 dispatch"
+fn listen(int port, string cert optional, string key optional) → listener.Listener {
+    panic "norma:net.listen is deferred pending Stage 2 dispatch"
 }
 
 @ public
 @ future
-fn listen_async(int port, string cert optional, string key optional) → auscultator.Listener {
-    panic "norma:caelum.listen_async is deferred pending Stage 2 dispatch"
+fn listen_async(int port, string cert optional, string key optional) → listener.Listener {
+    panic "norma:net.listen_async is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -49,12 +49,12 @@ fn listen_async(int port, string cert optional, string key optional) → auscult
 
 # Connect to TCP server (TLS when tute=verum)
 @ public
-fn connect(string host, int port, bool tute optional coalesce false) → connexus.Socket {
-    panic "norma:caelum.connect is deferred pending Stage 2 dispatch"
+fn connect(string host, int port, bool secure optional coalesce false) → connection.Socket {
+    panic "norma:net.connect is deferred pending Stage 2 dispatch"
 }
 
 @ public
 @ future
-fn connect_async(string host, int port, bool tute optional coalesce false) → connexus.Socket {
-    panic "norma:caelum.connect_async is deferred pending Stage 2 dispatch"
+fn connect_async(string host, int port, bool secure optional coalesce false) → connection.Socket {
+    panic "norma:net.connect_async is deferred pending Stage 2 dispatch"
 }

@@ -11,7 +11,7 @@ locale = "en"
 # conversions; the runtime-backed codec belongs behind this public Norma facade.
 #
 # No valor navigation surface here — that is codec-agnostic and lives in
-# norma:valor.
+# norma:value.
 
 # =========================================================================
 # SERIALIZATION
@@ -20,7 +20,7 @@ locale = "en"
 # Why: Composing/fastening data into JSON text representation.
 
 @ public
-fn stringify(json documentum) → string {
+fn stringify(json document) → string {
     panic "norma:json.stringify is deferred pending runtime codec dispatch"
 }
 

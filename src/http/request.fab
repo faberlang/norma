@@ -21,13 +21,13 @@ class Request {
     string body = ""
 
     @ public
-    fn header(string nomen) → string ∪ null {
-        return self.headers.get(nomen)
+    fn header(string name) → string ∪ null {
+        return self.headers.get(name)
     }
 
     @ public
-    fn query_field(string nomen) → string ∪ null {
-        return _query_field(self.query, nomen)
+    fn query_field(string name) → string ∪ null {
+        return _query_field(self.query, name)
     }
 }
 
@@ -74,8 +74,8 @@ fn _target_query(string target) → string {
     return ""
 }
 
-fn _query_field(string query, string nomen) → string ∪ null {
-    const string want ← _percent_decode(nomen)
+fn _query_field(string query, string name) → string ∪ null {
+    const string want ← _percent_decode(name)
     var int i ← 0
     while i ≤ query.length() {
         var int amp ← i

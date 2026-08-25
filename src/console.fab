@@ -2,9 +2,9 @@
 locale = "en"
 +++
 
-# consolum.fab - Console Device (stdin/stdout/stderr)
+# console.fab - Console Device (stdin/stdout/stderr)
 #
-# Etymology: "consolum" from "con-" (together) + "solum" (base/ground)
+# Etymology: console — shared base / meeting place; Latin locale spelling `consolum`.
 # The foundation for all I/O interaction.
 #
 # All operations call an `ad` route and wait for its frame response. Sync and

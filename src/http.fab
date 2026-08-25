@@ -6,7 +6,7 @@ locale = "en"
 #
 # Public import: import from "norma:http" http
 # For raw TCP/UDP sockets, see caelum.fab. This module imports nothing
-# from norma:caelum — they are siblings in the host-effect family.
+# from norma:net — they are siblings in the host-effect family.
 #
 # Leaves: headers, request, response, chunked, sse, server, client.
 # SSE is `norma:http/sse` only — the facade does not re-export it.

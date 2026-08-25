@@ -8,13 +8,13 @@ locale = "en"
 #
 # Wire floor only: parse (text → valor), stringify (valor → text), try_parse
 # (lenient parse). Faber-native Norma source (no residual Rust norma crate). Shared valor-tree
-# navigation (cape/carpe/inveni/exige/*ne) lives in norma:valor.
+# navigation (cape/carpe/inveni/exige/*ne) lives in norma:value.
 #
 # TOML's predicate semantics are emergent, not implemented here: TOML never
 # produces Valor::Nihil (so valor.nihilne returns falsum on any TOML tree),
 # and TOML datetimes lower to Valor::Instans (so valor.instansne distinguishes
 # them from textus). These behaviors come from what the parser produces, not
-# from predicate overrides — norma:valor's generic predicates are correct.
+# from predicate overrides — norma:value's generic predicates are correct.
 
 
 # =========================================================================

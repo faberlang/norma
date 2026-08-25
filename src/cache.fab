@@ -2,9 +2,9 @@
 locale = "en"
 +++
 
-# thesaurus.fab - Cache and Pub/Sub Device
+# cache.fab - Cache and Pub/Sub Device
 #
-# Etymology: "thesaurus" - treasury, storehouse. A cache of values.
+# Etymology: cache — treasury / storehouse; Latin locale spelling `thesaurus`.
 #
 # Part of the host effect surface (gateway-dispatched `thesaurus:*` routes).
 #
@@ -23,43 +23,43 @@ locale = "en"
 # Get value by key (returns nihil if not found)
 @ future
 fn get(string key) → string ∪ null {
-    panic "norma:thesaurus.get is deferred pending Stage 2 dispatch"
+    panic "norma:cache.get is deferred pending Stage 2 dispatch"
 }
 
 # Set value with optional TTL in seconds
 @ future
 fn put(string key, string value, int ttl) → void {
-    panic "norma:thesaurus.put is deferred pending Stage 2 dispatch"
+    panic "norma:cache.put is deferred pending Stage 2 dispatch"
 }
 
 # Set value only if key doesn't exist
 @ future
 fn put_if_absent(string key, string value) → bool {
-    panic "norma:thesaurus.put_if_absent is deferred pending Stage 2 dispatch"
+    panic "norma:cache.put_if_absent is deferred pending Stage 2 dispatch"
 }
 
 # Delete key(s)
 @ future
 fn delete(list<string> keys) → int {
-    panic "norma:thesaurus.delete is deferred pending Stage 2 dispatch"
+    panic "norma:cache.delete is deferred pending Stage 2 dispatch"
 }
 
 # Check if key exists
 @ future
 fn exists(string key) → bool {
-    panic "norma:thesaurus.exists is deferred pending Stage 2 dispatch"
+    panic "norma:cache.exists is deferred pending Stage 2 dispatch"
 }
 
 # Get remaining TTL in seconds (-1 = no expiry, -2 = not found)
 @ future
 fn ttl(string key) → int {
-    panic "norma:thesaurus.ttl is deferred pending Stage 2 dispatch"
+    panic "norma:cache.ttl is deferred pending Stage 2 dispatch"
 }
 
 # Set expiry on existing key
 @ future
-fn expire(string key, int secundae) → bool {
-    panic "norma:thesaurus.expire is deferred pending Stage 2 dispatch"
+fn expire(string key, int seconds) → bool {
+    panic "norma:cache.expire is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -69,13 +69,13 @@ fn expire(string key, int secundae) → bool {
 # Increment by amount (default 1)
 @ future
 fn increment(string key, int quantum) → int {
-    panic "norma:thesaurus.increment is deferred pending Stage 2 dispatch"
+    panic "norma:cache.increment is deferred pending Stage 2 dispatch"
 }
 
 # Decrement by 1
 @ future
 fn decrement(string key) → int {
-    panic "norma:thesaurus.decrement is deferred pending Stage 2 dispatch"
+    panic "norma:cache.decrement is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -84,8 +84,8 @@ fn decrement(string key) → int {
 
 # Find keys matching glob pattern
 @ future
-fn find_keys(string exemplar) → list<string> {
-    panic "norma:thesaurus.find_keys is deferred pending Stage 2 dispatch"
+fn find_keys(string pattern) → list<string> {
+    panic "norma:cache.find_keys is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -94,15 +94,15 @@ fn find_keys(string exemplar) → list<string> {
 
 # Publish message to topic, returns subscriber count
 @ future
-fn publish(string topic, string nuntius) → int {
-    panic "norma:thesaurus.publish is deferred pending Stage 2 dispatch"
+fn publish(string topic, string message) → int {
+    panic "norma:cache.publish is deferred pending Stage 2 dispatch"
 }
 
 # Subscribe to topic patterns
 # Pattern: * matches one segment, ** matches multiple
 @ future
-fn subscribe(list<string> exemplaria) → Subscription {
-    panic "norma:thesaurus.subscribe is deferred pending Stage 2 dispatch"
+fn subscribe(list<string> patterns) → Subscription {
+    panic "norma:cache.subscribe is deferred pending Stage 2 dispatch"
 }
 
 # Pub/Sub subscription

@@ -1,10 +1,11 @@
 +++
 locale = "en"
 +++
+# Canonical module: norma:math; Latin locale spelling: mathesis.
 
-# mathesis.fab — native Faber scalar math catalog
+# math.fab — native Faber scalar math catalog
 #
-# Public import: importa ex "norma:mathesis" privata mathesis
+# Public import: importa ex "norma:math" private math
 # Method ledger: docs/stdlib/mathesis-methods.md
 
 # -------------------------------------------------------------------------

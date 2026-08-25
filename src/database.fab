@@ -2,9 +2,9 @@
 locale = "en"
 +++
 
-# arca.fab — Database device (`norma:arca`)
+# database.fab — Database device (`norma:database`)
 #
-# Etymology: arca — chest, strongbox, treasury. Where data is stored.
+# Etymology: database — storage chest / treasury; Latin locale spelling `arca`.
 #
 # Host effect surface (gateway-dispatched `arca:*` routes). Bodies are deferred
 # pending Stage 2 provider policy and handle materialization; this file freezes
@@ -65,7 +65,7 @@ locale = "en"
 # Driver inferred from URL scheme.
 @ future
 fn connect(string url) → Connection {
-    panic "norma:arca.connect is deferred pending Stage 2 dispatch"
+    panic "norma:database.connect is deferred pending Stage 2 dispatch"
 }
 
 # Database connection handle

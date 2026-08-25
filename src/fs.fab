@@ -2,13 +2,13 @@
 locale = "en"
 +++
 
-# solum.fab - File System Device
+# fs.fab - File System Device
 #
-# Etymology: "solum" - ground, floor, base. Local/ground I/O (vs caelum/sky/network).
+# Etymology: fs — ground / base, local file I/O; Latin locale spelling `solum`.
 #
 # Operations route over `ad`; stat/stat_async remain explicit panic stubs until
 # Stage 2 can materialize FileStatus values.
-# Top-level path operations proxy norma:solum/path for compatibility.
+# Top-level path operations proxy norma:fs/path for compatibility.
 #
 # Sync and async wrappers use the same `ad` frame contract; `@ future` marks the
 # async caller posture. Text, bytes, and lines use distinct public operations.
@@ -45,16 +45,16 @@ class FileStatus {
 # Read entire file as text (sync)
 @ public
 @ radix type T mut string list<string> bytes
-fn read_file<T>(string via) → T {
-    return call 'solum:lege' (via) ↦ T
+fn read_file<T>(string path) → T {
+    return call 'solum:lege' (path) ↦ T
 }
 
 # Read entire file as text with async caller materialization.
 @ public
 @ radix type T mut string list<string> bytes
 @ future
-fn read_file_async<T>(string via) → T {
-    return call 'solum:lege' (via) ↦ T
+fn read_file_async<T>(string path) → T {
+    return call 'solum:lege' (path) ↦ T
 }
 
 # =========================================================================
@@ -63,26 +63,26 @@ fn read_file_async<T>(string via) → T {
 # Maps to: fs.readFileSync(path) / fs.readFile(path) returning Buffer
 
 # Draw entire file as bytes (sync)
-fn read_bytes(string via) → bytes {
-    return call 'solum:hauri' (via) ↦ bytes
+fn read_bytes(string path) → bytes {
+    return call 'solum:hauri' (path) ↦ bytes
 }
 
 # Draw entire file as bytes (async route; Faber blocks on the frame)
 @ future
-fn read_bytes_async(string via) → bytes {
-    return call 'solum:hauriet' (via) ↦ bytes
+fn read_bytes_async(string path) → bytes {
+    return call 'solum:hauriet' (path) ↦ bytes
 }
 
 # Draw a bounded byte range from a file.
 @ public
-fn read_range(string via, int initium, int longitudo) → bytes {
-    const list<value> args ← [via ↦ value, initium ↦ value, longitudo ↦ value]
+fn read_range(string path, int offset, int length) → bytes {
+    const list<value> args ← [path ↦ value, offset ↦ value, length ↦ value]
     return call 'solum:partem' (args) ↦ bytes
 }
 
 # Find a text byte pattern within a bounded file range, or -1 when absent.
-fn find(string via, string exemplar, int initium, int longitudo) → int {
-    const list<value> args ← [via ↦ value, exemplar ↦ value, initium ↦ value, longitudo ↦ value]
+fn find(string path, string pattern, int offset, int length) → int {
+    const list<value> args ← [path ↦ value, pattern ↦ value, offset ↦ value, length ↦ value]
     return call 'solum:inveni' (args) ↦ int
 }
 
@@ -93,14 +93,14 @@ fn find(string via, string exemplar, int initium, int longitudo) → int {
 
 # Pluck lines from file (sync)
 @ public
-fn read_lines(string via) → list<string> {
-    return call 'solum:carpe' (via) ↦ list<string>
+fn read_lines(string path) → list<string> {
+    return call 'solum:carpe' (path) ↦ list<string>
 }
 
 # Pluck lines from file (async route; Faber blocks on the frame)
 @ future
-fn read_lines_async(string via) → list<string> {
-    return call 'solum:carpiet' (via) ↦ list<string>
+fn read_lines_async(string path) → list<string> {
+    return call 'solum:carpiet' (path) ↦ list<string>
 }
 
 # =========================================================================
@@ -110,14 +110,14 @@ fn read_lines_async(string via) → list<string> {
 
 # Write text to file, overwrites existing (sync)
 @ public
-fn write_file(string via, string data) → void {
-    return call 'solum:scribe' ([via, data]) ↦ void
+fn write_file(string path, string data) → void {
+    return call 'solum:scribe' ([path, data]) ↦ void
 }
 
 # Write text to file, overwrites existing (async route; Faber blocks)
 @ future
-fn write_file_async(string via, string data) → void {
-    return call 'solum:scribet' ([via, data]) ↦ void
+fn write_file_async(string path, string data) → void {
+    return call 'solum:scribet' ([path, data]) ↦ void
 }
 
 # =========================================================================
@@ -127,16 +127,16 @@ fn write_file_async(string via, string data) → void {
 
 # Pour bytes to file, overwrites existing (sync)
 @ public
-fn write_bytes(string via, bytes data) → void {
-    const list<value> args ← [via ↦ value, data ↦ value]
+fn write_bytes(string path, bytes data) → void {
+    const list<value> args ← [path ↦ value, data ↦ value]
     return call 'solum:funde' (args) ↦ void
 }
 
 # Pour bytes to file with async caller materialization.
 @ public
 @ future
-fn write_bytes_async(string via, bytes data) → void {
-    const list<value> args ← [via ↦ value, data ↦ value]
+fn write_bytes_async(string path, bytes data) → void {
+    const list<value> args ← [path ↦ value, data ↦ value]
     return call 'solum:funde' (args) ↦ void
 }
 
@@ -146,14 +146,14 @@ fn write_bytes_async(string via, bytes data) → void {
 # Maps to: fs.appendFileSync(path, data) / fs.appendFile(path, data)
 
 # Append text to file (sync)
-fn append(string via, string data) → void {
-    return call 'solum:appone' ([via, data]) ↦ void
+fn append(string path, string data) → void {
+    return call 'solum:appone' ([path, data]) ↦ void
 }
 
 # Append text to file (async route; Faber blocks)
 @ future
-fn append_async(string via, string data) → void {
-    return call 'solum:apponet' ([via, data]) ↦ void
+fn append_async(string path, string data) → void {
+    return call 'solum:apponet' ([path, data]) ↦ void
 }
 
 # =========================================================================
@@ -163,49 +163,49 @@ fn append_async(string via, string data) → void {
 
 # Check if path exists (sync)
 @ public
-fn exists(string via) → bool {
-    return call 'solum:exstat' (via) ↦ bool
+fn exists(string path) → bool {
+    return call 'solum:exstat' (path) ↦ bool
 }
 
 # Check if path exists (async route; Faber blocks)
 @ future
-fn exists_async(string via) → bool {
-    return call 'solum:exstabit' (via) ↦ bool
+fn exists_async(string path) → bool {
+    return call 'solum:exstabit' (path) ↦ bool
 }
 
 # True when path metadata says directory.
 @ public
-fn is_directory(string via) → bool {
-    return call 'solum:directoriumne' (via) ↦ bool
+fn is_directory(string path) → bool {
+    return call 'solum:directoriumne' (path) ↦ bool
 }
 
 # True when path metadata says regular file.
 @ public
-fn is_regular(string via) → bool {
-    return call 'solum:regularene' (via) ↦ bool
+fn is_regular(string path) → bool {
+    return call 'solum:regularene' (path) ↦ bool
 }
 
 # True when path is a regular file and can be opened for reading.
-fn is_readable(string via) → bool {
-    return call 'solum:legibilene' (via) ↦ bool
+fn is_readable(string path) → bool {
+    return call 'solum:legibilene' (path) ↦ bool
 }
 
 # True when path itself is a symbolic link.
 @ public
-fn is_symlink(string via) → bool {
-    return call 'solum:vinculumne' (via) ↦ bool
+fn is_symlink(string path) → bool {
+    return call 'solum:vinculumne' (path) ↦ bool
 }
 
 # File size in bytes.
 @ public
-fn byte_length(string via) → int {
-    return call 'solum:mensura' (via) ↦ int
+fn byte_length(string path) → int {
+    return call 'solum:mensura' (path) ↦ int
 }
 
 # Permission/mode bits as a numeric value.
 @ public
-fn mode(string via) → int {
-    return call 'solum:modus' (via) ↦ int
+fn mode(string path) → int {
+    return call 'solum:modus' (path) ↦ int
 }
 
 # =========================================================================
@@ -220,14 +220,14 @@ fn mode(string via) → int {
 # `ad` requires extending the materializer's conversio-valor genus table
 # to lower SolumStatus as a Tabula walk. The host gateway work is the
 # right moment to land that.
-fn stat(string via) → FileStatus {
-    panic "norma:solum.stat is deferred pending Stage 2 dispatch"
+fn stat(string path) → FileStatus {
+    panic "norma:fs.stat is deferred pending Stage 2 dispatch"
 }
 
 # Get file details (async — same materializer blocker as stat)
 @ future
-fn stat_async(string via) → FileStatus {
-    panic "norma:solum.stat_async is deferred pending Stage 2 dispatch"
+fn stat_async(string path) → FileStatus {
+    panic "norma:fs.stat_async is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -237,20 +237,20 @@ fn stat_async(string via) → FileStatus {
 
 # Follow symlink to get target path (sync)
 @ public
-fn read_link(string via) → string {
-    return call 'solum:sequere' (via) ↦ string
+fn read_link(string path) → string {
+    return call 'solum:sequere' (path) ↦ string
 }
 
 # Follow symlink to get target path (async route; Faber blocks)
 @ future
-fn read_link_async(string via) → string {
-    return call 'solum:sequetur' (via) ↦ string
+fn read_link_async(string path) → string {
+    return call 'solum:sequetur' (path) ↦ string
 }
 
 # Create a symbolic link pointing from destinatio to fons.
 @ public
-fn create_link(string fons, string destinatio) → void {
-    return call 'solum:vincula' ([fons, destinatio]) ↦ void
+fn create_link(string source, string destination) → void {
+    return call 'solum:vincula' ([source, destination]) ↦ void
 }
 
 # =========================================================================
@@ -261,14 +261,14 @@ fn create_link(string fons, string destinatio) → void {
 
 # Delete file (sync)
 @ public
-fn delete(string via) → void {
-    return call 'solum:dele' (via) ↦ void
+fn delete(string path) → void {
+    return call 'solum:dele' (path) ↦ void
 }
 
 # Delete file (async route; Faber blocks)
 @ future
-fn delete_async(string via) → void {
-    return call 'solum:delet' (via) ↦ void
+fn delete_async(string path) → void {
+    return call 'solum:delet' (path) ↦ void
 }
 
 # =========================================================================
@@ -278,14 +278,14 @@ fn delete_async(string via) → void {
 
 # Copy file (sync)
 @ public
-fn exscribe(string fons, string destinatio) → void {
-    return call 'solum:exscribe' ([fons, destinatio]) ↦ void
+fn copy(string source, string destination) → void {
+    return call 'solum:copy' ([source, destination]) ↦ void
 }
 
 # Copy file (async route; Faber blocks)
 @ future
-fn exscribet(string fons, string destinatio) → void {
-    return call 'solum:exscribet' ([fons, destinatio]) ↦ void
+fn copy_async(string source, string destination) → void {
+    return call 'solum:copy_async' ([source, destination]) ↦ void
 }
 
 # =========================================================================
@@ -295,14 +295,14 @@ fn exscribet(string fons, string destinatio) → void {
 
 # Rename or move file (sync)
 @ public
-fn rename(string fons, string destinatio) → void {
-    return call 'solum:renomina' ([fons, destinatio]) ↦ void
+fn rename(string source, string destination) → void {
+    return call 'solum:renomina' ([source, destination]) ↦ void
 }
 
 # Rename or move file (async route; Faber blocks)
 @ future
-fn rename_async(string fons, string destinatio) → void {
-    return call 'solum:renominabit' ([fons, destinatio]) ↦ void
+fn rename_async(string source, string destination) → void {
+    return call 'solum:renominabit' ([source, destination]) ↦ void
 }
 
 # =========================================================================
@@ -312,20 +312,20 @@ fn rename_async(string fons, string destinatio) → void {
 
 # Touch file - create or update mtime (sync)
 @ public
-fn touch(string via) → void {
-    return call 'solum:tange' (via) ↦ void
+fn touch(string path) → void {
+    return call 'solum:tange' (path) ↦ void
 }
 
 # Touch file - create or update mtime (async route; Faber blocks)
 @ future
-fn touch_async(string via) → void {
-    return call 'solum:tanget' (via) ↦ void
+fn touch_async(string path) → void {
+    return call 'solum:tanget' (path) ↦ void
 }
 
 # Set permission/mode bits.
 @ public
-fn set_mode(string via, int mode) → void {
-    const list<value> args ← [via ↦ value, mode ↦ value]
+fn set_mode(string path, int mode) → void {
+    const list<value> args ← [path ↦ value, mode ↦ value]
     return call 'solum:modum' (args) ↦ void
 }
 
@@ -336,14 +336,14 @@ fn set_mode(string via, int mode) → void {
 
 # Create directory (sync)
 @ public
-fn create_dir(string via) → void {
-    return call 'solum:crea' (via) ↦ void
+fn create_dir(string path) → void {
+    return call 'solum:crea' (path) ↦ void
 }
 
 # Create directory (async route; Faber blocks)
 @ future
-fn create_dir_async(string via) → void {
-    return call 'solum:creabit' (via) ↦ void
+fn create_dir_async(string path) → void {
+    return call 'solum:creabit' (path) ↦ void
 }
 
 # =========================================================================
@@ -352,14 +352,14 @@ fn create_dir_async(string via) → void {
 # Maps to: fs.readdirSync(path) / fs.readdir(path)
 
 # List directory contents (sync)
-fn list_dir(string via) → list<string> {
-    return call 'solum:enumera' (via) ↦ list<string>
+fn list_dir(string path) → list<string> {
+    return call 'solum:enumera' (path) ↦ list<string>
 }
 
 # List directory contents (async route; Faber blocks)
 @ future
-fn list_dir_async(string via) → list<string> {
-    return call 'solum:enumerabit' (via) ↦ list<string>
+fn list_dir_async(string path) → list<string> {
+    return call 'solum:enumerabit' (path) ↦ list<string>
 }
 
 # =========================================================================
@@ -369,47 +369,47 @@ fn list_dir_async(string via) → list<string> {
 
 # Prune directory tree (sync)
 @ public
-fn remove_tree(string via) → void {
-    return call 'solum:amputa' (via) ↦ void
+fn remove_tree(string path) → void {
+    return call 'solum:amputa' (path) ↦ void
 }
 
 # Prune directory tree (async route; Faber blocks)
 @ future
-fn remove_tree_async(string via) → void {
-    return call 'solum:amputabit' (via) ↦ void
+fn remove_tree_async(string path) → void {
+    return call 'solum:amputabit' (path) ↦ void
 }
 
 # =========================================================================
-# PATH UTILITIES (proxies — canonical definitions live in norma:solum/path)
+# PATH UTILITIES (proxies — canonical definitions live in norma:fs/path)
 # =========================================================================
 # These top-level proxies preserve the facade while sharing the canonical
-# solum:* routes with norma:solum/path.
+# solum:* routes with norma:fs/path.
 
 # Join path segments
 @ public
-fn join(list<string> partes) → string {
-    return call 'solum:iunge' (partes) ↦ string
+fn join(list<string> parts) → string {
+    return call 'solum:iunge' (parts) ↦ string
 }
 
 # Parent path segment (directory part)
 @ public
-fn parent(string via) → string {
-    return call 'solum:parens' (via) ↦ string
+fn parent(string path) → string {
+    return call 'solum:parens' (path) ↦ string
 }
 
 # Final path segment (filename)
-fn file_name(string via) → string {
-    return call 'solum:nomen' (via) ↦ string
+fn file_name(string path) → string {
+    return call 'solum:nomen' (path) ↦ string
 }
 
 # File extension (includes dot)
-fn extension(string via) → string {
-    return call 'solum:suffixum' (via) ↦ string
+fn extension(string path) → string {
+    return call 'solum:suffixum' (path) ↦ string
 }
 
 # Resolve to absolute path
-fn resolve(string via) → string {
-    return call 'solum:absolve' (via) ↦ string
+fn resolve(string path) → string {
+    return call 'solum:absolve' (path) ↦ string
 }
 
 # Get user's home directory
@@ -423,11 +423,11 @@ fn temp_dir() → string {
 }
 
 @ private
-fn _join_two(string base, string segmentum) → string {
+fn _join_two(string base, string segment) → string {
     if base.ends_with("/") {
-        return "§§"(base, segmentum)
+        return "§§"(base, segment)
     }
-    return "§/§"(base, segmentum)
+    return "§/§"(base, segment)
 }
 
 # =========================================================================
@@ -437,18 +437,18 @@ fn _join_two(string base, string segmentum) → string {
 # Contract: glob(radix, exemplar) → lista<textus> ⇥ textus
 # v1: * matches exactly one path segment (e.g. "*/SKILL.md").
 #
-fn glob(string radix, string exemplar) → list<string> ⇥ string {
-    const list<string> segmenta ← exemplar.split("/")
-    var list<string> candidatos ← [radix]
+fn glob(string root, string pattern) → list<string> ⇥ string {
+    const list<string> segments ← pattern.split("/")
+    var list<string> candidatos ← [root]
     var int index ← 0
-    while index < segmenta.length() {
-        const string segmentum ← segmenta.get(index) coalesce ""
-        if segmentum ≡ "" {
-            throw "empty path segment in solum.glob exemplar"
+    while index < segments.length() {
+        const string segment ← segments.get(index) coalesce ""
+        if segment ≡ "" {
+            throw "empty path segment in solum.glob pattern"
         }
 
         var list<string> proximos ← []
-        if segmentum ≡ "*" {
+        if segment ≡ "*" {
             for from candidatos const base {
                 const list<string> entries ← list_dir(base)
                 for from entries const entry {
@@ -458,9 +458,9 @@ fn glob(string radix, string exemplar) → list<string> ⇥ string {
         }
         else {
             for from candidatos const base {
-                const string via ← _join_two(base, segmentum)
-                if exists(via) {
-                    proximos.append(via)
+                const string path ← _join_two(base, segment)
+                if exists(path) {
+                    proximos.append(path)
                 }
             }
         }

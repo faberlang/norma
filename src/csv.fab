@@ -6,9 +6,9 @@ locale = "en"
 #
 # Public import: importa ex "norma:csv" privata csv
 # Method ledger: docs/stdlib/csv-methods.md
-# Internal dependency: norma:chorda (split_n + join)
+# Internal dependency: norma:text (split_n + join)
 
-import from "norma:chorda" chorda
+import from "norma:text" text
 
 # Why: Strip a single trailing CR when rows arrive CRLF-split (v1 LF contract).
 @ private
@@ -27,11 +27,11 @@ fn _normalize_row(string row) → string {
 fn parse(string wire) → list<list<string>> {
     if wire.length() ≡ 0 then return empty
 
-    const list<string> rows ← chorda.split_n(wire, "\n", wire.length() + 1)
+    const list<string> rows ← text.split_n(wire, "\n", wire.length() + 1)
     var list<list<string>> map ← []
     for from rows const row {
         const string normalized ← _normalize_row(row)
-        map.append(chorda.split_n(normalized, ",", normalized.length() + 1))
+        map.append(text.split_n(normalized, ",", normalized.length() + 1))
     }
     return map
 }
@@ -42,7 +42,7 @@ fn parse(string wire) → list<list<string>> {
 fn stringify(list<list<string>> map) → string {
     var list<string> rows ← []
     for from map const fields {
-        rows.append(chorda.join(fields, ","))
+        rows.append(text.join(fields, ","))
     }
-    return chorda.join(rows, "\n")
+    return text.join(rows, "\n")
 }

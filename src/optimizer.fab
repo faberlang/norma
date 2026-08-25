@@ -17,8 +17,8 @@ locale = "en"
 # SGD step (shape-generic: magnitudo Figura binds implicitly at call sites)
 # -------------------------------------------------------------------------
 
-fn sgd_step<size Figura>(tensor<f32, Figura> param, tensor<f32, Figura> grad, f32 lr) → tensor<f32, Figura> {
-    const tensor<f32, Figura> lr_fill ← param.fill(lr)
-    const tensor<f32, Figura> scaled ← grad.multiply(lr_fill)
+fn sgd_step<size Shape>(tensor<f32, Shape> param, tensor<f32, Shape> grad, f32 lr) → tensor<f32, Shape> {
+    const tensor<f32, Shape> lr_fill ← param.fill(lr)
+    const tensor<f32, Shape> scaled ← grad.multiply(lr_fill)
     return param.subtract(scaled)
 }

@@ -2,9 +2,9 @@
 locale = "en"
 +++
 
-# crypta.fab - Cryptography Device
+# crypto.fab - Cryptography Device
 #
-# Etymology: "crypta" - vault, crypt, hidden chamber. Secret operations.
+# Etymology: crypto — vault / hidden chamber; Latin locale spelling `crypta`.
 #
 # Part of the host effect surface (gateway-dispatched `crypta:*` routes),
 # except the SHA-2 digests, which are native Faber bodies in this file.
@@ -32,11 +32,11 @@ locale = "en"
 # the 64 MiB boundary fail through the ⇥ textus channel before padding.
 @ public
 fn digest(string alg, bytes data) → bytes ⇥ string {
-    if data.length() > 67108864 then throw "norma:crypta.digest: input exceeds 67108864-byte limit"
+    if data.length() > 67108864 then throw "norma:crypto.digest: input exceeds 67108864-byte limit"
     if alg ≡ "sha256" then return _sha256(data)
     if alg ≡ "sha384" then return _sha384(data)
     if alg ≡ "sha512" then return _sha512(data)
-    throw "norma:crypta.digest: algorithm must be sha256, sha384, or sha512"
+    throw "norma:crypto.digest: algorithm must be sha256, sha384, or sha512"
 }
 
 # -------------------------------------------------------------------------
@@ -100,15 +100,15 @@ fn _schedule32(list<int<u8>> buf, int init) → list<uint<u32>> {
 }
 
 @ private
-fn _compress32(list<uint<u32>> statusus, list<uint<u32>> w, list<uint<u32>> k) → list<uint<u32>> {
-    var uint<u32> a ← statusus[0]
-    var uint<u32> b ← statusus[1]
-    var uint<u32> c ← statusus[2]
-    var uint<u32> d ← statusus[3]
-    var uint<u32> e ← statusus[4]
-    var uint<u32> f ← statusus[5]
-    var uint<u32> g ← statusus[6]
-    var uint<u32> h ← statusus[7]
+fn _compress32(list<uint<u32>> state, list<uint<u32>> w, list<uint<u32>> k) → list<uint<u32>> {
+    var uint<u32> a ← state[0]
+    var uint<u32> b ← state[1]
+    var uint<u32> c ← state[2]
+    var uint<u32> d ← state[3]
+    var uint<u32> e ← state[4]
+    var uint<u32> f ← state[5]
+    var uint<u32> g ← state[6]
+    var uint<u32> h ← state[7]
     for range 0‥64 const i {
         const uint<u32> s1 ← _Sigma1_32(e)
         const uint<u32> choose ← (e ∧ f) ⊻ ((¬e) ∧ g)
@@ -126,14 +126,14 @@ fn _compress32(list<uint<u32>> statusus, list<uint<u32>> w, list<uint<u32>> k) �
         a ← t1 + t2
     }
     var list<uint<u32>> result ← []
-    result.append(a + statusus[0])
-    result.append(b + statusus[1])
-    result.append(c + statusus[2])
-    result.append(d + statusus[3])
-    result.append(e + statusus[4])
-    result.append(f + statusus[5])
-    result.append(g + statusus[6])
-    result.append(h + statusus[7])
+    result.append(a + state[0])
+    result.append(b + state[1])
+    result.append(c + state[2])
+    result.append(d + state[3])
+    result.append(e + state[4])
+    result.append(f + state[5])
+    result.append(g + state[6])
+    result.append(h + state[7])
     return result
 }
 
@@ -177,13 +177,13 @@ fn _K32() → list<uint<u32>> {
 fn _sha256(bytes data) → bytes {
     const list<int<u8>> padded ← _pad32(data)
     const list<uint<u32>> k ← _K32()
-    var list<uint<u32>> statusus ← [1779033703, 3144134277, 1013904242, 2773480762, 1359893119, 2600822924, 528734635, 1541459225]
+    var list<uint<u32>> state ← [1779033703, 3144134277, 1013904242, 2773480762, 1359893119, 2600822924, 528734635, 1541459225]
     const int n_blocks ← padded.length() / 64
     for range 0‥n_blocks const bi {
         const list<uint<u32>> w ← _schedule32(padded, bi * 64)
-        statusus ← _compress32(statusus, w, k)
+        state ← _compress32(state, w, k)
     }
-    const list<int<u8>> out ← _serialize32(statusus)
+    const list<int<u8>> out ← _serialize32(state)
     const bytes result ← out
     return result
 }
@@ -243,15 +243,15 @@ fn _schedule64(list<int<u8>> buf, int init) → list<uint<u64>> {
 }
 
 @ private
-fn _compress64(list<uint<u64>> statusus, list<uint<u64>> w, list<uint<u64>> k) → list<uint<u64>> {
-    var uint<u64> a ← statusus[0]
-    var uint<u64> b ← statusus[1]
-    var uint<u64> c ← statusus[2]
-    var uint<u64> d ← statusus[3]
-    var uint<u64> e ← statusus[4]
-    var uint<u64> f ← statusus[5]
-    var uint<u64> g ← statusus[6]
-    var uint<u64> h ← statusus[7]
+fn _compress64(list<uint<u64>> state, list<uint<u64>> w, list<uint<u64>> k) → list<uint<u64>> {
+    var uint<u64> a ← state[0]
+    var uint<u64> b ← state[1]
+    var uint<u64> c ← state[2]
+    var uint<u64> d ← state[3]
+    var uint<u64> e ← state[4]
+    var uint<u64> f ← state[5]
+    var uint<u64> g ← state[6]
+    var uint<u64> h ← state[7]
     for range 0‥80 const i {
         const uint<u64> s1 ← _Sigma1_64(e)
         const uint<u64> choose ← (e ∧ f) ⊻ ((¬e) ∧ g)
@@ -269,14 +269,14 @@ fn _compress64(list<uint<u64>> statusus, list<uint<u64>> w, list<uint<u64>> k) �
         a ← t1 + t2
     }
     var list<uint<u64>> result ← []
-    result.append(a + statusus[0])
-    result.append(b + statusus[1])
-    result.append(c + statusus[2])
-    result.append(d + statusus[3])
-    result.append(e + statusus[4])
-    result.append(f + statusus[5])
-    result.append(g + statusus[6])
-    result.append(h + statusus[7])
+    result.append(a + state[0])
+    result.append(b + state[1])
+    result.append(c + state[2])
+    result.append(d + state[3])
+    result.append(e + state[4])
+    result.append(f + state[5])
+    result.append(g + state[6])
+    result.append(h + state[7])
     return result
 }
 
@@ -329,13 +329,13 @@ fn _K64() → list<uint<u64>> {
 fn _sha512_engine(bytes data, list<uint<u64>> iv, int n_words) → bytes {
     const list<int<u8>> padded ← _pad64(data)
     const list<uint<u64>> k ← _K64()
-    var list<uint<u64>> statusus ← iv
+    var list<uint<u64>> state ← iv
     const int n_blocks ← padded.length() / 128
     for range 0‥n_blocks const bi {
         const list<uint<u64>> w ← _schedule64(padded, bi * 128)
-        statusus ← _compress64(statusus, w, k)
+        state ← _compress64(state, w, k)
     }
-    const list<int<u8>> out ← _serialize64(statusus, n_words)
+    const list<int<u8>> out ← _serialize64(state, n_words)
     const bytes result ← out
     return result
 }
@@ -357,8 +357,8 @@ fn _sha384(bytes data) → bytes {
 # =========================================================================
 
 # HMAC (hmac-sha256, hmac-sha384, hmac-sha512)
-fn hmac(string alg, bytes clavis, bytes data) → bytes {
-    panic "norma:crypta.authenfica is deferred pending Stage 2 dispatch"
+fn hmac(string alg, bytes key, bytes data) → bytes {
+    panic "norma:crypto.authenfica is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -367,13 +367,13 @@ fn hmac(string alg, bytes clavis, bytes data) → bytes {
 
 # Encrypt (aes-256-gcm, aes-256-cbc)
 # Returns ciphertext with IV prepended
-fn encrypt(string alg, bytes clavis, bytes data) → bytes {
-    panic "norma:crypta.cela is deferred pending Stage 2 dispatch"
+fn encrypt(string alg, bytes key, bytes data) → bytes {
+    panic "norma:crypto.cela is deferred pending Stage 2 dispatch"
 }
 
 # Decrypt (expects IV prepended to ciphertext)
-fn decrypt(string alg, bytes clavis, bytes data) → bytes {
-    panic "norma:crypta.revela is deferred pending Stage 2 dispatch"
+fn decrypt(string alg, bytes key, bytes data) → bytes {
+    panic "norma:crypto.revela is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -381,13 +381,13 @@ fn decrypt(string alg, bytes clavis, bytes data) → bytes {
 # =========================================================================
 
 # Sign with private key
-fn sign(bytes arcana, bytes data) → bytes {
-    panic "norma:crypta.signa is deferred pending Stage 2 dispatch"
+fn sign(bytes secret, bytes data) → bytes {
+    panic "norma:crypto.signa is deferred pending Stage 2 dispatch"
 }
 
 # Verify with public key
-fn verify(bytes aperta, bytes data, bytes signatura) → bool {
-    panic "norma:crypta.verifica is deferred pending Stage 2 dispatch"
+fn verify(bytes public_key, bytes data, bytes signature) → bool {
+    panic "norma:crypto.verifica is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -396,12 +396,12 @@ fn verify(bytes aperta, bytes data, bytes signatura) → bool {
 
 # Generate symmetric key (aes-256)
 fn generate_key(string alg) → bytes {
-    panic "norma:crypta.genera is deferred pending Stage 2 dispatch"
+    panic "norma:crypto.genera is deferred pending Stage 2 dispatch"
 }
 
 # Generate asymmetric key pair (ed25519, rsa-2048, rsa-4096)
 fn generate_pair(string alg) → KeyPair {
-    panic "norma:crypta.gemina is deferred pending Stage 2 dispatch"
+    panic "norma:crypto.gemina is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -411,8 +411,8 @@ fn generate_pair(string alg) → KeyPair {
 # Derive key from password (pbkdf2, argon2id, scrypt)
 # Async because intentionally slow for security
 @ future
-fn derive_key(string alg, string password, bytes sal, int longitudo) → bytes {
-    panic "norma:crypta.derivabit is deferred pending Stage 2 dispatch"
+fn derive_key(string alg, string password, bytes salt, int length) → bytes {
+    panic "norma:crypto.derivabit is deferred pending Stage 2 dispatch"
 }
 
 # Asymmetric key pair

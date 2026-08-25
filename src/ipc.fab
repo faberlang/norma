@@ -2,9 +2,9 @@
 locale = "en"
 +++
 
-# nuncius.fab - Inter-Process Communication Device
+# ipc.fab - Inter-Process Communication Device
 #
-# Etymology: "nuncius" - messenger, envoy. Communication between processes.
+# Etymology: ipc — messenger between processes; Latin locale spelling `nuncius`.
 #
 # Part of the host effect surface (gateway-dispatched `nuncius:*` routes).
 # Maps to IPCDevice from monk-os-kernel.
@@ -23,7 +23,7 @@ locale = "en"
 
 # Allocate shared memory buffer
 fn allocate(int byte_length) → bytes {
-    panic "norma:nuncius.allocate is deferred pending Stage 2 dispatch"
+    panic "norma:ipc.allocate is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -34,7 +34,7 @@ fn allocate(int byte_length) → bytes {
 
 # Open a connected message port pair
 fn open_pair() → PortPair {
-    panic "norma:nuncius.open_pair is deferred pending Stage 2 dispatch"
+    panic "norma:ipc.open_pair is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -50,18 +50,18 @@ fn open_pair() → PortPair {
 # Why: Threads keep watch at a condition variable.
 
 # Restrict access via mutex backed by shared memory
-fn create_mutex(bytes memoria, int offset) → Mutex {
-    panic "norma:nuncius.create_mutex is deferred pending Stage 2 dispatch"
+fn create_mutex(bytes memory, int offset) → Mutex {
+    panic "norma:ipc.create_mutex is deferred pending Stage 2 dispatch"
 }
 
 # Count permits via semaphore backed by shared memory
-fn create_semaphore(bytes memoria, int offset, int value) → Semaphore {
-    panic "norma:nuncius.create_semaphore is deferred pending Stage 2 dispatch"
+fn create_semaphore(bytes memory, int offset, int value) → Semaphore {
+    panic "norma:ipc.create_semaphore is deferred pending Stage 2 dispatch"
 }
 
 # Keep watch via condition variable backed by shared memory
-fn create_condvar(bytes memoria, int offset) → Condition {
-    panic "norma:nuncius.create_condvar is deferred pending Stage 2 dispatch"
+fn create_condvar(bytes memory, int offset) → Condition {
+    panic "norma:ipc.create_condvar is deferred pending Stage 2 dispatch"
 }
 
 # Message port pair
@@ -74,7 +74,7 @@ interface PortPair {
 # Message port (one end of a channel)
 interface Port {
     # Send message
-    fn send(value nuntius) → void
+    fn send(value message) → void
 
     # Receive message (async, blocks until available)
     @ future

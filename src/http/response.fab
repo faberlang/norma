@@ -19,8 +19,8 @@ class Response {
     string body = ""
 
     @ public
-    fn header(string nomen) → string ∪ null {
-        return self.headers.get(nomen)
+    fn header(string name) → string ∪ null {
+        return self.headers.get(name)
     }
 
     @ public

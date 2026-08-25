@@ -2,9 +2,9 @@
 locale = "en"
 +++
 
-# processus.fab - Process Device
+# process.fab - Process Device
 #
-# Etymology: "processus" from "pro-" (forward) + "cedere" (to go)
+# Etymology: process — forward movement / execution; Latin locale spelling `processus`.
 # A going forward, a process in motion.
 #
 # Every verb blocks on its `ad` frame response. Async is host-side plumbing:
@@ -12,7 +12,7 @@ locale = "en"
 # There is no `@ future` — sync/async is a route-naming distinction, not a
 # Faber-side marker. Sync and async verbs name distinct `processus:*` routes.
 # `spawn` remains deferred: it returns the `Subprocess` genus, which the
-# ad materializer does not yet support (same blocker as solum.stat).
+# ad materializer does not yet support (same blocker as fs.stat).
 # Drifted annotation state is not preserved: the live surface is @ public.
 #
 # Design principles:
@@ -49,8 +49,8 @@ class Subprocess {
 # a reserved keyword (TokenKind::Argumenta, used for CLI argument binding),
 # so a native body would need to rename it.
 @ public
-fn spawn(list<string> args, string directorium optional, map<string, string> ambitus optional) → Subprocess {
-    panic "norma:processus.spawn is deferred pending Stage 2 dispatch"
+fn spawn(list<string> args, string directory optional, map<string, string> environment optional) → Subprocess {
+    panic "norma:process.spawn is deferred pending Stage 2 dispatch"
 }
 
 # =========================================================================
@@ -65,7 +65,7 @@ fn spawn(list<string> args, string directorium optional, map<string, string> amb
 # argument binding). Optional directorium/ambitus are accepted at the
 # Faber surface; the host route currently receives args only.
 @ public
-fn detach(list<string> args, string directorium optional, map<string, string> ambitus optional) → int {
+fn detach(list<string> args, string directory optional, map<string, string> environment optional) → int {
     return call 'processus:dimitte' (args) ↦ int
 }
 
@@ -105,8 +105,8 @@ fn exec_async(string command) → string {
 
 # Read environment variable (Imperativus: fails when unset; set-to-empty → "")
 @ public
-fn read_env(string nomen) → string {
-    return call 'processus:lege' (nomen) ↦ string
+fn read_env(string name) → string {
+    return call 'processus:lege' (name) ↦ string
 }
 
 # =========================================================================
@@ -118,8 +118,8 @@ fn read_env(string nomen) → string {
 
 # Write environment variable
 @ public
-fn write_env(string nomen, string value) → void {
-    return call 'processus:scribe' ([nomen, value]) ↦ void
+fn write_env(string name, string value) → void {
+    return call 'processus:scribe' ([name, value]) ↦ void
 }
 
 # =========================================================================
@@ -144,8 +144,8 @@ fn cwd() → string {
 
 # Change current working directory
 @ public
-fn chdir(string via) → void {
-    return call 'processus:muta' (via) ↦ void
+fn chdir(string path) → void {
+    return call 'processus:muta' (path) ↦ void
 }
 
 # =========================================================================
