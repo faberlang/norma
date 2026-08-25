@@ -18,7 +18,7 @@ locale = "en"
 #   0.0
 #   verum
 
-import from "norma:mathesis" mathesis
+import from "norma:math" mathesis
 
 main {
     const float pi ← mathesis.PI()
