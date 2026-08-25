@@ -53,11 +53,11 @@ main {
     print pow_cat
     print pow_recv
     print neg_pow_recv
-    assert s ≈ 0.0
-    assert c ≈ 1.0
-    assert r ≈ 2.0
+    assert s ≅ 0.0
+    assert c ≅ 1.0
+    assert r ≅ 2.0
     assert clamped ≡ 3.0
-    assert t ≈ 0.0
+    assert t ≅ 0.0
     assert exp1.approx(mathesis.E(), 0.000001)
     assert ln_e.approx(1.0, 0.000001)
     assert ln10.approx(2.0, 0.000001)
