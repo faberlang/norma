@@ -5,7 +5,7 @@
 (`cista.toml` version 0.1.0, pre-1.0) and its public reader surface
 (`norma:*` import coordinates and member names).
 **Row-level authority**: each locale-pack `[[library_members]]` row in
-`radix/stdlib/locale/{en,la}/pack.toml` is the row-level surface mapping;
+`norma/locale/{en,la}/pack.toml` is the row-level surface mapping;
 this document is the product-facing aggregate that names what breaks, what
 migrates, and the identity rules. On pack coverage, the la pack comment
 wins over this aggregate.
@@ -47,7 +47,7 @@ by the delivery policy (§12), not a compatibility surface.
   `norma:chorda`, `norma:solum`, … resolve as before; only member spellings
   moved.
 - **La-pack rows are a census + `@ public` projection, not a complete
-  public translation.** `radix/stdlib/locale/la/pack.toml` is an
+  public translation.** `norma/locale/la/pack.toml` is an
   **identity pack**. Its `package = "norma"` `[[library_members]]` rows
   add Latin surface projections for members whose canonical names became
   English in Pass B (`reverse→retorta`, `join→nexa`, `read_file→lege`,

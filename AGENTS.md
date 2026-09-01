@@ -1,9 +1,10 @@
 # Norma Agent Instructions
 
 Norma is the public backend-agnostic Faber source library for `norma:*`
-imports. This repo owns `.fab` source under `src/`; Radix consumes it through
-`FABER_LIBRARY_HOME`, usually the parent `faberlang/` directory in local
-development.
+imports. This repo owns `.fab` source under `src/` and library locale
+fragments under `locale/`; Radix consumes it through `FABER_LIBRARY_HOME`,
+usually the parent `faberlang/` directory in local development. The package
+manifest is `faber.toml`.
 
 **Workspace work mode.** Ordinary development is **direct** in this
 checkout on `main`. Worktree packets under `../worktrees/<lane>/` are
@@ -31,3 +32,4 @@ asked. Container law: [`../AGENTS.md`](../AGENTS.md).
 ## Validation
 
 Run `./scripta/check-source` from this repo after source changes.
+After locale-pack edits, run `./scripta/check-locale-la`.
