@@ -2,11 +2,11 @@
 locale = "en"
 +++
 
-# error-conversio — declared error arms replace administrative wrappers.
+# error-conversio — one declared conversion replaces administrative wrappers.
 #
 # The source error is deliberately small so the propagation seam stays visible.
-# The destination arm preserves the whole source value in `inner` and projects
-# its shared message. The `err` binding is receiver-safe: English `self` is the
+# The conversion preserves the whole source value in `inner` and projects its
+# shared message. The `err` binding is receiver-safe: English `self` is the
 # method-receiver keyword, so `self.message` is not a whole-source binding here.
 
 @ public
@@ -22,13 +22,19 @@ union BoundaryError {
     @ shared
     string message
 
-    @ conversion WireError err {
-        return variant WireFailure {message = err.message, inner = err}
-    }
-
     WireFailure {
         WireError inner
     }
+}
+
+# The declared conversion is an ordinary top-level function. Its parameter type
+# is the source error and its return type is the destination; the compiler
+# enrolls that ordered pair, so a propagating `⇥` failure converts at the
+# boundary without a wrapper at each caller. Nothing is nested in the union
+# body, and chains are never composed — only this direct pair is admitted.
+@ conversion
+fn from_wire_error(WireError err) → BoundaryError {
+    return variant WireFailure {message = err.message, inner = err}
 }
 
 @ public
@@ -54,7 +60,7 @@ fn read_wire() → string ⇥ WireError {
 # }
 
 # -------------------------------------------------------------------------
-# AFTER — direct propagation through the declared arm
+# AFTER — direct propagation through the declared conversion
 # -------------------------------------------------------------------------
 
 @ public
@@ -67,8 +73,8 @@ fn inspect_after() → string ⇥ BoundaryError {
 # Source: UnmappedError; destination: BoundaryError.
 # An active equivalent would be rejected with the named diagnostic
 # `failable_call_conversion_absent`; only the direct (WireError, BoundaryError)
-# arm above is admitted. The invalid call stays commented so this happy-path
-# package remains green while the decline contract remains visible.
+# conversion above is admitted. The invalid call stays commented so this
+# happy-path package remains green while the decline contract remains visible.
 #
 # fn declined() → string ⇥ UnmappedError { ... }
 # fn missing_direct_arm() → string ⇥ BoundaryError {
