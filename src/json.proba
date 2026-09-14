@@ -12,6 +12,13 @@ class Payload {
     bool active
 }
 
+@ json
+class EscapedText {
+    string control
+    string text
+    string unicode
+}
+
 fn rejects(string wire) → bool {
     do {
         json_codec.parse(wire)
@@ -109,5 +116,58 @@ describe "JSON parsing" {
     test "try_parse returns null on malformed input" {
         assert json_codec.try_parse("{]") is null
         assert json_codec.try_parse("{\"ok\":true}") not is null
+    }
+}
+
+describe "JSON serialization" {
+    test "serializes every JSON value kind" {
+        const json document ← {
+            "text": "Ada",
+            "integer": 3,
+            "fraction": 1.25,
+            "active": true,
+            "nothing": null,
+            "items": [1, false, {"nested": "yes"}]
+        }
+        const string wire ← json_codec.stringify(document)
+        assert wire ≡ «{"active":true,"fraction":1.25,"integer":3,"items":[1,false,{"nested":"yes"}],"nothing":null,"text":"Ada"}»
+    }
+
+    test "escapes strings and preserves Unicode" {
+        const string control ← ([1] ↦ bytes) ↦ string
+        const string backspace ← ([8] ↦ bytes) ↦ string
+        const string formfeed ← ([12] ↦ bytes) ↦ string
+        const EscapedText payload ← EscapedText {
+            control = control,
+            text = «line§quote: § slash: § tab:§ back:§ form:§»(
+                "\n", «"», "\\", "\t", backspace, formfeed
+            ),
+            unicode = "λ𝄞"
+        }
+        const json document ← payload ↦ json
+        const string wire ← json_codec.stringify(document)
+        const string expected ← «{"control":"\\u0001","text":"line\\nquote: \\" slash: \\\\ tab:\\t back:\\b form:\\f","unicode":"λ𝄞"}»
+        assert wire ≡ expected
+        const EscapedText roundtrip ← parse_valid(wire) ↦ EscapedText
+        assert roundtrip.control ≡ payload.control
+        assert roundtrip.text ≡ payload.text
+        assert roundtrip.unicode ≡ payload.unicode
+    }
+
+    test "round trips through the public facade" {
+        const json original ← {
+            "model": "gpt-test",
+            "messages": [{"role": "user", "content": "hello"}],
+            "stream": false
+        }
+        const json reparsed ← parse_valid(json_codec.stringify(original))
+        const value tree ← reparsed ↦ value
+        const map<string, value> root ↤ tree
+        assert (root.get("model") ↦ string) ≡ "gpt-test"
+        assert (root.get("stream") ↦ bool) ≡ false
+        const list<value> messages ↤ root.get("messages")
+        const map<string, value> first ↤ messages.get(0)
+        assert (first.get("role") ↦ string) ≡ "user"
+        assert (first.get("content") ↦ string) ≡ "hello"
     }
 }

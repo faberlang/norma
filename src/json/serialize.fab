@@ -1,17 +1,80 @@
 +++
 locale = "en"
 +++
-
-# json/serialize.fab — JSON serialization facade
+# json/serialize.fab — recursive JSON serializer
 #
-# The compiler/runtime-owned formal `json` conversio is the single codec
-# authority. This module exists so direct `norma:json/serialize` imports share the
-# same path as the top-level `norma:json.stringify` facade.
-#
-# The direct `json ↦ string` conversion is rejected by the compiler (SEM016);
-# the runtime-backed codec mirrors the `json.stringify` facade, deferred pending
-# runtime codec dispatch.
+# The serializer is ordinary Faber. The language's `json ↦ value` conversion
+# exposes the already-validated JSON tree; this module only renders that tree
+# as deterministic compact wire text.
 
+import from "norma:json/lexer" lexer
+
+import from "norma:text" text
+
+@ public
 fn stringify(json document) → string {
-    panic "norma:json/serialize.stringify is deferred pending runtime codec dispatch"
+    return encode(document ↦ value)
+}
+
+fn encode(value node) → string {
+    if node is null then return "null"
+    if node is bool {
+        if node ↦ bool then return "true"
+        return "false"
+    }
+    if node is string then return quote(node ↦ string)
+    if node is int then return (node ↦ int) ↦ string
+    if node is float then return (node ↦ float) ↦ string
+    do {
+        const map<string, value> fields ↤ node
+        return encode_object(fields)
+    }
+    catch err {
+    }
+    do {
+        const list<value> items ↤ node
+        return encode_array(items)
+    }
+    catch err {
+    }
+    panic "invalid value in JSON document"
+}
+
+fn encode_array(list<value> items) → string {
+    var list<string> encoded ← empty
+    for from items const item {
+        encoded.append(encode(item))
+    }
+    return text.join(["[", text.join(encoded, ","), "]"], "")
+}
+
+fn encode_object(map<string, value> fields) → string {
+    var list<string> keys ← fields.keys()
+    keys.sort()
+    var list<string> members ← empty
+    for from keys const key {
+        members.append(text.join([quote(key), ":", encode(fields[key])], ""))
+    }
+    return text.join(["{", text.join(members, ","), "}"], "")
+}
+
+fn quote(string raw) → string {
+    var list<string> parts ← [«"»]
+    var int index ← 0
+    while index ≺ raw.length() {
+        const string c ← raw.slice(index, index + 1)
+        const string ∪ null escaped ← lexer.escape_char(c)
+        if escaped not is null {
+            parts.append(escaped coalesce "")
+        }
+        elif lexer.is_control(c) {
+            parts.append(lexer.control_escape(c))
+        }
+        else {
+            parts.append(c)
+        }
+        index ← index + 1
+    }
+    parts.append(«"»)
+    return text.join(parts, "")
 }

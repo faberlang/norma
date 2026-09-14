@@ -14,6 +14,8 @@ locale = "en"
 
 import from "norma:json/solve" parser
 
+import from "norma:json/serialize" encoder
+
 # =========================================================================
 # SERIALIZATION
 # =========================================================================
@@ -22,7 +24,7 @@ import from "norma:json/solve" parser
 
 @ public
 fn stringify(json document) → string {
-    panic "norma:json.stringify is deferred until the pure-Faber serializer is implemented"
+    return encoder.stringify(document)
 }
 
 # =========================================================================
