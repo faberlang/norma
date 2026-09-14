@@ -1,7 +1,6 @@
 +++
 locale = "en"
 +++
-
 # json/cursor.fab — parser cursor type
 #
 # Position-threading genus for the recursive-descent parser in solve.fab.
@@ -9,6 +8,7 @@ locale = "en"
 # both the parsed valor and the next scan index. Mirrors the caelum pattern
 # of placing a shared value type in its own submodule file.
 
+@ public
 class ScanResult {
     value payload
     int index
