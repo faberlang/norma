@@ -20,7 +20,15 @@ locale = "en"
 # Same findings + exit contract as the Python original: exit 0 when every
 # source `call 'route'` family matches its provider manifest.json and every
 # manifest route appears in the matching Rust dispatch match; exit 1 on any
-# finding. The default subject is the LIVE hosts HEAD: ../hosts is resolved
+# finding. Exactly one manifest-only exception is admitted by name:
+# solum:digestio (streamed SHA-256 file digest, hosts 5a52ee52) is a
+# deliberate direct-host capability — the file-streaming admission seam
+# (Vivi 8a08bd23), distinct from norma:crypta.digest — so Norma claims no
+# route and ships no wrapper for it. The exception exempts it from the
+# source-claim requirement only; manifest-to-dispatch checking still
+# applies, and the exception fails closed the moment the route leaves the
+# provider manifest. The default subject is the LIVE hosts HEAD: ../hosts is
+# resolved
 # at audit time, the audit assesses current hosts, and the examined revision
 # is recorded in its report (`hosts: rev=...`). `--expected-rev <sha>` is the
 # explicit historical pin — use it to re-verify a recorded evidence state
@@ -445,9 +453,23 @@ fn run_audit(string root, string host, string expected_rev, list<string> stdout_
             exclusions.append("processus:exi")
         }
 
+        # manifest-only exceptions: provider routes deliberately manifested
+        # and dispatched without a Norma source claim. solum:digestio is the
+        # streamed SHA-256 file digest (hosts 5a52ee52) admitted for direct
+        # host use — the file-streaming admission seam (Vivi 8a08bd23),
+        # distinct from norma:crypta.digest — so Norma keeps no claim and no
+        # wrapper. Only the source-claim requirement is waived; a route that
+        # leaves the manifest makes the exception stale.
+        var list<string> manifest_only ← empty
+        if family ≡ "solum" {
+            manifest_only.append("solum:digestio")
+        }
+
         const list<string> claimed_manifested ← difference(claimed, manifested)
         const list<string> unexpected_source_only ← difference(claimed_manifested, exclusions)
-        const list<string> missing_from_source ← difference(manifested, claimed)
+        const list<string> stale_exceptions ← difference(manifest_only, manifested)
+        const list<string> exception_used ← difference(manifest_only, stale_exceptions)
+        const list<string> missing_from_source ← difference(difference(manifested, claimed), exception_used)
         const list<string> missing_from_dispatch ← difference(manifested, dispatched)
         const list<string> stale_exclusions ← difference(exclusions, claimed_manifested)
         const list<string> excluded_used ← difference(exclusions, stale_exclusions)
@@ -458,6 +480,7 @@ fn run_audit(string root, string host, string expected_rev, list<string> stdout_
         summary ← summary + " manifest=" + (manifested.length() ↦ string)
         summary ← summary + " dispatch=" + (dispatch_common.length() ↦ string)
         summary ← summary + " excluded=" + (excluded_used.length() ↦ string)
+        summary ← summary + " exception=" + (exception_used.length() ↦ string)
         stdout_lines.append(summary)
 
         # excluded source-only routes (stdout, sorted)
@@ -468,6 +491,15 @@ fn run_audit(string root, string host, string expected_rev, list<string> stdout_
         while ei < el {
             stdout_lines.append("  excluded source-only: " + excluded_sorted[ei] + " (process exit is source-only until host exit has a protocol-visible terminal response)")
             ei ← ei + 1
+        }
+
+        # manifest-only exceptions in force (stdout, sorted)
+        const list<string> exception_sorted ← exception_used.sorted() ↦ list<string>
+        const int xl ← exception_sorted.length()
+        var int xi ← 0
+        while xi < xl {
+            stdout_lines.append("  manifest-only exception: " + exception_sorted[xi] + " (deliberately direct-host: streamed SHA-256 file digest admitted with no Norma claim or wrapper)")
+            xi ← xi + 1
         }
 
         if unexpected_source_only.length() > 0 {
@@ -514,13 +546,26 @@ fn run_audit(string root, string host, string expected_rev, list<string> stdout_
                 li ← li + 1
             }
         }
+        if stale_exceptions.length() > 0 {
+            status ← 1
+            stderr_lines.append("audit-provider-route-claims: stale manifest-only exceptions for " + family + ":")
+            const list<string> sorted ← stale_exceptions.sorted() ↦ list<string>
+            const int sn ← sorted.length()
+            var int li ← 0
+            while li < sn {
+                stderr_lines.append("  " + sorted[li])
+                li ← li + 1
+            }
+        }
         fi ← fi + 1
     }
     return status
 }
 
 # ===========================================================================
-# SELF-TEST (negative fixtures: missing dispatch, dirty evidence, rev mismatch)
+# SELF-TEST (negative fixtures: missing dispatch, dirty evidence, rev
+# mismatch, unclaimed manifested route, stale manifest-only exception; the
+# manifest-only exception is asserted reported on stdout)
 # ===========================================================================
 
 fn self_test_run() → int {
@@ -539,13 +584,18 @@ fn self_test_run() → int {
         const string family ← families[fi]
         const string provider_src ← host + "/crates/" + family + "/src"
         solum.create_dir(provider_src)
-        # manifest routes: one per family; aleator adds `missing`; processus adds `exi`
+        # manifest routes: one per family; aleator adds `missing`; processus adds `exi`;
+        # solum adds `digestio` (manifested + dispatched, never claimed — the
+        # manifest-only exception under test)
         var list<string> routes ← ["one"]
         if family ≡ "aleator" {
             routes.append("missing")
         }
         if family ≡ "processus" {
             routes.append("exi")
+        }
+        if family ≡ "solum" {
+            routes.append("digestio")
         }
         var string calls_json ← ""
         const int rn ← routes.length()
@@ -559,8 +609,14 @@ fn self_test_run() → int {
         }
         const string manifest_text ← "{\"manifest_version\": 1, \"provider\": \"" + family + "\", \"prefix\": \"" + family + "\", \"calls\": [" + calls_json + "]}"
         solum.write_file(provider_src + "/manifest.json", manifest_text)
-        # dispatch: only `family:one` is matched (aleator:missing is undispatchable)
-        const string lib_text ← "fn dispatch(request: RequestFrame) {\n    match request.route.as_str() {\n        \"" + family + ":one\" => Ok(()),\n        other => Err(other),\n    }\n}\n"
+        # dispatch: only `family:one` is matched (aleator:missing is undispatchable);
+        # solum also dispatches `digestio` so the manifest-only exception keeps
+        # its manifest-to-dispatch checking
+        var string arms ← "        \"" + family + ":one\" => Ok(())"
+        if family ≡ "solum" {
+            arms ← arms + ",\n        \"" + family + ":digestio\" => Ok(())"
+        }
+        const string lib_text ← "fn dispatch(request: RequestFrame) {\n    match request.route.as_str() {\n" + arms + ",\n        other => Err(other),\n    }\n}\n"
         solum.write_file(provider_src + "/lib.rs", lib_text)
         fi ← fi + 1
     }
@@ -625,6 +681,11 @@ fn self_test_run() → int {
         solum.remove_tree(base)
         return 1
     }
+    if lines_contain(stdout_lines, "manifest-only exception: solum:digestio") ≡ false {
+        consolum.warn_line("audit-provider-route-claims: self-test did not report the manifest-only exception")
+        solum.remove_tree(base)
+        return 1
+    }
 
     # Fixture 2: dirty provider evidence must be rejected
     # (rebuild the aleator manifest with an extra route, making the checkout dirty)
@@ -658,6 +719,50 @@ fn self_test_run() → int {
     }
     if lines_contain(stderr_three, "revision mismatch") ≡ false {
         consolum.warn_line("audit-provider-route-claims: self-test did not report the expected revision mismatch")
+        solum.remove_tree(base)
+        return 1
+    }
+
+    # Fixture 4: a different manifested-and-dispatched route with no Norma
+    # claim stays subject to the source-claim requirement (no exception creep)
+    const string unclaimed_manifest ← "{\"manifest_version\": 1, \"provider\": \"aleator\", \"prefix\": \"aleator\", \"calls\": [{\"route\": \"aleator:one\"}, {\"route\": \"aleator:missing\"}, {\"route\": \"aleator:unclaimed\"}]}"
+    solum.write_file(aleator_src + "/manifest.json", unclaimed_manifest)
+    const string unclaimed_lib ← "fn dispatch(request: RequestFrame) {\n    match request.route.as_str() {\n        \"aleator:one\" => Ok(()),\n        \"aleator:missing\" => Ok(()),\n        \"aleator:unclaimed\" => Ok(()),\n        other => Err(other),\n    }\n}\n"
+    solum.write_file(aleator_src + "/lib.rs", unclaimed_lib)
+    var list<string> stdout_four ← empty
+    var list<string> stderr_four ← empty
+    const int status_four ← run_audit(norma_root, host, actual_rev, stdout_four, stderr_four)
+    if status_four ≡ 0 {
+        consolum.warn_line("audit-provider-route-claims: self-test failed to reject a manifested route with no Norma claim")
+        solum.remove_tree(base)
+        return 1
+    }
+    if lines_contain(stderr_four, "aleator:unclaimed") ≡ false {
+        consolum.warn_line("audit-provider-route-claims: self-test did not report the unclaimed manifested route")
+        solum.remove_tree(base)
+        return 1
+    }
+
+    # Fixture 5: a stale manifest-only exception must fail closed (route
+    # absent from the provider manifest)
+    const string solum_src ← host + "/crates/solum/src"
+    const string no_digestio_manifest ← "{\"manifest_version\": 1, \"provider\": \"solum\", \"prefix\": \"solum\", \"calls\": [{\"route\": \"solum:one\"}]}"
+    solum.write_file(solum_src + "/manifest.json", no_digestio_manifest)
+    var list<string> stdout_five ← empty
+    var list<string> stderr_five ← empty
+    const int status_five ← run_audit(norma_root, host, actual_rev, stdout_five, stderr_five)
+    if status_five ≡ 0 {
+        consolum.warn_line("audit-provider-route-claims: self-test failed to reject a stale manifest-only exception")
+        solum.remove_tree(base)
+        return 1
+    }
+    if lines_contain(stderr_five, "stale manifest-only exceptions") ≡ false {
+        consolum.warn_line("audit-provider-route-claims: self-test did not report the stale-exception finding")
+        solum.remove_tree(base)
+        return 1
+    }
+    if lines_contain(stderr_five, "solum:digestio") ≡ false {
+        consolum.warn_line("audit-provider-route-claims: self-test did not name the stale exception route")
         solum.remove_tree(base)
         return 1
     }
