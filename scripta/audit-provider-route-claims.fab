@@ -2,168 +2,179 @@
 locale = "en"
 +++
 
-# audit-provider-route-claims — cross-check Norma source ad routes against
+# audit-provider-route-claims — cross-check Norma source call routes against
 # host provider manifests and Rust dispatch.
 #
-# Native-Faber conversion of scripta/audit-provider-route-claims (python3),
-# run by the released binary: `faber script scripta/audit-provider-route-claims.fab`
-# (faber/target/debug/faber; NEVER ~/.local/bin/faber). Script mode only —
-# kernel imports (faber:solum, faber:json, faber:processus, faber:consolum).
+# Native-Faber script (converted from the python3 original, then moved to the
+# current surface: en keywords, v0.84.0 kernel verbs, and `call 'route'`
+# claims — the english-locale Pass A renamed the `ad` route-call spelling in
+# src, so the scanner tracks the live source surface).
+#
+# Kernel script: imports faber:solum, faber:json, faber:processus,
+# faber:consolum, so it must run manifest-free — a path under faber.toml
+# routes to package mode, which rejects faber:* kernel imports:
+#   stage=$(mktemp -d) && cp scripta/audit-provider-route-claims.fab "$stage/"
+#   FABER_LIBRARY_HOME="$(pwd)/.." faber run "$stage/audit-provider-route-claims.fab"
+# (workspace radix binary; NEVER ~/.local/bin/faber).
 #
 # Same findings + exit contract as the Python original: exit 0 when every
-# source `ad 'route'` family matches its provider manifest.json and every
-# manifest route appears in the matching Rust dispatch match, at the pinned
-# evidence revision with a clean evidence checkout; exit 1 on any finding.
-# The provider evidence repo is the sibling `faberlang/hosts` checkout
-# (host-providers-rs was relocated into it); the expected revision pins the
-# evidence boundary and must be refreshed deliberately when evidence moves.
+# source `call 'route'` family matches its provider manifest.json and every
+# manifest route appears in the matching Rust dispatch match; exit 1 on any
+# finding. The default subject is the LIVE hosts HEAD: ../hosts is resolved
+# at audit time, the audit assesses current hosts, and the examined revision
+# is recorded in its report (`hosts: rev=...`). `--expected-rev <sha>` is the
+# explicit historical pin — use it to re-verify a recorded evidence state
+# (for example the e066ee0 provider-evidence snapshot); the audit then fails
+# on any other revision. In both modes the provider evidence repo must have a
+# clean checkout/index.
 # `processus:exi` is an intentional source-only exclusion until host exit has
 # a protocol-visible terminal response.
 
-importa ex "faber:processus" privata processus
-importa ex "faber:solum" privata solum
-importa ex "faber:consolum" privata consolum
-importa ex "faber:json" privata json
+import from "faber:processus" processus
+import from "faber:solum" solum
+import from "faber:consolum" consolum
+import from "faber:json" json
 
 # ===========================================================================
 # LIST HELPERS (kernel lists are dynamic values; index loops only)
 # ===========================================================================
 
-functio continet_route(lista<textus> xs, textus x) → bivalens {
-    fixum numerus n ← xs.longitudo()
-    varia numerus i ← 0
-    dum i < n {
-        si xs[i] ≡ x {
-            redde verum
+fn contains_route(list<string> xs, string x) → bool {
+    const int n ← xs.length()
+    var int i ← 0
+    while i < n {
+        if xs[i] ≡ x {
+            return true
         }
         i ← i + 1
     }
-    redde falsum
+    return false
 }
 
-functio differentia(lista<textus> a, lista<textus> b) → lista<textus> {
-    varia lista<textus> out ← vacua
-    fixum numerus n ← a.longitudo()
-    varia numerus i ← 0
-    dum i < n {
-        si continet_route(b, a[i]) ≡ falsum {
-            out.appende(a[i])
+fn difference(list<string> a, list<string> b) → list<string> {
+    var list<string> out ← empty
+    const int n ← a.length()
+    var int i ← 0
+    while i < n {
+        if contains_route(b, a[i]) ≡ false {
+            out.append(a[i])
         }
         i ← i + 1
     }
-    redde out
+    return out
 }
 
-functio interseca(lista<textus> a, lista<textus> b) → lista<textus> {
-    varia lista<textus> out ← vacua
-    fixum numerus n ← a.longitudo()
-    varia numerus i ← 0
-    dum i < n {
-        si continet_route(b, a[i]) {
-            out.appende(a[i])
+fn intersect(list<string> a, list<string> b) → list<string> {
+    var list<string> out ← empty
+    const int n ← a.length()
+    var int i ← 0
+    while i < n {
+        if contains_route(b, a[i]) {
+            out.append(a[i])
         }
         i ← i + 1
     }
-    redde out
+    return out
 }
 
 # Whether any collected line contains the needle (self-test stderr checks).
-functio lineae_continent(lista<textus> lineae, textus acus) → bivalens {
-    fixum numerus n ← lineae.longitudo()
-    varia numerus i ← 0
-    dum i < n {
-        si lineae[i].continet(acus) {
-            redde verum
+fn lines_contain(list<string> lines, string needle) → bool {
+    const int n ← lines.length()
+    var int i ← 0
+    while i < n {
+        if lines[i].contains(needle) {
+            return true
         }
         i ← i + 1
     }
-    redde falsum
+    return false
 }
 
 # ===========================================================================
-# SOURCE ROUTES (Python: rglob('*.fab') + `\bad\s+'([^']+)'`)
+# SOURCE ROUTES (rglob('*.fab') + `\bcall\s+'([^']+)'`)
 # ===========================================================================
 
-functio collect_fab(textus dir) → lista<textus> {
-    varia lista<textus> out ← vacua
-    fixum lista<textus> names ← solum.enumera(dir) ↦ lista<textus>
-    fixum lista<textus> sorted ← names.ordinata() ↦ lista<textus>
-    fixum numerus n ← sorted.longitudo()
-    varia numerus i ← 0
-    dum i < n {
-        fixum textus name ← sorted[i]
-        fixum textus via ← dir + "/" + name
-        si solum.directoriumne(via) ↦ bivalens {
-            fixum lista<textus> sub ← collect_fab(via)
-            fixum numerus sn ← sub.longitudo()
-            varia numerus j ← 0
-            dum j < sn {
-                out.appende(sub[j])
+fn collect_fab(string dir) → list<string> {
+    var list<string> out ← empty
+    const list<string> names ← solum.list_dir(dir) ↦ list<string>
+    const list<string> sorted ← names.sorted() ↦ list<string>
+    const int n ← sorted.length()
+    var int i ← 0
+    while i < n {
+        const string name ← sorted[i]
+        const string path ← dir + "/" + name
+        if solum.is_directory(path) ↦ bool {
+            const list<string> sub ← collect_fab(path)
+            const int sn ← sub.length()
+            var int j ← 0
+            while j < sn {
+                out.append(sub[j])
                 j ← j + 1
             }
-        } secus {
-            si name.finis(".fab") {
-                out.appende(via)
+        } else {
+            if name.ends_with(".fab") {
+                out.append(path)
             }
         }
         i ← i + 1
     }
-    redde out
+    return out
 }
 
-# Scan a source text for `ad 'route'` occurrences, mirroring the Python regex
-# `\bad\s+'([^']+)'`: `ad` not preceded by a word character, then whitespace,
-# then a single-quoted route (the route requires at least one character).
-# Scanned per line (splitting on "\n"): every `ad 'route'` occurrence in the
-# corpus sits on one line, so this is behavior-identical to the Python
-# whole-text regex while avoiding per-character slicing of the whole file.
-functio ad_itinera(textus text) → lista<textus> {
-    fixum textus word_chars ← "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
-    varia lista<textus> routes ← vacua
-    fixum lista<textus> lineae ← text.divide("\n")
-    fixum numerus line_count ← lineae.longitudo()
-    varia numerus li ← 0
-    dum li < line_count {
-        fixum textus striga ← lineae[li]
-        si striga.continet("ad") {
-            fixum numerus n ← striga.longitudo()
-            varia numerus i ← 0
-            dum i < n {
-                si striga.sectio(i, i + 2) ≡ "ad" {
-                    varia bivalens boundary ← verum
-                    si i > 0 {
-                        si word_chars.continet(striga.sectio(i - 1, i)) {
-                            boundary ← falsum
+# Scan a source text for `call 'route'` occurrences, mirroring the regex
+# `\bcall\s+'([^']+)'`: `call` not preceded by a word character, then
+# whitespace, then a single-quoted route (the route requires at least one
+# character). Scanned per line (splitting on "\n"): every `call 'route'`
+# occurrence in the corpus sits on one line, so this is behavior-identical
+# to the whole-text regex while avoiding per-character slicing of the whole
+# file.
+fn call_routes(string text) → list<string> {
+    const string word_chars ← "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
+    var list<string> routes ← empty
+    const list<string> lines ← text.split("\n")
+    const int line_count ← lines.length()
+    var int li ← 0
+    while li < line_count {
+        const string line ← lines[li]
+        if line.contains("call") {
+            const int n ← line.length()
+            var int i ← 0
+            while i < n {
+                if line.slice(i, i + 4) ≡ "call" {
+                    var bool boundary ← true
+                    if i > 0 {
+                        if word_chars.contains(line.slice(i - 1, i)) {
+                            boundary ← false
                         }
                     }
-                    si boundary {
+                    if boundary {
                         # skip Python \s within the line
-                        varia numerus j ← i + 2
-                        varia bivalens scanning ← verum
-                        dum j < n et scanning {
-                            fixum textus c ← striga.sectio(j, j + 1)
-                            si c ≡ " " aut c ≡ "\t" {
+                        var int j ← i + 4
+                        var bool scanning ← true
+                        while j < n and scanning {
+                            const string c ← line.slice(j, j + 1)
+                            if c ≡ " " or c ≡ "\t" {
                                 j ← j + 1
-                            } secus {
-                                scanning ← falsum
+                            } else {
+                                scanning ← false
                             }
                         }
-                        si j < n {
-                            si striga.sectio(j, j + 1) ≡ "'" {
-                                varia numerus k ← j + 1
-                                varia bivalens closed ← falsum
-                                varia textus route ← ""
-                                dum k < n et closed ≡ falsum {
-                                    fixum textus c2 ← striga.sectio(k, k + 1)
-                                    si c2 ≡ "'" {
-                                        closed ← verum
-                                    } secus {
+                        if j < n {
+                            if line.slice(j, j + 1) ≡ "'" {
+                                var int k ← j + 1
+                                var bool closed ← false
+                                var string route ← ""
+                                while k < n and closed ≡ false {
+                                    const string c2 ← line.slice(k, k + 1)
+                                    if c2 ≡ "'" {
+                                        closed ← true
+                                    } else {
                                         route ← route + c2
                                         k ← k + 1
                                     }
                                 }
-                                si closed et route.longitudo() > 0 {
-                                    routes.appende(route)
+                                if closed and route.length() > 0 {
+                                    routes.append(route)
                                 }
                             }
                         }
@@ -174,514 +185,514 @@ functio ad_itinera(textus text) → lista<textus> {
         }
         li ← li + 1
     }
-    redde routes
+    return routes
 }
 
-functio source_itinera(textus src) → lista<textus> {
-    varia lista<textus> all ← vacua
-    fixum lista<textus> files ← collect_fab(src)
-    fixum numerus n ← files.longitudo()
-    varia numerus i ← 0
-    dum i < n {
-        fixum textus text ← solum.lege(files[i]) ↦ textus
-        fixum lista<textus> found ← ad_itinera(text)
-        fixum numerus fc ← found.longitudo()
-        varia numerus j ← 0
-        dum j < fc {
-            si continet_route(all, found[j]) ≡ falsum {
-                all.appende(found[j])
+fn source_routes(string src) → list<string> {
+    var list<string> all ← empty
+    const list<string> files ← collect_fab(src)
+    const int n ← files.length()
+    var int i ← 0
+    while i < n {
+        const string text ← solum.read_file(files[i]) ↦ string
+        const list<string> found ← call_routes(text)
+        const int fc ← found.length()
+        var int j ← 0
+        while j < fc {
+            if contains_route(all, found[j]) ≡ false {
+                all.append(found[j])
             }
             j ← j + 1
         }
         i ← i + 1
     }
-    redde all
+    return all
 }
 
 # Routes whose family prefix matches, mirroring the Python partition-by-`:`
 # filter into the per-family sets.
-functio itinera_praefixi(lista<textus> all, textus family) → lista<textus> {
-    fixum textus prefix ← family + ":"
-    varia lista<textus> out ← vacua
-    fixum numerus n ← all.longitudo()
-    varia numerus i ← 0
-    dum i < n {
-        si all[i].initium(prefix) {
-            out.appende(all[i])
+fn routes_with_prefix(list<string> all, string family) → list<string> {
+    const string prefix ← family + ":"
+    var list<string> out ← empty
+    const int n ← all.length()
+    var int i ← 0
+    while i < n {
+        if all[i].starts_with(prefix) {
+            out.append(all[i])
         }
         i ← i + 1
     }
-    redde out
+    return out
 }
 
 # ===========================================================================
 # PROVIDER EVIDENCE (faberlang/hosts sibling checkout)
 # ===========================================================================
 
-functio manifest_itinera(textus host, textus family) → lista<textus> {
-    fixum textus manifest ← host + "/crates/" + family + "/src/manifest.json"
-    si solum.regularene(manifest) ↦ bivalens ≡ falsum {
-        consolum.mone("audit-provider-route-claims: missing provider manifest: " + manifest)
-        processus.exi(1)
+fn manifest_routes(string host, string family) → list<string> {
+    const string manifest ← host + "/crates/" + family + "/src/manifest.json"
+    if solum.is_regular(manifest) ↦ bool ≡ false {
+        consolum.warn_line("audit-provider-route-claims: missing provider manifest: " + manifest)
+        processus.exit_process(1)
     }
-    fixum textus wire ← solum.lege(manifest) ↦ textus
-    fixum tabula<textus, valor> payload ← json.solve(wire) ↦ tabula<textus, valor>
-    fixum lista<valor> calls ← payload["calls"] ↦ lista<valor>
-    varia lista<textus> routes ← vacua
-    fixum numerus n ← calls.longitudo()
-    varia numerus i ← 0
-    dum i < n {
-        fixum tabula<textus, valor> entrada ← calls[i] ↦ tabula<textus, valor>
-        fixum textus route ← entrada["route"] ↦ textus
-        routes.appende(route)
+    const string wire ← solum.read_file(manifest) ↦ string
+    const map<string, value> payload ← json.parse(wire) ↦ map<string, value>
+    const list<value> calls ← payload["calls"] ↦ list<value>
+    var list<string> routes ← empty
+    const int n ← calls.length()
+    var int i ← 0
+    while i < n {
+        const map<string, value> entry ← calls[i] ↦ map<string, value>
+        const string route ← entry["route"] ↦ string
+        routes.append(route)
         i ← i + 1
     }
-    redde routes
+    return routes
 }
 
 # Brace-matched body of the `match request.route.as_str() { ... }` dispatch,
 # then every `"family:route"` string inside it (same findings as the Python
 # body-extract + regex pass).
-functio dispatch_corpus(textus host, textus family) → lista<textus> {
-    fixum textus lib ← host + "/crates/" + family + "/src/lib.rs"
-    si solum.regularene(lib) ↦ bivalens ≡ falsum {
-        consolum.mone("audit-provider-route-claims: missing provider dispatch source: " + lib)
-        processus.exi(1)
+fn dispatch_corpus(string host, string family) → list<string> {
+    const string lib ← host + "/crates/" + family + "/src/lib.rs"
+    if solum.is_regular(lib) ↦ bool ≡ false {
+        consolum.warn_line("audit-provider-route-claims: missing provider dispatch source: " + lib)
+        processus.exit_process(1)
     }
-    fixum textus source ← solum.lege(lib) ↦ textus
-    fixum textus marker ← "match request.route.as_str()"
-    fixum numerus marker_len ← marker.longitudo()
-    fixum numerus src_len ← source.longitudo()
-    varia numerus pos ← 0
-    varia bivalens marker_found ← falsum
-    dum pos < src_len et marker_found ≡ falsum {
-        si source.sectio(pos, pos + marker_len) ≡ marker {
-            marker_found ← verum
-        } secus {
+    const string source ← solum.read_file(lib) ↦ string
+    const string marker ← "match request.route.as_str()"
+    const int marker_len ← marker.length()
+    const int src_len ← source.length()
+    var int pos ← 0
+    var bool marker_found ← false
+    while pos < src_len and marker_found ≡ false {
+        if source.slice(pos, pos + marker_len) ≡ marker {
+            marker_found ← true
+        } else {
             pos ← pos + 1
         }
     }
-    si marker_found ≡ falsum {
-        consolum.mone("audit-provider-route-claims: missing dispatch match on request.route.as_str() for " + family)
-        processus.exi(1)
+    if marker_found ≡ false {
+        consolum.warn_line("audit-provider-route-claims: missing dispatch match on request.route.as_str() for " + family)
+        processus.exit_process(1)
     }
-    varia numerus open_brace ← pos + marker_len
-    varia bivalens brace_found ← falsum
-    dum open_brace < src_len et brace_found ≡ falsum {
-        si source.sectio(open_brace, open_brace + 1) ≡ "{" {
-            brace_found ← verum
-        } secus {
+    var int open_brace ← pos + marker_len
+    var bool brace_found ← false
+    while open_brace < src_len and brace_found ≡ false {
+        if source.slice(open_brace, open_brace + 1) ≡ "{" {
+            brace_found ← true
+        } else {
             open_brace ← open_brace + 1
         }
     }
-    si brace_found ≡ falsum {
-        consolum.mone("audit-provider-route-claims: missing dispatch match body for " + family)
-        processus.exi(1)
+    if brace_found ≡ false {
+        consolum.warn_line("audit-provider-route-claims: missing dispatch match body for " + family)
+        processus.exit_process(1)
     }
     # depth scan from inside the opening brace; collect `"family:route"` strings
-    varia lista<textus> routes ← vacua
-    fixum textus route_prefix ← "\"" + family + ":"
-    fixum numerus route_prefix_len ← route_prefix.longitudo()
-    varia numerus depth ← 1
-    varia numerus index ← open_brace + 1
-    dum index < src_len et depth > 0 {
-        fixum textus ch ← source.sectio(index, index + 1)
-        si ch ≡ "{" {
+    var list<string> routes ← empty
+    const string route_prefix ← "\"" + family + ":"
+    const int route_prefix_len ← route_prefix.length()
+    var int depth ← 1
+    var int index ← open_brace + 1
+    while index < src_len and depth > 0 {
+        const string ch ← source.slice(index, index + 1)
+        if ch ≡ "{" {
             depth ← depth + 1
             index ← index + 1
-        } secus {
-            si ch ≡ "}" {
+        } else {
+            if ch ≡ "}" {
                 depth ← depth - 1
                 index ← index + 1
-            } secus {
-                si ch ≡ "\"" {
-                    si source.sectio(index, index + route_prefix_len) ≡ route_prefix {
-                        varia numerus k ← index + route_prefix_len
-                        varia textus route ← route_prefix.sectio(1, route_prefix_len)
-                        varia bivalens route_closed ← falsum
-                        dum k < src_len et route_closed ≡ falsum {
-                            fixum textus c2 ← source.sectio(k, k + 1)
-                            si c2 ≡ "\"" {
-                                route_closed ← verum
-                            } secus {
+            } else {
+                if ch ≡ "\"" {
+                    if source.slice(index, index + route_prefix_len) ≡ route_prefix {
+                        var int k ← index + route_prefix_len
+                        var string route ← route_prefix.slice(1, route_prefix_len)
+                        var bool route_closed ← false
+                        while k < src_len and route_closed ≡ false {
+                            const string c2 ← source.slice(k, k + 1)
+                            if c2 ≡ "\"" {
+                                route_closed ← true
+                            } else {
                                 route ← route + c2
                                 k ← k + 1
                             }
                         }
-                        si route_closed {
-                            routes.appende(route)
+                        if route_closed {
+                            routes.append(route)
                             index ← k
-                        } secus {
+                        } else {
                             index ← index + 1
                         }
-                    } secus {
+                    } else {
                         index ← index + 1
                     }
-                } secus {
+                } else {
                     index ← index + 1
                 }
             }
         }
     }
-    redde routes
+    return routes
 }
 
-functio git_short_head(textus host) → textus {
-    fixum tabula<textus, valor> result ← processus.captura(["git", "-C", host, "rev-parse", "--short=7", "HEAD"]) ↦ tabula<textus, valor>
-    fixum numerus status ← result["status"] ↦ numerus
-    si status ≠ 0 {
-        fixum textus err ← result["stderr"] ↦ textus
-        consolum.mone("audit-provider-route-claims: could not read git HEAD for provider evidence repo " + host + ": " + err.recide())
-        processus.exi(1)
+fn git_short_head(string host) → string {
+    const map<string, value> result ← processus.captura(["git", "-C", host, "rev-parse", "--short=7", "HEAD"]) ↦ map<string, value>
+    const int status ← result["status"] ↦ int
+    if status ≠ 0 {
+        const string err ← result["stderr"] ↦ string
+        consolum.warn_line("audit-provider-route-claims: could not read git HEAD for provider evidence repo " + host + ": " + err.trim())
+        processus.exit_process(1)
     }
-    fixum textus stdout ← result["stdout"] ↦ textus
-    redde stdout.recide()
+    const string stdout ← result["stdout"] ↦ string
+    return stdout.trim()
 }
 
-functio dirty_provider_paths(textus host) → lista<textus> {
-    fixum tabula<textus, valor> refresh ← processus.captura(["git", "-C", host, "update-index", "-q", "--refresh"]) ↦ tabula<textus, valor>
-    fixum numerus refresh_status ← refresh["status"] ↦ numerus
-    si refresh_status ≠ 0 {
-        fixum textus err ← refresh["stderr"] ↦ textus
-        consolum.mone("audit-provider-route-claims: could not refresh provider evidence git index for " + host + ": " + err.recide())
-        processus.exi(1)
+fn dirty_provider_paths(string host) → list<string> {
+    const map<string, value> refresh ← processus.captura(["git", "-C", host, "update-index", "-q", "--refresh"]) ↦ map<string, value>
+    const int refresh_status ← refresh["status"] ↦ int
+    if refresh_status ≠ 0 {
+        const string err ← refresh["stderr"] ↦ string
+        consolum.warn_line("audit-provider-route-claims: could not refresh provider evidence git index for " + host + ": " + err.trim())
+        processus.exit_process(1)
     }
-    fixum tabula<textus, valor> result ← processus.captura(["git", "-C", host, "status", "--porcelain=v1", "--untracked-files=all"]) ↦ tabula<textus, valor>
-    fixum numerus status ← result["status"] ↦ numerus
-    si status ≠ 0 {
-        fixum textus err ← result["stderr"] ↦ textus
-        consolum.mone("audit-provider-route-claims: could not inspect provider evidence git status for " + host + ": " + err.recide())
-        processus.exi(1)
+    const map<string, value> result ← processus.captura(["git", "-C", host, "status", "--porcelain=v1", "--untracked-files=all"]) ↦ map<string, value>
+    const int status ← result["status"] ↦ int
+    if status ≠ 0 {
+        const string err ← result["stderr"] ↦ string
+        consolum.warn_line("audit-provider-route-claims: could not inspect provider evidence git status for " + host + ": " + err.trim())
+        processus.exit_process(1)
     }
-    fixum textus raw ← result["stdout"] ↦ textus
-    fixum lista<textus> lineae ← raw.divide("\n")
-    varia lista<textus> dirty ← vacua
-    fixum numerus n ← lineae.longitudo()
-    varia numerus i ← 0
-    dum i < n {
-        fixum textus striga ← lineae[i]
-        si striga.longitudo() > 0 {
-            dirty.appende(striga)
+    const string raw ← result["stdout"] ↦ string
+    const list<string> lines ← raw.split("\n")
+    var list<string> dirty ← empty
+    const int n ← lines.length()
+    var int i ← 0
+    while i < n {
+        const string line ← lines[i]
+        if line.length() > 0 {
+            dirty.append(line)
         }
         i ← i + 1
     }
-    redde dirty
+    return dirty
 }
 
 # Last path segment of the evidence repo (used in diagnostics).
-functio repo_nomen(textus host) → textus {
-    fixum lista<textus> parts ← host.divide("/")
-    fixum numerus n ← parts.longitudo()
-    varia textus last ← host
-    varia numerus i ← 0
-    dum i < n {
-        si parts[i].longitudo() > 0 {
+fn repo_name(string host) → string {
+    const list<string> parts ← host.split("/")
+    const int n ← parts.length()
+    var string last ← host
+    var int i ← 0
+    while i < n {
+        if parts[i].length() > 0 {
             last ← parts[i]
         }
         i ← i + 1
     }
-    redde last
+    return last
 }
 
 # ===========================================================================
 # AUDIT
 # ===========================================================================
 
-functio check_clean_provider_checkout(textus host, lista<textus> stderr_lines) → bivalens {
-    fixum lista<textus> dirty ← dirty_provider_paths(host)
-    si dirty.longitudo() ≡ 0 {
-        redde verum
+fn check_clean_provider_checkout(string host, list<string> stderr_lines) → bool {
+    const list<string> dirty ← dirty_provider_paths(host)
+    if dirty.length() ≡ 0 {
+        return true
     }
-    fixum textus nomen ← repo_nomen(host)
-    stderr_lines.appende("audit-provider-route-claims: " + nomen + " evidence checkout is dirty; commit or clean provider manifest/dispatch changes before accepting pinned evidence")
-    fixum numerus n ← dirty.longitudo()
-    varia numerus i ← 0
-    dum i < n {
-        stderr_lines.appende("  " + dirty[i])
+    const string name ← repo_name(host)
+    stderr_lines.append("audit-provider-route-claims: " + name + " evidence checkout is dirty; commit or clean provider manifest/dispatch changes before accepting pinned evidence")
+    const int n ← dirty.length()
+    var int i ← 0
+    while i < n {
+        stderr_lines.append("  " + dirty[i])
         i ← i + 1
     }
-    redde falsum
+    return false
 }
 
-functio run_audit(textus root, textus host, textus expected_rev, lista<textus> stdout_lines, lista<textus> stderr_lines) → numerus {
-    fixum textus actual_rev ← git_short_head(host)
-    fixum bivalens revision_ok ← actual_rev ≡ expected_rev
-    si revision_ok ≡ falsum {
-        fixum textus nomen ← repo_nomen(host)
-        stderr_lines.appende("audit-provider-route-claims: " + nomen + " revision mismatch: expected " + expected_rev + ", got " + actual_rev)
+fn run_audit(string root, string host, string expected_rev, list<string> stdout_lines, list<string> stderr_lines) → int {
+    const string actual_rev ← git_short_head(host)
+    const bool revision_ok ← actual_rev ≡ expected_rev
+    if revision_ok ≡ false {
+        const string name ← repo_name(host)
+        stderr_lines.append("audit-provider-route-claims: " + name + " revision mismatch: expected " + expected_rev + ", got " + actual_rev)
     }
-    fixum bivalens clean_ok ← check_clean_provider_checkout(host, stderr_lines)
-    varia numerus status ← 0
-    si revision_ok ≡ falsum aut clean_ok ≡ falsum {
+    const bool clean_ok ← check_clean_provider_checkout(host, stderr_lines)
+    var int status ← 0
+    if revision_ok ≡ false or clean_ok ≡ false {
         status ← 1
     }
-    fixum textus nomen ← repo_nomen(host)
-    stdout_lines.appende(nomen + ": rev=" + actual_rev)
+    const string name ← repo_name(host)
+    stdout_lines.append(name + ": rev=" + actual_rev)
 
-    fixum lista<textus> all_routes ← source_itinera(root + "/src")
-    fixum lista<textus> familias ← ["aleator", "consolum", "processus", "solum", "tempus"]
-    fixum numerus nf ← familias.longitudo()
-    varia numerus fi ← 0
-    dum fi < nf {
-        fixum textus family ← familias[fi]
-        fixum lista<textus> claimed ← itinera_praefixi(all_routes, family)
-        fixum lista<textus> manifested ← manifest_itinera(host, family)
-        fixum lista<textus> dispatched ← dispatch_corpus(host, family)
+    const list<string> all_routes ← source_routes(root + "/src")
+    const list<string> families ← ["aleator", "consolum", "processus", "solum", "tempus"]
+    const int nf ← families.length()
+    var int fi ← 0
+    while fi < nf {
+        const string family ← families[fi]
+        const list<string> claimed ← routes_with_prefix(all_routes, family)
+        const list<string> manifested ← manifest_routes(host, family)
+        const list<string> dispatched ← dispatch_corpus(host, family)
 
         # source-only exclusions (processus:exi is the only one)
-        varia lista<textus> exclusions ← vacua
-        si family ≡ "processus" {
-            exclusions.appende("processus:exi")
+        var list<string> exclusions ← empty
+        if family ≡ "processus" {
+            exclusions.append("processus:exi")
         }
 
-        fixum lista<textus> claimed_manifested ← differentia(claimed, manifested)
-        fixum lista<textus> unexpected_source_only ← differentia(claimed_manifested, exclusions)
-        fixum lista<textus> missing_from_source ← differentia(manifested, claimed)
-        fixum lista<textus> missing_from_dispatch ← differentia(manifested, dispatched)
-        fixum lista<textus> stale_exclusions ← differentia(exclusions, claimed_manifested)
-        fixum lista<textus> excluded_used ← differentia(exclusions, stale_exclusions)
-        fixum lista<textus> dispatch_common ← interseca(dispatched, manifested)
+        const list<string> claimed_manifested ← difference(claimed, manifested)
+        const list<string> unexpected_source_only ← difference(claimed_manifested, exclusions)
+        const list<string> missing_from_source ← difference(manifested, claimed)
+        const list<string> missing_from_dispatch ← difference(manifested, dispatched)
+        const list<string> stale_exclusions ← difference(exclusions, claimed_manifested)
+        const list<string> excluded_used ← difference(exclusions, stale_exclusions)
+        const list<string> dispatch_common ← intersect(dispatched, manifested)
 
         # summary line (stdout)
-        varia textus summary ← family + ": source=" + (claimed.longitudo() ↦ textus)
-        summary ← summary + " manifest=" + (manifested.longitudo() ↦ textus)
-        summary ← summary + " dispatch=" + (dispatch_common.longitudo() ↦ textus)
-        summary ← summary + " excluded=" + (excluded_used.longitudo() ↦ textus)
-        stdout_lines.appende(summary)
+        var string summary ← family + ": source=" + (claimed.length() ↦ string)
+        summary ← summary + " manifest=" + (manifested.length() ↦ string)
+        summary ← summary + " dispatch=" + (dispatch_common.length() ↦ string)
+        summary ← summary + " excluded=" + (excluded_used.length() ↦ string)
+        stdout_lines.append(summary)
 
         # excluded source-only routes (stdout, sorted)
-        fixum lista<textus> excluded_list ← interseca(exclusions, claimed_manifested)
-        fixum lista<textus> excluded_sorted ← excluded_list.ordinata() ↦ lista<textus>
-        fixum numerus el ← excluded_sorted.longitudo()
-        varia numerus ei ← 0
-        dum ei < el {
-            stdout_lines.appende("  excluded source-only: " + excluded_sorted[ei] + " (process exit is source-only until host exit has a protocol-visible terminal response)")
+        const list<string> excluded_list ← intersect(exclusions, claimed_manifested)
+        const list<string> excluded_sorted ← excluded_list.sorted() ↦ list<string>
+        const int el ← excluded_sorted.length()
+        var int ei ← 0
+        while ei < el {
+            stdout_lines.append("  excluded source-only: " + excluded_sorted[ei] + " (process exit is source-only until host exit has a protocol-visible terminal response)")
             ei ← ei + 1
         }
 
-        si unexpected_source_only.longitudo() > 0 {
+        if unexpected_source_only.length() > 0 {
             status ← 1
-            stderr_lines.appende("audit-provider-route-claims: " + family + " source routes missing from manifest:")
-            fixum lista<textus> sorted ← unexpected_source_only.ordinata() ↦ lista<textus>
-            fixum numerus sn ← sorted.longitudo()
-            varia numerus li ← 0
-            dum li < sn {
-                stderr_lines.appende("  " + sorted[li])
+            stderr_lines.append("audit-provider-route-claims: " + family + " source routes missing from manifest:")
+            const list<string> sorted ← unexpected_source_only.sorted() ↦ list<string>
+            const int sn ← sorted.length()
+            var int li ← 0
+            while li < sn {
+                stderr_lines.append("  " + sorted[li])
                 li ← li + 1
             }
         }
-        si missing_from_source.longitudo() > 0 {
+        if missing_from_source.length() > 0 {
             status ← 1
-            stderr_lines.appende("audit-provider-route-claims: " + family + " manifest routes missing from Norma source:")
-            fixum lista<textus> sorted ← missing_from_source.ordinata() ↦ lista<textus>
-            fixum numerus sn ← sorted.longitudo()
-            varia numerus li ← 0
-            dum li < sn {
-                stderr_lines.appende("  " + sorted[li])
+            stderr_lines.append("audit-provider-route-claims: " + family + " manifest routes missing from Norma source:")
+            const list<string> sorted ← missing_from_source.sorted() ↦ list<string>
+            const int sn ← sorted.length()
+            var int li ← 0
+            while li < sn {
+                stderr_lines.append("  " + sorted[li])
                 li ← li + 1
             }
         }
-        si missing_from_dispatch.longitudo() > 0 {
+        if missing_from_dispatch.length() > 0 {
             status ← 1
-            stderr_lines.appende("audit-provider-route-claims: " + family + " manifest routes missing from provider dispatch:")
-            fixum lista<textus> sorted ← missing_from_dispatch.ordinata() ↦ lista<textus>
-            fixum numerus sn ← sorted.longitudo()
-            varia numerus li ← 0
-            dum li < sn {
-                stderr_lines.appende("  " + sorted[li])
+            stderr_lines.append("audit-provider-route-claims: " + family + " manifest routes missing from provider dispatch:")
+            const list<string> sorted ← missing_from_dispatch.sorted() ↦ list<string>
+            const int sn ← sorted.length()
+            var int li ← 0
+            while li < sn {
+                stderr_lines.append("  " + sorted[li])
                 li ← li + 1
             }
         }
-        si stale_exclusions.longitudo() > 0 {
+        if stale_exclusions.length() > 0 {
             status ← 1
-            stderr_lines.appende("audit-provider-route-claims: stale source-only exclusions for " + family + ":")
-            fixum lista<textus> sorted ← stale_exclusions.ordinata() ↦ lista<textus>
-            fixum numerus sn ← sorted.longitudo()
-            varia numerus li ← 0
-            dum li < sn {
-                stderr_lines.appende("  " + sorted[li])
+            stderr_lines.append("audit-provider-route-claims: stale source-only exclusions for " + family + ":")
+            const list<string> sorted ← stale_exclusions.sorted() ↦ list<string>
+            const int sn ← sorted.length()
+            var int li ← 0
+            while li < sn {
+                stderr_lines.append("  " + sorted[li])
                 li ← li + 1
             }
         }
         fi ← fi + 1
     }
-    redde status
+    return status
 }
 
 # ===========================================================================
 # SELF-TEST (negative fixtures: missing dispatch, dirty evidence, rev mismatch)
 # ===========================================================================
 
-functio self_test_run() → numerus {
-    fixum numerus pid ← processus.identitas() ↦ numerus
-    fixum textus pid_s ← pid ↦ textus
-    fixum textus tmp_base ← solum.temporarium() ↦ textus
-    fixum textus base ← tmp_base + "/norma-route-audit-" + pid_s
-    fixum textus norma_root ← base + "/norma"
-    fixum textus host ← base + "/host-providers-rs"
-    solum.crea(norma_root + "/src")
+fn self_test_run() → int {
+    const int pid ← processus.pid() ↦ int
+    const string pid_s ← pid ↦ string
+    const string tmp_base ← solum.temp_dir() ↦ string
+    const string base ← tmp_base + "/norma-route-audit-" + pid_s
+    const string norma_root ← base + "/norma"
+    const string host ← base + "/host-providers-rs"
+    solum.create_dir(norma_root + "/src")
 
-    fixum lista<textus> familias ← ["aleator", "consolum", "processus", "solum", "tempus"]
-    fixum numerus nf ← familias.longitudo()
-    varia numerus fi ← 0
-    dum fi < nf {
-        fixum textus family ← familias[fi]
-        fixum textus provider_src ← host + "/crates/" + family + "/src"
-        solum.crea(provider_src)
+    const list<string> families ← ["aleator", "consolum", "processus", "solum", "tempus"]
+    const int nf ← families.length()
+    var int fi ← 0
+    while fi < nf {
+        const string family ← families[fi]
+        const string provider_src ← host + "/crates/" + family + "/src"
+        solum.create_dir(provider_src)
         # manifest routes: one per family; aleator adds `missing`; processus adds `exi`
-        varia lista<textus> routes ← ["one"]
-        si family ≡ "aleator" {
-            routes.appende("missing")
+        var list<string> routes ← ["one"]
+        if family ≡ "aleator" {
+            routes.append("missing")
         }
-        si family ≡ "processus" {
-            routes.appende("exi")
+        if family ≡ "processus" {
+            routes.append("exi")
         }
-        varia textus calls_json ← ""
-        fixum numerus rn ← routes.longitudo()
-        varia numerus ri ← 0
-        dum ri < rn {
-            si ri > 0 {
+        var string calls_json ← ""
+        const int rn ← routes.length()
+        var int ri ← 0
+        while ri < rn {
+            if ri > 0 {
                 calls_json ← calls_json + ", "
             }
             calls_json ← calls_json + "{\"route\": \"" + family + ":" + routes[ri] + "\"}"
             ri ← ri + 1
         }
-        fixum textus manifest_text ← "{\"manifest_version\": 1, \"provider\": \"" + family + "\", \"prefix\": \"" + family + "\", \"calls\": [" + calls_json + "]}"
-        solum.scribe(provider_src + "/manifest.json", manifest_text)
+        const string manifest_text ← "{\"manifest_version\": 1, \"provider\": \"" + family + "\", \"prefix\": \"" + family + "\", \"calls\": [" + calls_json + "]}"
+        solum.write_file(provider_src + "/manifest.json", manifest_text)
         # dispatch: only `family:one` is matched (aleator:missing is undispatchable)
-        fixum textus lib_text ← "fn dispatch(request: RequestFrame) {\n    match request.route.as_str() {\n        \"" + family + ":one\" => Ok(()),\n        other => Err(other),\n    }\n}\n"
-        solum.scribe(provider_src + "/lib.rs", lib_text)
+        const string lib_text ← "fn dispatch(request: RequestFrame) {\n    match request.route.as_str() {\n        \"" + family + ":one\" => Ok(()),\n        other => Err(other),\n    }\n}\n"
+        solum.write_file(provider_src + "/lib.rs", lib_text)
         fi ← fi + 1
     }
     # source routes.fab claiming every route (so aleator:missing shows up)
-    varia textus routes_fab ← ""
-    fixum numerus nf2 ← familias.longitudo()
-    varia numerus f2 ← 0
-    dum f2 < nf2 {
-        fixum textus family ← familias[f2]
-        varia lista<textus> routes ← ["one"]
-        si family ≡ "aleator" {
-            routes.appende("missing")
+    var string routes_fab ← ""
+    const int nf2 ← families.length()
+    var int f2 ← 0
+    while f2 < nf2 {
+        const string family ← families[f2]
+        var list<string> routes ← ["one"]
+        if family ≡ "aleator" {
+            routes.append("missing")
         }
-        si family ≡ "processus" {
-            routes.appende("exi")
+        if family ≡ "processus" {
+            routes.append("exi")
         }
-        fixum numerus rn ← routes.longitudo()
-        varia numerus ri ← 0
-        dum ri < rn {
-            fixum textus route ← family + ":" + routes[ri]
-            fixum textus safe ← route.muta(":", "_")
-            routes_fab ← routes_fab + "def " + safe + "() = ad '" + route + "' ()\n"
+        const int rn ← routes.length()
+        var int ri ← 0
+        while ri < rn {
+            const string route ← family + ":" + routes[ri]
+            const string safe ← route.replace(":", "_")
+            routes_fab ← routes_fab + "fn " + safe + "() = call '" + route + "' ()\n"
             ri ← ri + 1
         }
         f2 ← f2 + 1
     }
-    solum.scribe(norma_root + "/src/routes.fab", routes_fab)
+    solum.write_file(norma_root + "/src/routes.fab", routes_fab)
 
-    fixum tabula<textus, valor> init_result ← processus.captura(["git", "-C", host, "init", "-q"]) ↦ tabula<textus, valor>
-    fixum numerus init_status ← init_result["status"] ↦ numerus
-    si init_status ≠ 0 {
-        consolum.mone("audit-provider-route-claims: self-test git init failed")
-        redde 1
+    const map<string, value> init_result ← processus.captura(["git", "-C", host, "init", "-q"]) ↦ map<string, value>
+    const int init_status ← init_result["status"] ↦ int
+    if init_status ≠ 0 {
+        consolum.warn_line("audit-provider-route-claims: self-test git init failed")
+        return 1
     }
-    fixum tabula<textus, valor> add_result ← processus.captura(["git", "-C", host, "add", "."]) ↦ tabula<textus, valor>
-    fixum numerus add_status ← add_result["status"] ↦ numerus
-    si add_status ≠ 0 {
-        consolum.mone("audit-provider-route-claims: self-test git add failed")
-        redde 1
+    const map<string, value> add_result ← processus.captura(["git", "-C", host, "add", "."]) ↦ map<string, value>
+    const int add_status ← add_result["status"] ↦ int
+    if add_status ≠ 0 {
+        consolum.warn_line("audit-provider-route-claims: self-test git add failed")
+        return 1
     }
-    fixum tabula<textus, valor> commit_result ← processus.captura(["git", "-C", host, "-c", "user.name=Norma Route Audit", "-c", "user.email=norma-route-audit@example.invalid", "commit", "-q", "-m", "self-test provider evidence"]) ↦ tabula<textus, valor>
-    fixum numerus commit_status ← commit_result["status"] ↦ numerus
-    si commit_status ≠ 0 {
-        fixum textus commit_err ← commit_result["stderr"] ↦ textus
-        consolum.mone("audit-provider-route-claims: self-test git commit failed: " + commit_err.recide())
-        redde 1
+    const map<string, value> commit_result ← processus.captura(["git", "-C", host, "-c", "user.name=Norma Route Audit", "-c", "user.email=norma-route-audit@example.invalid", "commit", "-q", "-m", "self-test provider evidence"]) ↦ map<string, value>
+    const int commit_status ← commit_result["status"] ↦ int
+    if commit_status ≠ 0 {
+        const string commit_err ← commit_result["stderr"] ↦ string
+        consolum.warn_line("audit-provider-route-claims: self-test git commit failed: " + commit_err.trim())
+        return 1
     }
 
-    fixum textus actual_rev ← git_short_head(host)
+    const string actual_rev ← git_short_head(host)
 
     # Fixture 1: missing dispatch route must be rejected (aleator:missing)
-    varia lista<textus> stdout_lines ← vacua
-    varia lista<textus> stderr_lines ← vacua
-    fixum numerus status_one ← run_audit(norma_root, host, actual_rev, stdout_lines, stderr_lines)
-    si status_one ≡ 0 {
-        consolum.mone("audit-provider-route-claims: self-test failed to reject a missing dispatch route")
-        solum.amputa(base)
-        redde 1
+    var list<string> stdout_lines ← empty
+    var list<string> stderr_lines ← empty
+    const int status_one ← run_audit(norma_root, host, actual_rev, stdout_lines, stderr_lines)
+    if status_one ≡ 0 {
+        consolum.warn_line("audit-provider-route-claims: self-test failed to reject a missing dispatch route")
+        solum.remove_tree(base)
+        return 1
     }
-    si lineae_continent(stderr_lines, "aleator:missing") ≡ falsum {
-        consolum.mone("audit-provider-route-claims: self-test did not report the expected route")
-        solum.amputa(base)
-        redde 1
+    if lines_contain(stderr_lines, "aleator:missing") ≡ false {
+        consolum.warn_line("audit-provider-route-claims: self-test did not report the expected route")
+        solum.remove_tree(base)
+        return 1
     }
 
     # Fixture 2: dirty provider evidence must be rejected
     # (rebuild the aleator manifest with an extra route, making the checkout dirty)
-    fixum textus aleator_src ← host + "/crates/aleator/src"
-    fixum textus dirty_manifest ← "{\"manifest_version\": 1, \"provider\": \"aleator\", \"prefix\": \"aleator\", \"calls\": [{\"route\": \"aleator:one\"}, {\"route\": \"aleator:missing\"}, {\"route\": \"aleator:dirty\"}]}"
-    solum.scribe(aleator_src + "/manifest.json", dirty_manifest)
-    varia lista<textus> stdout_two ← vacua
-    varia lista<textus> stderr_two ← vacua
-    fixum numerus status_two ← run_audit(norma_root, host, actual_rev, stdout_two, stderr_two)
-    si status_two ≡ 0 {
-        consolum.mone("audit-provider-route-claims: self-test failed to reject dirty provider evidence")
-        solum.amputa(base)
-        redde 1
+    const string aleator_src ← host + "/crates/aleator/src"
+    const string dirty_manifest ← "{\"manifest_version\": 1, \"provider\": \"aleator\", \"prefix\": \"aleator\", \"calls\": [{\"route\": \"aleator:one\"}, {\"route\": \"aleator:missing\"}, {\"route\": \"aleator:dirty\"}]}"
+    solum.write_file(aleator_src + "/manifest.json", dirty_manifest)
+    var list<string> stdout_two ← empty
+    var list<string> stderr_two ← empty
+    const int status_two ← run_audit(norma_root, host, actual_rev, stdout_two, stderr_two)
+    if status_two ≡ 0 {
+        consolum.warn_line("audit-provider-route-claims: self-test failed to reject dirty provider evidence")
+        solum.remove_tree(base)
+        return 1
     }
-    si lineae_continent(stderr_two, "checkout is dirty") ≡ falsum {
-        consolum.mone("audit-provider-route-claims: self-test did not report dirty provider evidence")
-        solum.amputa(base)
-        redde 1
+    if lines_contain(stderr_two, "checkout is dirty") ≡ false {
+        consolum.warn_line("audit-provider-route-claims: self-test did not report dirty provider evidence")
+        solum.remove_tree(base)
+        return 1
     }
 
     # Fixture 3: revision mismatch must be rejected (restore clean evidence first)
-    fixum textus clean_manifest ← "{\"manifest_version\": 1, \"provider\": \"aleator\", \"prefix\": \"aleator\", \"calls\": [{\"route\": \"aleator:one\"}, {\"route\": \"aleator:missing\"}]}"
-    solum.scribe(aleator_src + "/manifest.json", clean_manifest)
-    varia lista<textus> stdout_three ← vacua
-    varia lista<textus> stderr_three ← vacua
-    fixum numerus status_three ← run_audit(norma_root, host, "0000000", stdout_three, stderr_three)
-    si status_three ≡ 0 {
-        consolum.mone("audit-provider-route-claims: self-test failed to reject a revision mismatch")
-        solum.amputa(base)
-        redde 1
+    const string clean_manifest ← "{\"manifest_version\": 1, \"provider\": \"aleator\", \"prefix\": \"aleator\", \"calls\": [{\"route\": \"aleator:one\"}, {\"route\": \"aleator:missing\"}]}"
+    solum.write_file(aleator_src + "/manifest.json", clean_manifest)
+    var list<string> stdout_three ← empty
+    var list<string> stderr_three ← empty
+    const int status_three ← run_audit(norma_root, host, "0000000", stdout_three, stderr_three)
+    if status_three ≡ 0 {
+        consolum.warn_line("audit-provider-route-claims: self-test failed to reject a revision mismatch")
+        solum.remove_tree(base)
+        return 1
     }
-    si lineae_continent(stderr_three, "revision mismatch") ≡ falsum {
-        consolum.mone("audit-provider-route-claims: self-test did not report the expected revision mismatch")
-        solum.amputa(base)
-        redde 1
+    if lines_contain(stderr_three, "revision mismatch") ≡ false {
+        consolum.warn_line("audit-provider-route-claims: self-test did not report the expected revision mismatch")
+        solum.remove_tree(base)
+        return 1
     }
 
-    solum.amputa(base)
-    consolum.scribe("audit-provider-route-claims: self-test passed")
-    redde 0
+    solum.remove_tree(base)
+    consolum.write_line("audit-provider-route-claims: self-test passed")
+    return 0
 }
 
 # ===========================================================================
 # ENTRY
 # ===========================================================================
 
-incipit {
-    fixum textus root ← processus.sedes() ↦ textus
-    varia textus host ← root + "/../hosts"
-    varia textus expected_rev ← "e066ee0"
-    varia bivalens self_test ← falsum
-    fixum lista<textus> argv ← processus.argumenta() ↦ lista<textus>
-    fixum numerus argc ← argv.longitudo()
-    varia numerus ai ← 0
-    dum ai < argc {
-        fixum textus arg ← argv[ai]
-        si arg ≡ "--self-test" {
-            self_test ← verum
-        } secus {
-            si arg ≡ "--host-providers" {
+main {
+    const string root ← processus.cwd() ↦ string
+    var string host ← root + "/../hosts"
+    var string expected_rev ← ""
+    var bool self_test ← false
+    const list<string> argv ← processus.argv() ↦ list<string>
+    const int argc ← argv.length()
+    var int ai ← 0
+    while ai < argc {
+        const string arg ← argv[ai]
+        if arg ≡ "--self-test" {
+            self_test ← true
+        } else {
+            if arg ≡ "--host-providers" {
                 ai ← ai + 1
-                si ai < argc {
+                if ai < argc {
                     host ← argv[ai]
                 }
-            } secus {
-                si arg ≡ "--expected-rev" {
+            } else {
+                if arg ≡ "--expected-rev" {
                     ai ← ai + 1
-                    si ai < argc {
+                    if ai < argc {
                         expected_rev ← argv[ai]
                     }
                 }
@@ -690,26 +701,33 @@ incipit {
         ai ← ai + 1
     }
 
-    si self_test {
-        fixum numerus st ← self_test_run()
-        processus.exi(st)
+    if self_test {
+        const int st ← self_test_run()
+        processus.exit_process(st)
     }
 
-    varia lista<textus> stdout_lines ← vacua
-    varia lista<textus> stderr_lines ← vacua
-    fixum numerus status ← run_audit(root, host, expected_rev, stdout_lines, stderr_lines)
+    # Default subject: the live provider evidence. Resolve the hosts HEAD at
+    # audit time so the audit assesses current hosts and records the examined
+    # revision; --expected-rev overrides with an explicit historical pin.
+    if expected_rev.length() ≡ 0 {
+        expected_rev ← git_short_head(host)
+    }
 
-    fixum numerus so ← stdout_lines.longitudo()
-    varia numerus oi ← 0
-    dum oi < so {
-        consolum.scribe(stdout_lines[oi])
+    var list<string> stdout_lines ← empty
+    var list<string> stderr_lines ← empty
+    const int status ← run_audit(root, host, expected_rev, stdout_lines, stderr_lines)
+
+    const int so ← stdout_lines.length()
+    var int oi ← 0
+    while oi < so {
+        consolum.write_line(stdout_lines[oi])
         oi ← oi + 1
     }
-    fixum numerus se ← stderr_lines.longitudo()
-    varia numerus ei ← 0
-    dum ei < se {
-        consolum.mone(stderr_lines[ei])
+    const int se ← stderr_lines.length()
+    var int ei ← 0
+    while ei < se {
+        consolum.warn_line(stderr_lines[ei])
         ei ← ei + 1
     }
-    processus.exi(status)
+    processus.exit_process(status)
 }

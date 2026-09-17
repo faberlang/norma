@@ -13,7 +13,7 @@ import from "faber:processus" processus
 import from "faber:consolum" consolum
 
 main {
-    const string root ← processus.sedes() ↦ string
+    const string root ← processus.cwd() ↦ string
     const map<string, value> result ← processus.captura(["git", "-C", root, "ls-files"]) ↦ map<string, value>
     const string tracked ← result["stdout"] ↦ string
 
@@ -26,10 +26,10 @@ main {
         }
         const string file ← tracked.slice(pos, end)
         if file.starts_with("target/") or file.contains("/target/") {
-            consolum.mone("check-generated-output: tracked generated output is not allowed: " + file)
+            consolum.warn_line("check-generated-output: tracked generated output is not allowed: " + file)
             status ← 1
         }
         pos ← end + 1
     }
-    processus.exi(status)
+    processus.exit_process(status)
 }

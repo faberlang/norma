@@ -16,10 +16,8 @@ asked. Container law: [`../AGENTS.md`](../AGENTS.md).
 - Keep public modules under `src/**/*.fab`.
 - Prefer colocated `src/**/*.proba` for stdlib behavior tests (not importable;
   not published as interfaces). Keep instructional demos under `exempla/`.
-- Do not add `@ externa` or `@ subsidia`; Norma source should stay native Faber,
-  codegen-template, `ad`, or explicit `mori` deferral based.
-- Do not reintroduce public `norma:hal/*` imports. Use flat modules such as
-  `norma:solum`, `norma:json`, and nested modules such as `norma:solum/path`.
+- Use flat modules such as `norma:solum`, `norma:json`, and nested modules
+  such as `norma:solum/path`.
 - Do not treat any historical Radix `crates/norma` path as the source library —
   that crate is removed; this repo is canonical.
 - **Verb conjugation / method posture:** follow sibling radix
