@@ -6,9 +6,20 @@ locale = "en"
 # via `faber check` import smoke on generated temp `.fab` files.
 #
 # Native-Faber conversion of scripta/check-promoted-helper-imports (bash):
-# same pass/fail decisions — the matrix row must list every promoted module
-# (backtick-wrapped), must not list parked/compile-gap modules, and each
-# promoted module must pass a `faber check` import smoke.
+# the matrix row must list every promoted module (backtick-wrapped), every
+# listed module must resolve in the live corpus (norma/src/<module>.fab —
+# fail-closed, so a corpus rename breaks this gate loudly instead of
+# silently carrying a deleted name), and each promoted module must pass a
+# `faber check` import smoke.
+#
+# The parked/compile-gap list was removed 2026-09-17: all four parked names
+# were deleted by the R100 rename (5fc2645) and the compile gap closed
+# (matrix compile-gap row flipped green). deque/ordered_map stay
+# design-parked in the matrix only; this gate does not enforce that row.
+#
+# Kernel verbs use the English kernel-manifest surface (v0.84.0): cwd,
+# read_lines, write_file, exists, mode, temp_dir, delete, write_env, pid,
+# exit_process, warn_line, captura.
 
 import from "faber:processus" processus
 import from "faber:solum" solum
@@ -16,7 +27,7 @@ import from "faber:consolum" consolum
 
 # First row of the document starting with the promoted-helper matrix header.
 fn find_promoted_row(string via) → string {
-    const list<value> rows ← solum.carpe(via) ↦ list<value>
+    const list<value> rows ← solum.read_lines(via) ↦ list<value>
     const int n ← rows.length()
     var int idx ← 0
     while idx < n {
@@ -30,7 +41,7 @@ fn find_promoted_row(string via) → string {
 }
 
 main {
-    const string root ← processus.sedes() ↦ string
+    const string root ← processus.cwd() ↦ string
 
     # FABER and FABER_LIBRARY_HOME overrides, matching ${VAR:-default}.
     # Default is the in-workspace radix binary (sibling, then container).
@@ -41,9 +52,9 @@ main {
         faber ← faber_env
     }
     if faber_env.length() ≡ 0 {
-        if solum.exstat(faber) ↦ bool is false {
+        if solum.exists(faber) ↦ bool is false {
             const string container ← root + "/../../../radix/target/debug/faber"
-            if solum.exstat(container) ↦ bool {
+            if solum.exists(container) ↦ bool {
                 faber ← container
             }
         }
@@ -56,46 +67,46 @@ main {
     }
 
     # Executable check for the pinned faber binary
-    if solum.exstat(faber) ↦ bool is false {
-        consolum.mone("check-promoted-helper-imports: missing executable faber at " + faber)
-        processus.exi(1)
+    if solum.exists(faber) ↦ bool is false {
+        consolum.warn_line("check-promoted-helper-imports: missing executable faber at " + faber)
+        processus.exit_process(1)
     }
-    const int mode ← solum.modus(faber) ↦ int
+    const int mode ← solum.mode(faber) ↦ int
     if (mode ∧ 64) ≡ 0 and (mode ∧ 8) ≡ 0 and (mode ∧ 1) ≡ 0 {
-        consolum.mone("check-promoted-helper-imports: missing executable faber at " + faber)
-        processus.exi(1)
+        consolum.warn_line("check-promoted-helper-imports: missing executable faber at " + faber)
+        processus.exit_process(1)
     }
 
     # Matrix row validation
     const string matrix ← root + "/docs/factory/provider-source-claim-matrix.md"
     const string promoted_row ← find_promoted_row(matrix)
     if promoted_row.length() ≡ 0 {
-        consolum.mone("check-promoted-helper-imports: missing promoted helper matrix row")
-        processus.exi(1)
+        consolum.warn_line("check-promoted-helper-imports: missing promoted helper matrix row")
+        processus.exit_process(1)
     }
 
     const string tick ← "\`".slice(1, 2)
 
-    const list<string> promoted ← ["csv", "json", "json/solve", "json/cursor", "json/lexica", "model", "tensor", "valor", "vector", "chorda", "tempus", "solum/path"]
-    const list<string> parked ← ["fila", "ordinata", "mathesis", "json/pange"]
+    const list<string> promoted ← ["csv", "json", "json/solve", "json/cursor", "json/lexer", "model", "tensor", "value", "vector", "text", "time", "fs/path"]
 
     for from promoted const module {
-        if not (promoted_row.contains(tick + module + tick)) {
-            consolum.mone("check-promoted-helper-imports: matrix row missing promoted module " + module)
-            processus.exi(1)
+        # Fail-closed corpus resolution: a listed module that no longer
+        # exists in the live corpus aborts before the smoke runs.
+        const string corpus_file ← lib_home + "/norma/src/" + module + ".fab"
+        if solum.exists(corpus_file) ↦ bool is false {
+            consolum.warn_line("check-promoted-helper-imports: listed module norma:" + module + " does not resolve in the live corpus (missing " + corpus_file + ")")
+            processus.exit_process(1)
         }
-    }
-    for from parked const module {
-        if promoted_row.contains(tick + module + tick) {
-            consolum.mone("check-promoted-helper-imports: parked/compile-gap module " + module + " is listed as promoted")
-            processus.exi(1)
+        if not (promoted_row.contains(tick + module + tick)) {
+            consolum.warn_line("check-promoted-helper-imports: matrix row missing promoted module " + module)
+            processus.exit_process(1)
         }
     }
 
     # Import smoke: run `faber check` on a generated temp .fab per module
-    processus.scribe("FABER_LIBRARY_HOME", lib_home)
-    const string tmp ← solum.temporarium() ↦ string
-    const int pid ← processus.identitas() ↦ int
+    processus.write_env("FABER_LIBRARY_HOME", lib_home)
+    const string tmp ← solum.temp_dir() ↦ string
+    const int pid ← processus.pid() ↦ int
     const string pid_s ← pid ↦ string
     var int status ← 0
 
@@ -112,24 +123,24 @@ main {
             i ← i + 1
         }
         const string file ← tmp + "/check-promoted-helper-imports-" + pid_s + "-" + safe + ".fab"
-        solum.scribe(file, "import from \"norma:" + module + "\" m\nmain { }\n")
+        solum.write_file(file, "import from \"norma:" + module + "\" m\nmain { }\n")
         const map<string, value> check ← processus.captura([faber, "check", file]) ↦ map<string, value>
         const int check_status ← check["status"] ↦ int
         const string check_stdout ← check["stdout"] ↦ string
         const string check_stderr ← check["stderr"] ↦ string
-        solum.dele(file)
+        solum.delete(file)
         if check_status ≡ 0 {
             print "ok: norma:" + module
         } else {
-            consolum.mone("check-promoted-helper-imports: failed import smoke for norma:" + module)
+            consolum.warn_line("check-promoted-helper-imports: failed import smoke for norma:" + module)
             if check_stdout.length() > 0 {
-                consolum.mone(check_stdout)
+                consolum.warn_line(check_stdout)
             }
             if check_stderr.length() > 0 {
-                consolum.mone(check_stderr)
+                consolum.warn_line(check_stderr)
             }
             status ← 1
         }
     }
-    processus.exi(status)
+    processus.exit_process(status)
 }
