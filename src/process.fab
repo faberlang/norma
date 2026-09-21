@@ -22,7 +22,7 @@ locale = "en"
 # - Shell execution uses traditional sync/async:
 # - Imperative (exec): sync, blocks until complete
 # - Future (exec_async): async, returns promise
-# - Environment uses read_env/write_env (read/write) - simple and consistent
+# - Environment uses read_env (read) - simple and consistent
 
 
 # =============================================================================
@@ -107,19 +107,6 @@ fn exec_async(string command) → string {
 @ public
 fn read_env(string name) → string {
     return call 'processus:lege' (name) ↦ string
-}
-
-# =========================================================================
-# ENVIRONMENT - Write
-# =========================================================================
-# Verb: write_env from "scribere" (to write)
-# Why: Same verb as file writing - context disambiguates.
-# Maps to: Bun.env[name] = value / process.env[name] = value
-
-# Write environment variable
-@ public
-fn write_env(string name, string value) → void {
-    return call 'processus:scribe' ([name, value]) ↦ void
 }
 
 # =========================================================================
