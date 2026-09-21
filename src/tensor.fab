@@ -61,7 +61,7 @@ fn apply<T, size Shape>(tensor<T, Shape> grid, (T) → T f) → tensor<T, Shape>
     for from flat const elem {
         mapped.append(f(elem))
     }
-    const tensor<T, []> seed ← [] ∷ tensor<T, []>
+    const tensor<T, []> seed ← empty
     return seed.from_flat(mapped, shape)
 }
 
