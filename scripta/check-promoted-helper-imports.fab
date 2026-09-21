@@ -18,8 +18,11 @@ locale = "en"
 # design-parked in the matrix only; this gate does not enforce that row.
 #
 # Kernel verbs use the English kernel-manifest surface (v0.84.0): cwd,
-# read_lines, write_file, exists, mode, temp_dir, delete, write_env, pid,
-# exit_process, warn_line, captura.
+# read_lines, write_file, exists, mode, temp_dir, delete, pid,
+# exit_process, warn_line, captura. write_env is retired from the kernel
+# surface (hosts dropped processus:scribe 7098458, norma wrapper removed
+# b62153e), so the smoke passes FABER_LIBRARY_HOME per invocation through
+# /usr/bin/env.
 
 import from "faber:processus" processus
 import from "faber:solum" solum
@@ -103,8 +106,10 @@ main {
         }
     }
 
-    # Import smoke: run `faber check` on a generated temp .fab per module
-    processus.write_env("FABER_LIBRARY_HOME", lib_home)
+    # Import smoke: run `faber check` on a generated temp .fab per module.
+    # write_env is retired from the kernel surface, so each child gets
+    # FABER_LIBRARY_HOME through /usr/bin/env (argv vector, no shell
+    # quoting).
     const string tmp ← solum.temp_dir() ↦ string
     const int pid ← processus.pid() ↦ int
     const string pid_s ← pid ↦ string
@@ -124,7 +129,7 @@ main {
         }
         const string file ← tmp + "/check-promoted-helper-imports-" + pid_s + "-" + safe + ".fab"
         solum.write_file(file, "import from \"norma:" + module + "\" m\nmain { }\n")
-        const map<string, value> check ← processus.captura([faber, "check", file]) ↦ map<string, value>
+        const map<string, value> check ← processus.captura(["/usr/bin/env", "FABER_LIBRARY_HOME=" + lib_home, faber, "check", file]) ↦ map<string, value>
         const int check_status ← check["status"] ↦ int
         const string check_stdout ← check["stdout"] ↦ string
         const string check_stderr ← check["stderr"] ↦ string
