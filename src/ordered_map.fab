@@ -45,6 +45,7 @@ locale = "en"
 # the actual key→value bindings. Maintaining both lets lookup stay O(1)
 # (tabula get) while ordered iteration is O(n) over an already-sorted
 # lista, instead of O(n log n) sort-on-each-iteration.
+@ public
 class SortedMap<K, V> {
     list<K> index = []
     map<K, V> entries = [] ∷ map<K, V>
@@ -131,6 +132,7 @@ class SortedMap<K, V> {
 # fila.empty; `is_empty` is the emptiness predicate above.
 
 # Empty sorted map constructor.
+@ public
 fn empty<K, V>() → SortedMap<K, V> {
     return SortedMap { }
 }
@@ -138,6 +140,7 @@ fn empty<K, V>() → SortedMap<K, V> {
 # Build a sorted map from a tabula, sorting keys once at construction.
 # WHY: One sort at build time is cheaper than re-sorting on every ordered
 # iteration, which is the common ordinata use case.
+@ public
 fn from_map<K, V>(map<K, V> source_map) → SortedMap<K, V> {
     var SortedMap<K, V> out ← SortedMap { entries = source_map }
     var list<K> keys ← source_map.keys()

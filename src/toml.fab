@@ -20,6 +20,7 @@ locale = "en"
 # =========================================================================
 # SERIALIZATION (wire floor)
 # =========================================================================
+@ public
 fn stringify(value value) → string {
     panic "norma:toml.stringify is deferred pending Stage 2 dispatch"
 }
@@ -31,6 +32,7 @@ fn stringify(value value) → string {
 fn parse(string toml) → value {
     panic "norma:toml.parse is deferred pending Stage 2 dispatch"
 }
+@ public
 fn try_parse(string toml) → value ∪ null {
     panic "norma:toml.try_parse is deferred pending Stage 2 dispatch"
 }

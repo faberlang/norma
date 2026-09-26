@@ -21,11 +21,13 @@ locale = "en"
 # =========================================================================
 
 # Compress bytes (optional level 1-9)
+@ public
 fn compress(string algorithm, bytes data, int level optional) → bytes {
     panic "norma:compression.compress is deferred pending Stage 2 dispatch"
 }
 
 # Decompress bytes
+@ public
 fn decompress(string algorithm, bytes data) → bytes {
     panic "norma:compression.decompress is deferred pending Stage 2 dispatch"
 }
@@ -35,16 +37,19 @@ fn decompress(string algorithm, bytes data) → bytes {
 # =========================================================================
 
 # Create compression stream (optional level 1-9)
+@ public
 fn create_compressor(string algorithm, int level optional) → Compressor {
     panic "norma:compression.create_compressor is deferred pending Stage 2 dispatch"
 }
 
 # Create decompression stream
+@ public
 fn create_decompressor(string algorithm) → Decompressor {
     panic "norma:compression.create_decompressor is deferred pending Stage 2 dispatch"
 }
 
 # Compression stream
+@ public
 interface Compressor {
     # Write bytes in
     fn write_bytes(bytes data) → void
@@ -54,6 +59,7 @@ interface Compressor {
 }
 
 # Decompression stream
+@ public
 interface Decompressor {
     # Write compressed bytes in
     fn write_bytes(bytes data) → void

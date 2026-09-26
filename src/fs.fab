@@ -20,6 +20,7 @@ locale = "en"
 
 # Full file status returned by stat/stat_async
 # Maps to: stat(), lstat()
+@ public
 class FileStatus {
     int mode
     # permission bits (e.g., 0o755)
@@ -63,12 +64,14 @@ fn read_file_async<T>(string path) → T {
 # Maps to: fs.readFileSync(path) / fs.readFile(path) returning Buffer
 
 # Draw entire file as bytes (sync)
+@ public
 fn read_bytes(string path) → bytes {
     return call 'solum:hauri' (path) ↦ bytes
 }
 
 # Draw entire file as bytes (async route; Faber blocks on the frame)
 @ future
+@ public
 fn read_bytes_async(string path) → bytes {
     return call 'solum:hauriet' (path) ↦ bytes
 }
@@ -81,6 +84,7 @@ fn read_range(string path, int offset, int length) → bytes {
 }
 
 # Find a text byte pattern within a bounded file range, or -1 when absent.
+@ public
 fn find(string path, string pattern, int offset, int length) → int {
     const list<value> args ← [path ↦ value, pattern ↦ value, offset ↦ value, length ↦ value]
     return call 'solum:inveni' (args) ↦ int
@@ -99,6 +103,7 @@ fn read_lines(string path) → list<string> {
 
 # Pluck lines from file (async route; Faber blocks on the frame)
 @ future
+@ public
 fn read_lines_async(string path) → list<string> {
     return call 'solum:carpiet' (path) ↦ list<string>
 }
@@ -116,6 +121,7 @@ fn write_file(string path, string data) → void {
 
 # Write text to file, overwrites existing (async route; Faber blocks)
 @ future
+@ public
 fn write_file_async(string path, string data) → void {
     return call 'solum:scribet' ([path, data]) ↦ void
 }
@@ -146,12 +152,14 @@ fn write_bytes_async(string path, bytes data) → void {
 # Maps to: fs.appendFileSync(path, data) / fs.appendFile(path, data)
 
 # Append text to file (sync)
+@ public
 fn append(string path, string data) → void {
     return call 'solum:appone' ([path, data]) ↦ void
 }
 
 # Append text to file (async route; Faber blocks)
 @ future
+@ public
 fn append_async(string path, string data) → void {
     return call 'solum:apponet' ([path, data]) ↦ void
 }
@@ -169,6 +177,7 @@ fn exists(string path) → bool {
 
 # Check if path exists (async route; Faber blocks)
 @ future
+@ public
 fn exists_async(string path) → bool {
     return call 'solum:exstabit' (path) ↦ bool
 }
@@ -186,6 +195,7 @@ fn is_regular(string path) → bool {
 }
 
 # True when path is a regular file and can be opened for reading.
+@ public
 fn is_readable(string path) → bool {
     return call 'solum:legibilene' (path) ↦ bool
 }
@@ -220,12 +230,14 @@ fn mode(string path) → int {
 # `ad` requires extending the materializer's conversio-valor genus table
 # to lower SolumStatus as a Tabula walk. The host gateway work is the
 # right moment to land that.
+@ public
 fn stat(string path) → FileStatus {
     panic "norma:fs.stat is deferred pending Stage 2 dispatch"
 }
 
 # Get file details (async — same materializer blocker as stat)
 @ future
+@ public
 fn stat_async(string path) → FileStatus {
     panic "norma:fs.stat_async is deferred pending Stage 2 dispatch"
 }
@@ -243,6 +255,7 @@ fn read_link(string path) → string {
 
 # Follow symlink to get target path (async route; Faber blocks)
 @ future
+@ public
 fn read_link_async(string path) → string {
     return call 'solum:sequetur' (path) ↦ string
 }
@@ -267,6 +280,7 @@ fn delete(string path) → void {
 
 # Delete file (async route; Faber blocks)
 @ future
+@ public
 fn delete_async(string path) → void {
     return call 'solum:delet' (path) ↦ void
 }
@@ -284,6 +298,7 @@ fn copy(string source, string destination) → void {
 
 # Copy file (async route; Faber blocks)
 @ future
+@ public
 fn copy_async(string source, string destination) → void {
     return call 'solum:copy_async' ([source, destination]) ↦ void
 }
@@ -301,6 +316,7 @@ fn rename(string source, string destination) → void {
 
 # Rename or move file (async route; Faber blocks)
 @ future
+@ public
 fn rename_async(string source, string destination) → void {
     return call 'solum:renominabit' ([source, destination]) ↦ void
 }
@@ -318,6 +334,7 @@ fn touch(string path) → void {
 
 # Touch file - create or update mtime (async route; Faber blocks)
 @ future
+@ public
 fn touch_async(string path) → void {
     return call 'solum:tanget' (path) ↦ void
 }
@@ -342,6 +359,7 @@ fn create_dir(string path) → void {
 
 # Create directory (async route; Faber blocks)
 @ future
+@ public
 fn create_dir_async(string path) → void {
     return call 'solum:creabit' (path) ↦ void
 }
@@ -352,12 +370,14 @@ fn create_dir_async(string path) → void {
 # Maps to: fs.readdirSync(path) / fs.readdir(path)
 
 # List directory contents (sync)
+@ public
 fn list_dir(string path) → list<string> {
     return call 'solum:enumera' (path) ↦ list<string>
 }
 
 # List directory contents (async route; Faber blocks)
 @ future
+@ public
 fn list_dir_async(string path) → list<string> {
     return call 'solum:enumerabit' (path) ↦ list<string>
 }
@@ -375,6 +395,7 @@ fn remove_tree(string path) → void {
 
 # Prune directory tree (async route; Faber blocks)
 @ future
+@ public
 fn remove_tree_async(string path) → void {
     return call 'solum:amputabit' (path) ↦ void
 }
@@ -398,26 +419,31 @@ fn parent(string path) → string {
 }
 
 # Final path segment (filename)
+@ public
 fn file_name(string path) → string {
     return call 'solum:nomen' (path) ↦ string
 }
 
 # File extension (includes dot)
+@ public
 fn extension(string path) → string {
     return call 'solum:suffixum' (path) ↦ string
 }
 
 # Resolve to absolute path
+@ public
 fn resolve(string path) → string {
     return call 'solum:absolve' (path) ↦ string
 }
 
 # Get user's home directory
+@ public
 fn home() → string {
     return call 'solum:domus' ↦ string
 }
 
 # Get system temp directory
+@ public
 fn temp_dir() → string {
     return call 'solum:temporarium' ↦ string
 }
@@ -437,6 +463,7 @@ fn _join_two(string base, string segment) → string {
 # Contract: glob(radix, exemplar) → lista<textus> ⇥ textus
 # v1: * matches exactly one path segment (e.g. "*/SKILL.md").
 #
+@ public
 fn glob(string root, string pattern) → list<string> ⇥ string {
     const list<string> segments ← pattern.split("/")
     var list<string> candidatos ← [root]
