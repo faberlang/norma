@@ -15,11 +15,13 @@ locale = "en"
 # classification/diagnostic helper floor only. It imports nothing and does
 # no byte parsing.
 
+@ public
 class Diagnostic {
     string severity
     string message
 }
 
+@ public
 fn detect_format(string status, string source) → string {
     if status ≡ "missing-download" then return "alias-missing"
     if source.contains("GGUF") then return "gguf"
@@ -29,6 +31,7 @@ fn detect_format(string status, string source) → string {
     return "unknown"
 }
 
+@ public
 fn diagnose(string status, string source, string router_model_id) → string {
     if status ≡ "router-backed" then return "metadata parser pending; router model is " + router_model_id
     if status ≡ "missing-download" then return "missing local download for " + source
@@ -37,11 +40,13 @@ fn diagnose(string status, string source, string router_model_id) → string {
     return "unknown alias or unsupported path"
 }
 
+@ public
 fn severity_for_status(string status) → string {
     if status ≡ "error" then return "error"
     return "warning"
 }
 
+@ public
 fn empty_diagnostic(string status, string source, string router_model_id) → list<Diagnostic> {
     return [
         Diagnostic {

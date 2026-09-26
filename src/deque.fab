@@ -39,6 +39,7 @@ locale = "en"
 # =============================================================================
 
 # Double-ended queue over T. See module header for the two-lista scheme.
+@ public
 class Deque<T> {
     list<T> head = []
     list<T> tail = []
@@ -138,11 +139,13 @@ class Deque<T> {
 # Deque<T> rather than operating on an existing one. `is_empty` is reserved
 # for the emptiness predicate above.
 
+@ public
 fn empty<T>() → Deque<T> {
     return Deque { }
 }
 
 # First element of the source becomes the queue head (`tail = res` with empty `head`).
+@ public
 fn from_list<T>(list<T> items) → Deque<T> {
     return Deque { tail = items }
 }

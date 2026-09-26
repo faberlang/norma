@@ -181,6 +181,7 @@ fn sleep(int ms) → void {
 # from functions yet"). Matches thesaurus.messages. A native Faber `ad`
 # body becomes possible once cursor-return-from-function ships.
 @ cursor
+@ public
 fn interval(int ms) → cursor<instant> {
     panic "norma:time.interval is deferred pending Stage 2 dispatch"
 }
@@ -195,18 +196,22 @@ fn MILLISECOND() → int {
     return 1
 }
 
+@ public
 fn SECOND() → int {
     return 1000
 }
 
+@ public
 fn MINUTE() → int {
     return 60000
 }
 
+@ public
 fn HOUR() → int {
     return 3600000
 }
 
+@ public
 fn DAY() → int {
     return 86400000
 }

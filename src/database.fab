@@ -64,11 +64,13 @@ locale = "en"
 # Stem connect- · cell: future singular (async finite)
 # Driver inferred from URL scheme.
 @ future
+@ public
 fn connect(string url) → Connection {
     panic "norma:database.connect is deferred pending Stage 2 dispatch"
 }
 
 # Database connection handle
+@ public
 interface Connection {
     # -----------------------------------------------------------------
     # QUERIES — stem quaer- (quaerere) + stem capi- (capere)
@@ -119,6 +121,7 @@ interface Connection {
 }
 
 # Database transaction handle (same query/mutation stems as Connection)
+@ public
 interface Transaction {
     # Stem quaer- · future singular
     @ future

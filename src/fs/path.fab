@@ -39,6 +39,7 @@ locale = "en"
 # Join path segments into a single path string.
 # Maps to: Rust PathBuf::push, Go path.Join, Node path.join.
 # Imperativus — produces a joined path from parts.
+@ public
 fn join(list<string> parts) → string {
     return call 'solum:iunge' (parts) ↦ string
 }
@@ -49,6 +50,7 @@ fn join(list<string> parts) → string {
 
 # Parent directory of a path. Returns "" for paths with no parent.
 # Maps to: Rust Path::parent, Go path.Dir, Node path.dirname.
+@ public
 fn parent(string path) → string {
     return call 'solum:parens' (path) ↦ string
 }
@@ -63,6 +65,7 @@ fn file_name(string path) → string {
 # File extension, including the leading dot (e.g. ".txt"). Returns "" if
 # there is no extension.
 # Maps to: Rust Path::extension, Go path.Ext, Node path.extname.
+@ public
 fn extension(string path) → string {
     return call 'solum:suffixum' (path) ↦ string
 }
@@ -77,6 +80,7 @@ fn extension(string path) → string {
 # WHY: this one does touch the filesystem (canonicalize) — it lives here
 # because it is path resolution, but it can fail on non-existent paths and
 # falls back to cwd-join rather than throwing.
+@ public
 fn resolve(string path) → string {
     return call 'solum:absolve' (path) ↦ string
 }
@@ -87,12 +91,14 @@ fn resolve(string path) → string {
 
 # User's home directory. Reads $HOME on Unix; falls back to "/" if unset.
 # Maps to: Rust env::var("HOME"), Go os.UserHomeDir, Node os.homedir.
+@ public
 fn home() → string {
     return call 'solum:domus' ↦ string
 }
 
 # System temporary directory.
 # Maps to: Rust env::temp_dir, Go os.TempDir, Node os.tmpdir.
+@ public
 fn temp_dir() → string {
     return call 'solum:temporarium' ↦ string
 }
