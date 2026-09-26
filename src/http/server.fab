@@ -40,12 +40,10 @@ import from "norma:http/sse" sse
 class Listener {
     int handle = 0
 
-    @ public
     fn accept() → Incoming {
         return accept_incoming(self.handle)
     }
 
-    @ public
     fn stop() → void {
         return call 'http:stop' (self.handle) ↦ void
     }
@@ -64,17 +62,14 @@ class Incoming {
 class Stream {
     int writer = 0
 
-    @ public
     fn write(bytes data) → void {
         return write_chunk(self, data)
     }
 
-    @ public
     fn write_event(sse.Event event) → void {
         return send_event(self, event)
     }
 
-    @ public
     fn finish(bool keep_alive) → void {
         return finish_stream(self, keep_alive)
     }

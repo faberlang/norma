@@ -23,13 +23,11 @@ class Header {
 class Headers {
     list<Header> entries = []
 
-    @ public
     fn length() → int {
         return self.entries.length()
     }
 
     # Returns false and leaves the map unchanged when name or value is illegal.
-    @ public
     fn append(string name, string value) → bool {
         if not _is_token(name) then return false
         if not _is_field_value(value) then return false
@@ -38,7 +36,6 @@ class Headers {
     }
 
     # First value whose name matches under ASCII case-fold; nihil if absent.
-    @ public
     fn get(string name) → string ∪ null {
         const string folded ← _ascii_lower(name)
         for from self.entries const entry {
@@ -50,7 +47,6 @@ class Headers {
     }
 
     # Every value whose name matches under ASCII case-fold, in append order.
-    @ public
     fn values(string name) → list<string> {
         const string folded ← _ascii_lower(name)
         var list<string> out ← []

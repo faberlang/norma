@@ -20,12 +20,10 @@ class Request {
     headers.Headers headers = headers.Headers { }
     string body = ""
 
-    @ public
     fn header(string name) → string ∪ null {
         return self.headers.get(name)
     }
 
-    @ public
     fn query_field(string name) → string ∪ null {
         return _query_field(self.query, name)
     }
