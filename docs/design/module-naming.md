@@ -72,7 +72,6 @@ units dispatch**):
 | `norma:crypta` | `norma:crypto` | cryptography device |
 | `norma:fila` | `norma:deque` | double-ended queue |
 | `norma:mathesis` | `norma:math` | scalar math catalog |
-| `norma:nuncius` | `norma:ipc` | inter-process communication device |
 | `norma:ordinata` | `norma:ordered_map` | key-ordered associative collection |
 | `norma:pressura` | `norma:compression` | compression device |
 | `norma:processus` | `norma:process` | process device |

@@ -58,7 +58,7 @@ materializer blockers:
 | `src/solum.fab` | Many scalar/list filesystem routes use `ad 'solum:*'`; `describe` and `describet` still `mori` because arbitrary genera such as `SolumStatus` are not supported by the `ad` materializer. | Do not claim complete filesystem metadata API. |
 | `src/processus.fab` | Process routes such as `dimitte`, `captura`, `exsequi`, and environment calls use `ad 'processus:*'`; `genera` is deferred because `Subprocessus` cannot be materialized yet. `processus:exi` is a source-only never-returning exit intent and is excluded from provider coverage until host exit has a protocol-visible terminal response. | Do not claim complete process lifecycle API or provider-covered process exit. |
 | `src/tempus.fab` | Clock and sleep routes use `ad`; `vigila` is deferred because live inbound cursor returns from functions are not available. | Do not claim timer streams/cursor route support. |
-| `src/crypta.fab` and `src/nuncius.fab` | Headers describe gateway-dispatched routes, but sampled functions remain `mori` deferrals. | Do not claim crypto or IPC provider support. |
+| `src/crypta.fab` | Header describes gateway-dispatched routes, but sampled functions remain `mori` deferrals. | Do not claim crypto provider support. |
 | `docs/factory/nondum-mori-deferral-residual.md` | Runtime `mori` deferrals remain until free-function `@ nondum` support produces compile-time SEM017. | Public examples must not rely on deferred stubs without evidence. |
 
 This supports a source-library planning claim, not a public runnable API claim.
@@ -79,8 +79,7 @@ Notable gaps relative to public copy:
 - `providers.json` in the RC1 packet is still a placeholder.
 - The current site does not publish a provider coverage matrix generated from
   exported manifests.
-- Provider manifests do not cover deferred Norma modules such as `crypta` and
-  `nuncius`.
+- Provider manifests do not cover deferred Norma modules such as `crypta`.
 - Some Norma functions require materializer/cursor work before a public API
   reference can mark them runnable.
 - `processus:exi` is intentionally source-only/deferred rather than part of the

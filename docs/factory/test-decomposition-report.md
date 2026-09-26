@@ -200,10 +200,6 @@
 - **Assertion counts:** 10 probae across 1 probandum. Happy-path assertions: ~18. Error-path assertions: ~6. Ratio: 3:1. Good but could improve on binary edge cases.
 - **Severity:** High. The model metadata parser is the most complex native Faber code in the repo (GGUF is ~350 lines of binary parsing). Untested error paths in binary format parsing are bug risks.
 
-### `src/nuncius.fab` → exempla: NONE
-- **Coverage gaps:** 5 public functions + 5 implendums (ParPortarum, Porta, Mutex, Semaphorum, Conditio). All deferred.
-- **Severity:** Low. All Stage 2 deferred.
-
 ### `src/ordinata.fab` → exempla: NONE
 - **Coverage gaps:** `Ordinata<K,V>` genus (10 methods) + 2 constructors. TARGET form — will not compile.
 - **Severity:** Low. Blocked on compiler work. Exempla needed for: insert order preservation, range query edge cases (inferior > superior, empty range), delete-then-reinsert ordering, `fines` with bounds outside key set.

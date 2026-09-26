@@ -76,8 +76,7 @@ the authority for the public member names and domain grouping:
 - `PB-CONSOLUM`, `PB-PROCESSUS`, `PB-SOLUM`, `PB-TEMPUS` — I/O, process, and
   time leaves;
 - `PB-MODEL` — model metadata;
-- `PB-ARCA`, `PB-HTTP`, `PB-NUNCIUS`, `PB-THESAURUS` — storage, transport, and
-  concurrency leaves.
+- `PB-ARCA`, `PB-HTTP`, `PB-THESAURUS` — storage and transport leaves.
 
 The internal JSON files remain module rows because they are live source
 modules, but their private helpers must be covered through the JSON facade
@@ -284,7 +283,7 @@ TC-00 triage
   ├─ COV-WIRE codecs + JSON family       (7 modules)
   ├─ COV-IO   I/O + process + time       (5 modules)
   ├─ COV-META model + config             (3 modules)
-  └─ COV-SYS  storage + transport        (5 modules)
+  └─ COV-SYS  storage + transport        (4 modules)
        └─ TC-GATE per-module executed-proba sweep (34 rows)
 ```
 
@@ -446,13 +445,13 @@ Authoring focus:
   malformed input and null/error-channel behavior where they do not;
 - no fixture is promoted from a documentation example without an assertion.
 
-### `COV-SYS` — storage, transport, and concurrency family
+### `COV-SYS` — storage and transport family
 
-**Modules (5):** `arca.fab`, `http.fab`, `nuncius.fab`, `pressura.fab`,
+**Modules (4):** `arca.fab`, `http.fab`, `pressura.fab`,
 `thesaurus.fab`.
-**PB ledgers:** `PB-ARCA`, `PB-HTTP`, `PB-NUNCIUS`, `PB-PRESSURA`,
+**PB ledgers:** `PB-ARCA`, `PB-HTTP`, `PB-PRESSURA`,
 `PB-THESAURUS`.
-**Write scope:** `src/arca.proba`, `src/http.proba`, `src/nuncius.proba`,
+**Write scope:** `src/arca.proba`, `src/http.proba`,
 `src/pressura.proba`, `src/thesaurus.proba`.
 **Risk:** medium; most bodies are provider/deferred contracts.
 
@@ -462,8 +461,6 @@ Authoring focus:
   cases, and closed-connection negatives when implementation exists;
 - HTTP: request/response fields, client method names, headers/body/status,
   and server route shape without external network I/O;
-- nuncius: port pair, mutex, semaphore, and condition construction/contract
-  cases, including timeout and closed-state edges;
 - pressura: algorithm/level contract and stream lifecycle cases, with deferred
   calls explicitly marked;
 - thesaurus: key/value, TTL, existence, increment/decrement, publish/subscribe
@@ -485,7 +482,7 @@ it is not permission to edit unrelated source or to hide a per-module gate.
 | `COV-WIRE` | 7 | `src/codex.proba`, `src/crypta.proba`, `src/json.proba`, `src/json/{pange,solve}.proba`; cursor/lexica traced through `json.proba` | `TC-00`, `NORMA-VIS-EXPOSE`, `OUT-RADIX-PROBA-IMPORTED-PROVIDER` for execution | high | yes |
 | `COV-IO` | 5 | `src/{consolum,processus,solum,tempus}.proba`, `src/solum/path.proba` | `TC-00`, `NORMA-VIS-EXPOSE`, `OUT-RADIX-PROBA-IMPORTED-PROVIDER` for execution | high | yes |
 | `COV-META` | 3 | `src/{model,toml,yaml}.proba` | `TC-00`, `NORMA-VIS-EXPOSE`, `OUT-RADIX-PROBA-IMPORTED-PROVIDER` for execution | medium-high | yes |
-| `COV-SYS` | 5 | `src/{arca,http,nuncius,pressura,thesaurus}.proba` | `TC-00`, `NORMA-VIS-EXPOSE`, `OUT-RADIX-PROBA-IMPORTED-PROVIDER` for execution | medium | yes |
+| `COV-SYS` | 4 | `src/{arca,http,pressura,thesaurus}.proba` | `TC-00`, `NORMA-VIS-EXPOSE`, `OUT-RADIX-PROBA-IMPORTED-PROVIDER` for execution | medium | yes |
 
 No child unit owns `./scripta/check-source`, package-wide `faber test`,
 `--stage`, `--e2e`, or Radix changes. Those belong to `TC-GATE` and the named
@@ -534,7 +531,6 @@ column names the PB public-surface family that the row must cover.
 | `json/solve.fab` | `src/json/solve.proba` | `COV-WIRE` | `PB-JSON`: direct parse/try-parse facade contract | new |
 | `mathesis.fab` | existing `src/mathesis.proba` | `TC-00` + gate | `PB-MATHESIS`: PI/add now; catalog expansion stays scoped | existing, SEM006 + provider runner |
 | `model.fab` | `src/model.proba` | `COV-META` | `PB-MODEL`: model metadata and binary/text negatives | new |
-| `nuncius.fab` | `src/nuncius.proba` | `COV-SYS` | `PB-NUNCIUS`: port/mutex/semaphore/condition contracts | new |
 | `optimizer.fab` | `src/optimizer.proba` | `COV-NUM` | `PB-OPTIMIZER`: SGD step and shape contract | new |
 | `ordinata.fab` | `src/ordinata.proba` | `COV-NUM` | `PB-ORDINATA`: SortedMap ordering and constructors | new |
 | `pressura.fab` | `src/pressura.proba` | `COV-SYS` | `PB-PRESSURA`: compression and stream contracts | new |
