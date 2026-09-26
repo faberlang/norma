@@ -15,25 +15,21 @@ class Listener {
     int id = 0
 
     # Accept next incoming connection
-    @ public
     fn accept() → connection.Socket {
         panic "norma:net/listener.accept is deferred pending Stage 2 dispatch"
     }
 
-    @ public
     @ future
     fn accept_async() → connection.Socket {
         panic "norma:net/listener.accept_async is deferred pending Stage 2 dispatch"
     }
 
     # Stop listening
-    @ public
     fn close() → void {
         panic "norma:net/listener.close is deferred pending Stage 2 dispatch"
     }
 
     # Local port
-    @ public
     fn port() → int {
         panic "norma:net/listener.port is deferred pending Stage 2 dispatch"
     }

@@ -18,32 +18,26 @@ class Response {
     headers.Headers headers = headers.Headers { }
     string body = ""
 
-    @ public
     fn header(string name) → string ∪ null {
         return self.headers.get(name)
     }
 
-    @ public
     fn is_informational() → bool {
         return self.status ≥ 100 and self.status < 200
     }
 
-    @ public
     fn is_ok() → bool {
         return self.status ≥ 200 and self.status < 300
     }
 
-    @ public
     fn is_redirect() → bool {
         return self.status ≥ 300 and self.status < 400
     }
 
-    @ public
     fn is_client_error() → bool {
         return self.status ≥ 400 and self.status < 500
     }
 
-    @ public
     fn is_server_error() → bool {
         return self.status ≥ 500 and self.status < 600
     }

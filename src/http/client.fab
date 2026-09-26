@@ -54,12 +54,10 @@ class Receive {
     int status = 0
     headers.Headers headers = headers.Headers { }
 
-    @ public
     fn next() → Chunk {
         return receive(self)
     }
 
-    @ public
     fn next_n(int max_bytes) → Chunk {
         return receive_n(self, max_bytes)
     }

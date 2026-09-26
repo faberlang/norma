@@ -15,43 +15,36 @@ class Socket {
     int id = 0
 
     # Draw bytes (up to n if provided, otherwise whatever is available)
-    @ public
     fn read_bytes(int n optional) → bytes {
         panic "norma:net/connection.read_bytes is deferred pending Stage 2 dispatch"
     }
 
-    @ public
     @ future
     fn read_bytes_async(int n optional) → bytes {
         panic "norma:net/connection.read_bytes_async is deferred pending Stage 2 dispatch"
     }
 
     # Pour bytes
-    @ public
     fn write_bytes(bytes data) → void {
         panic "norma:net/connection.write_bytes is deferred pending Stage 2 dispatch"
     }
 
-    @ public
     @ future
     fn write_bytes_async(bytes data) → void {
         panic "norma:net/connection.write_bytes_async is deferred pending Stage 2 dispatch"
     }
 
     # Close connection
-    @ public
     fn close() → void {
         panic "norma:net/connection.close is deferred pending Stage 2 dispatch"
     }
 
     # Remote endpoint
-    @ public
     fn remote() → endpoint.Endpoint {
         panic "norma:net/connection.remote is deferred pending Stage 2 dispatch"
     }
 
     # Local endpoint
-    @ public
     fn local() → endpoint.Endpoint {
         panic "norma:net/connection.local is deferred pending Stage 2 dispatch"
     }
