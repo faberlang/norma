@@ -12,7 +12,7 @@ import from "norma:text" text
 
 # Why: Strip a single trailing CR when rows arrive CRLF-split (v1 LF contract).
 @ private
-fn _normalize_row(string row) → string {
+fn normalize_row(string row) → string {
     if row.length() ≡ 0 then return row
 
     const string last ← row.slice(row.length() - 1, row.length())
@@ -30,7 +30,7 @@ fn parse(string wire) → list<list<string>> {
     const list<string> rows ← text.split_n(wire, "\n", wire.length() + 1)
     var list<list<string>> map ← []
     for from rows const row {
-        const string normalized ← _normalize_row(row)
+        const string normalized ← normalize_row(row)
         map.append(text.split_n(normalized, ",", normalized.length() + 1))
     }
     return map

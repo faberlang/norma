@@ -11,7 +11,7 @@ locale = "en"
 # `<` ordering are not yet supported by the compiler (the
 # generic-genus-construction and Ord-bound goals are still draft). The
 # constructors use `SortedMap { ... }` with type arguments inferred from the
-# return type, `_insert` keeps the index sorted via `sort()` instead of
+# return type, `insert` keeps the index sorted via `sort()` instead of
 # comparison, and `fines` is removed until an ordering surface exists.
 #
 # Layering: pure native Faber over the builtin tabula<K, V> (for O(1) lookup)
@@ -31,9 +31,9 @@ locale = "en"
 # keys, values); the sorted-iteration surface (keys, values) is
 # what ordinata adds on top of tabula.
 #
-# Internal helpers (_insert, _remove, _remove_at, _equals) live at file
+# Internal helpers (insert, remove, remove_at, equals) live at file
 # scope as free functions with their own <K> type parameter, called from
-# genus methods via turbofish (_insert<K>(...)). File-scope free functions
+# genus methods via turbofish (insert<K>(...)). File-scope free functions
 # do not inherit the enclosing genus's type parameters — they declare their
 # own. This matches how generic functions already work elsewhere in the stdlib.
 
@@ -87,7 +87,7 @@ class SortedMap<K, V> {
     # Reuses the tabula insert stem.
     fn put(K key, V value) → void {
         if not self.entries.has(key) {
-            _insert<K>(self.index, key)
+            insert<K>(self.index, key)
         }
         self.entries.put(key, value)
     }
@@ -97,7 +97,7 @@ class SortedMap<K, V> {
     fn delete(K key) → void {
         if self.entries.has(key) {
             self.entries.delete(key)
-            _remove<K>(self.index, key)
+            remove<K>(self.index, key)
         }
     }
 
@@ -155,7 +155,7 @@ fn from_map<K, V>(map<K, V> source_map) → SortedMap<K, V> {
 # WHY: file-scope free functions, not genus methods, because they are pure
 # algorithms over a lista<K> that do not need the SortedMap<K, V> receiver.
 # They declare their own <K> type parameter and are called via turbofish
-# (_insert<K>(...)) from the genus methods. This is the standard generic-
+# (insert<K>(...)) from the genus methods. This is the standard generic-
 # function pattern; file-scope functions do not inherit enclosing genus type
 # parameters.
 
@@ -165,14 +165,14 @@ fn from_map<K, V>(map<K, V> source_map) → SortedMap<K, V> {
 # goal). The append-then-sort keeps the index sorted; duplicates can't occur
 # here because callers check has first.
 @ private
-fn _insert<K>(list<K> index, K key) → void {
+fn insert<K>(list<K> index, K key) → void {
     index.append(key)
     index.sort()
 }
 
 # Remove a key from the sorted index.
 @ private
-fn _remove<K>(list<K> index, K key) → void {
+fn remove<K>(list<K> index, K key) → void {
     var int i ← 0
     while i < index.length() {
         const K ∪ null extans ← index.get(i)
@@ -180,8 +180,8 @@ fn _remove<K>(list<K> index, K key) → void {
             i ← i + 1
             continue
         }
-        if _equals<K>(extans, key) {
-            _remove_at<K>(index, i)
+        if equals<K>(extans, key) {
+            remove_at<K>(index, i)
             return
         }
         i ← i + 1
@@ -192,7 +192,7 @@ fn _remove<K>(list<K> index, K key) → void {
 # null-narrowed binding does not see the refined type, so the comparison is
 # delegated to a two-rigid-param helper.
 @ private
-fn _equals<K>(K a, K b) → bool {
+fn equals<K>(K a, K b) → bool {
     return a ≡ b
 }
 
@@ -200,7 +200,7 @@ fn _equals<K>(K a, K b) → bool {
 # The rebuild mutates the receiver in place: a parameter binding cannot be
 # reassigned (SEM020), so the original is drained and refilled.
 @ private
-fn _remove_at<K>(list<K> index, int positio) → void {
+fn remove_at<K>(list<K> index, int positio) → void {
     var list<K> out ← []
     var int i ← 0
     while i < index.length() {

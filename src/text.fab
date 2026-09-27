@@ -245,27 +245,27 @@ fn suffix(string s, int start) → string {
 # DOCUMENT SPLIT (delimiter-leading front block)
 # =========================================================================
 
-# Name: _newline is private helper vocabulary, not a public Latin verb.
+# Name: nl is private helper vocabulary, not a public Latin verb.
 # Morphologia: Private support noun; this isolates the line delimiter used
 # by split_frontmatter helpers.
-# Why: Keep newline spelling in one place for fence-line detection.
+# Why: Keep nl spelling in one place for fence-line detection.
 @ private
-fn _newline() → string {
+fn newline() → string {
     return "\n"
 }
 
-# Name: _delimiter_end (Latin locale: _finis_delimitris) means the delimiter boundary found while scanning.
+# Name: delimiter_end (Latin locale: _finis_delimitris) means the delimiter boundary found while scanning.
 # Morphologia: Private nominal helper; it returns a position, not a cord.
-# Why: Find the newline before a line whose full content is the delimiter.
+# Why: Find the nl before a line whose full content is the delimiter.
 # Edge: A delimiter at document end is accepted as the closing fence.
 @ private
-fn _delimiter_end(string document, string delimiter, int search_from) → int {
+fn delimiter_end(string document, string delimiter, int search_from) → int {
     const int delim_len ← delimiter.length()
-    const string newline ← _newline()
+    const string nl ← newline()
     var int pos ← search_from
 
     while pos < document.length() {
-        if document.slice(pos, pos + 1) ≡ newline {
+        if document.slice(pos, pos + 1) ≡ nl {
             const int line_start ← pos + 1
 
             if line_start + delim_len ≤ document.length() {
@@ -273,7 +273,7 @@ fn _delimiter_end(string document, string delimiter, int search_from) → int {
                     const int line_end ← line_start + delim_len
 
                     if line_end ≡ document.length() then return pos
-                    if document.slice(line_end, line_end + 1) ≡ newline then return pos
+                    if document.slice(line_end, line_end + 1) ≡ nl then return pos
                 }
             }
         }
@@ -284,18 +284,18 @@ fn _delimiter_end(string document, string delimiter, int search_from) → int {
     return -1
 }
 
-# Name: _trim_trailing_newlines (Latin locale: _amputa_postremam_newline) from amputare, "to cut off."
+# Name: trim_trailing_newlines (Latin locale: _amputa_postremam_newline) from amputare, "to cut off."
 # Morphologia: Private perfective helper; it trims the completed extracted
 # wire segment before split_frontmatter returns it.
 # Why: Drop trailing newline(s) from an extracted metadata wire blob.
 # Edge: Multiple trailing newlines are removed because frontmatter payloads
 # are line records, not significant terminal blank lines.
 @ private
-fn _trim_trailing_newlines(string s) → string {
+fn trim_trailing_newlines(string s) → string {
     var int len ← s.length()
-    const string newline ← _newline()
+    const string nl ← newline()
 
-    while len > 0 and s.slice(len - 1, len) ≡ newline {
+    while len > 0 and s.slice(len - 1, len) ≡ nl {
         len ← len - 1
     }
 
@@ -321,20 +321,20 @@ fn split_frontmatter(string document, string delimiter) → list<string> ⇥ str
     if document.slice(0, delim_len) ≠ delimiter then throw "missing opening delimiter"
 
     var int meta_start ← delim_len
-    const string newline ← _newline()
+    const string nl ← newline()
 
-    if meta_start < document.length() and document.slice(meta_start, meta_start + 1) ≡ newline {
+    if meta_start < document.length() and document.slice(meta_start, meta_start + 1) ≡ nl {
         meta_start ← meta_start + 1
     }
 
-    const int close_line ← _delimiter_end(document, delimiter, delim_len)
+    const int close_line ← delimiter_end(document, delimiter, delim_len)
 
     if close_line < 0 then throw "missing closing delimiter"
 
-    const string metadata ← _trim_trailing_newlines(document.slice(meta_start, close_line))
+    const string metadata ← trim_trailing_newlines(document.slice(meta_start, close_line))
     var int corpus_start ← (close_line + 1) + delim_len
 
-    if corpus_start < document.length() and document.slice(corpus_start, corpus_start + 1) ≡ newline {
+    if corpus_start < document.length() and document.slice(corpus_start, corpus_start + 1) ≡ nl {
         corpus_start ← corpus_start + 1
     }
 

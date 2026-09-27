@@ -166,14 +166,14 @@ fn shift_right(int a, int b) → int {
 # Why: Sine of x radians — exact π/2 reduction, then a series on [-π/4, π/4].
 @ public
 fn sin(float x) → float {
-    if not _is_finite(x) then return nan
+    if not is_finite(x) then return nan
 
     const float a ← x.abs()
-    if a ≤ 0.7853981633974483 then return _sin_series(x)
+    if a ≤ 0.7853981633974483 then return sin_series(x)
 
-    const AngleReduction reduced ← _reduce_half_pi(a)
-    var float v ← _cos_series(reduced.angle)
-    if reduced.quadrant % 2 ≡ 0 then v ← _sin_series(reduced.angle)
+    const AngleReduction reduced ← reduce_half_pi(a)
+    var float v ← cos_series(reduced.angle)
+    if reduced.quadrant % 2 ≡ 0 then v ← sin_series(reduced.angle)
 
     if reduced.quadrant ≥ 2 then v ← -v
 
@@ -185,14 +185,14 @@ fn sin(float x) → float {
 # Why: Cosine of x radians — exact π/2 reduction, then a series on [-π/4, π/4].
 @ public
 fn cos(float x) → float {
-    if not _is_finite(x) then return nan
+    if not is_finite(x) then return nan
 
     const float a ← x.abs()
-    if a ≤ 0.7853981633974483 then return _cos_series(x)
+    if a ≤ 0.7853981633974483 then return cos_series(x)
 
-    const AngleReduction reduced ← _reduce_half_pi(a)
-    var float v ← _sin_series(reduced.angle)
-    if reduced.quadrant % 2 ≡ 0 then v ← _cos_series(reduced.angle)
+    const AngleReduction reduced ← reduce_half_pi(a)
+    var float v ← sin_series(reduced.angle)
+    if reduced.quadrant % 2 ≡ 0 then v ← cos_series(reduced.angle)
 
     if reduced.quadrant ≡ 1 or reduced.quadrant ≡ 2 then return -v
 
@@ -202,14 +202,14 @@ fn cos(float x) → float {
 # Why: Tangent of x radians — sin/cos of the reduced angle; large (not zero) near poles.
 @ public
 fn tan(float x) → float {
-    if not _is_finite(x) then return nan
+    if not is_finite(x) then return nan
 
     const float a ← x.abs()
-    if a ≤ 0.7853981633974483 then return _sin_series(x) / _cos_series(x)
+    if a ≤ 0.7853981633974483 then return sin_series(x) / cos_series(x)
 
-    const AngleReduction reduced ← _reduce_half_pi(a)
-    const float s ← _sin_series(reduced.angle)
-    const float c ← _cos_series(reduced.angle)
+    const AngleReduction reduced ← reduce_half_pi(a)
+    const float s ← sin_series(reduced.angle)
+    const float c ← cos_series(reduced.angle)
     var float v ← s / c
     if reduced.quadrant % 2 ≡ 1 then v ← -c / s
 
@@ -221,7 +221,7 @@ fn tan(float x) → float {
 # Why: Natural exponential e^x — x = k·ln2 + r, series on |r| ≤ ln2/2, scale by 2^k.
 @ public
 fn exp(float x) → float {
-    if _is_nan(x) then return x
+    if is_nan(x) then return x
 
     if x > 709.782712893384 then return ∞
 
@@ -229,15 +229,15 @@ fn exp(float x) → float {
 
     const int k ← (x * 1.4426950408889634).round()
     const float kf ← k ↦ float
-    const float r ← (x - kf * _LN2_HI()) - kf * _LN2_LO()
-    return _scale2(_exp_series(r), k)
+    const float r ← (x - kf * LN2_HI()) - kf * LN2_LO()
+    return scale2(exp_series(r), k)
 }
 
 # Why: Natural logarithm — x = m·2^e with m in [√½, √2], series on m, plus e·ln2.
 # ln(0) → -∞; ln(x < 0) → NaN; ln(∞) → ∞.
 @ public
 fn ln(float x) → float {
-    if _is_nan(x) then return x
+    if is_nan(x) then return x
 
     if x < 0.0 then return nan
 
@@ -247,18 +247,18 @@ fn ln(float x) → float {
 
     var float m ← x
     var int e ← 0
-    if _biased_exponent(m) ≡ 0 {
+    if biased_exponent(m) ≡ 0 {
         m ← m * 18014398509481984.0
         e ← -54
     }
-    e ← e + _biased_exponent(m) - 1023
-    m ← _unit_mantissa(m)
+    e ← e + biased_exponent(m) - 1023
+    m ← unit_mantissa(m)
     if m > 1.4142135623730951 {
         m ← m / 2.0
         e ← e + 1
     }
     const float ef ← e ↦ float
-    return ef * _LN2_HI() + (_ln_series(m) + ef * _LN2_LO())
+    return ef * LN2_HI() + (ln_series(m) + ef * LN2_LO())
 }
 
 # Why: Base-10 logarithm via ln(x) / ln(10); same domain as ln.
@@ -271,7 +271,7 @@ fn log10(float x) → float {
 # sqrt(x < 0) → NaN; sqrt(±0) → ±0; sqrt(∞) → ∞.
 @ public
 fn sqrt(float x) → float {
-    if _is_nan(x) then return x
+    if is_nan(x) then return x
 
     if x < 0.0 then return nan
 
@@ -281,17 +281,17 @@ fn sqrt(float x) → float {
 
     var float m ← x
     var int e ← 0
-    if _biased_exponent(m) ≡ 0 {
+    if biased_exponent(m) ≡ 0 {
         m ← m * 18014398509481984.0
         e ← -54
     }
-    e ← e + _biased_exponent(m) - 1023
-    m ← _unit_mantissa(m)
+    e ← e + biased_exponent(m) - 1023
+    m ← unit_mantissa(m)
     if e % 2 ≠ 0 {
         m ← m * 2.0
         e ← e - 1
     }
-    return _scale2(_sqrt_newton(m), e / 2)
+    return scale2(sqrt_newton(m), e / 2)
 }
 
 # pow: ⋆ glyph not shipped — delegates to the compiler's float `power` (pow-glyph goal)
@@ -309,47 +309,47 @@ fn pow(float base, float exponent) → float {
 
 # Why: High part of ln2 (32 significant bits) so k·hi is exact for |k| < 2^21.
 @ private
-fn _LN2_HI() → float {
+fn LN2_HI() → float {
     return 0.6931471803691238
 }
 
-# Why: Low part of ln2 — ln2 − _LN2_HI().
+# Why: Low part of ln2 — ln2 − LN2_HI().
 @ private
-fn _LN2_LO() → float {
+fn LN2_LO() → float {
     return 1.9082149292705877e-10
 }
 
 # Why: Raw IEEE binary64 payload of x.
 @ private
-fn _bits(float x) → int<u64> {
+fn bits(float x) → int<u64> {
     const f64 wide ← x ↦ f64
     return wide ↦ int<u64, Bits>
 }
 
 # Why: Biased exponent field (0 = zero/subnormal, 2047 = ∞/NaN).
 @ private
-fn _biased_exponent(float x) → int {
-    const int<u64> field ← (_bits(x) ⇒ 52) ∧ (2047 ∷ int<u64>)
+fn biased_exponent(float x) → int {
+    const int<u64> field ← (bits(x) ⇒ 52) ∧ (2047 ∷ int<u64>)
     return field ↦ int
 }
 
 # Why: NaN test on the bit fields — independent of each lane's NaN comparison.
 @ private
-fn _is_nan(float x) → bool {
-    const int<u64> fraction ← _bits(x) ∧ (4503599627370495 ∷ int<u64>)
-    return _biased_exponent(x) ≡ 2047 and fraction ≠ (0 ∷ int<u64>)
+fn is_nan(float x) → bool {
+    const int<u64> fraction ← bits(x) ∧ (4503599627370495 ∷ int<u64>)
+    return biased_exponent(x) ≡ 2047 and fraction ≠ (0 ∷ int<u64>)
 }
 
 # Why: Finite test on the exponent field (excludes ±∞ and NaN).
 @ private
-fn _is_finite(float x) → bool {
-    return _biased_exponent(x) ≠ 2047
+fn is_finite(float x) → bool {
+    return biased_exponent(x) ≠ 2047
 }
 
 # Why: Replace the exponent of normal x with 0 — mantissa in [1, 2).
 @ private
-fn _unit_mantissa(float x) → float {
-    const int<u64> fraction ← _bits(x) ∧ (4503599627370495 ∷ int<u64>)
+fn unit_mantissa(float x) → float {
+    const int<u64> fraction ← bits(x) ∧ (4503599627370495 ∷ int<u64>)
     const int<u64> unit ← fraction ∨ (4607182418800017408 ∷ int<u64>)
     const f64 wide ← unit ↦ float<f64, Bits>
     return wide
@@ -357,7 +357,7 @@ fn _unit_mantissa(float x) → float {
 
 # Why: Exact 2^k for normal exponents k in [-1022, 1023].
 @ private
-fn _pow2(int k) → float {
+fn pow2(int k) → float {
     const int<u64> field ← (k + 1023) ↦ int<u64>
     const f64 wide ← (field ⇐ 52) ↦ float<f64, Bits>
     return wide
@@ -365,18 +365,18 @@ fn _pow2(int k) → float {
 
 # Why: v · 2^k for k in [-2044, 2046] in at most three exact power-of-two steps.
 @ private
-fn _scale2(float v, int k) → float {
+fn scale2(float v, int k) → float {
     var float out ← v
     var int rest ← k
     if rest > 1023 {
-        out ← out * _pow2(1023)
+        out ← out * pow2(1023)
         rest ← rest - 1023
     }
     if rest < -1022 {
-        out ← out * _pow2(-1022)
+        out ← out * pow2(-1022)
         rest ← rest + 1022
     }
-    return out * _pow2(rest)
+    return out * pow2(rest)
 }
 
 # -------------------------------------------------------------------------
@@ -393,7 +393,7 @@ class AngleReduction {
 # Why: 2/π as 24-bit big-endian chunks: 2/π = Σ c[i]·2^(−24(i+1)); 1296 bits
 # cover the largest f64 exponent.
 @ private
-fn _two_over_pi() → list<int> {
+fn two_over_pi() → list<int> {
     return [10680707, 7228996, 1387004, 2578385, 16069853, 12639074, 9804092, 4427841, 16666979, 11263675, 12935607, 2387514, 4345298, 14681673, 3074569, 13734428, 16653803, 1880361, 10960616, 8533493, 3062596, 8710556, 7349940, 6258241, 3772886, 3769171, 3798172, 8675211, 12450088, 3874808, 9961438, 366607, 15675153, 9132554, 7151469, 3571407, 2607881, 12013382, 4155038, 6285869, 7677882, 13102053, 15825725, 473591, 9065106, 15363067, 6271263, 9264392, 5636912, 4652155, 7056368, 13614112, 10155062, 1944035]
 }
 
@@ -401,11 +401,11 @@ fn _two_over_pi() → list<int> {
 # integer limbs (only the limbs that reach the integer part mod 8 or the first
 # 168 fraction bits), so no precision is lost for any f64 magnitude.
 @ private
-fn _reduce_half_pi(float a) → AngleReduction {
+fn reduce_half_pi(float a) → AngleReduction {
     const int mask ← 16777215
-    const int<u64> fraction ← _bits(a) ∧ (4503599627370495 ∷ int<u64>)
+    const int<u64> fraction ← bits(a) ∧ (4503599627370495 ∷ int<u64>)
     const int mantissa ← (fraction ↦ int) + 4503599627370496
-    const int e ← _biased_exponent(a) - 1075
+    const int e ← biased_exponent(a) - 1075
     const int q ← (e + 2400) / 24 - 100
     const int s ← e - 24 * q
 
@@ -420,7 +420,7 @@ fn _reduce_half_pi(float a) → AngleReduction {
         (mantissa ⇒ (48 - s)) ∧ mask,
         top
     ]
-    const list<int> table ← _two_over_pi()
+    const list<int> table ← two_over_pi()
 
     # acc[l] holds the coefficient of 2^(−24l); l = 0 is the integer part.
     var list<int> acc ← [0, 0, 0, 0, 0, 0, 0, 0]
@@ -467,7 +467,7 @@ fn _reduce_half_pi(float a) → AngleReduction {
 
 # Why: Taylor series for sin(x) on |x| ≤ π/4 (12 terms, far below f64 ulp).
 @ private
-fn _sin_series(float x) → float {
+fn sin_series(float x) → float {
     var float term ← x
     var float sum ← x
     const float x2 ← x * x
@@ -482,7 +482,7 @@ fn _sin_series(float x) → float {
 
 # Why: Taylor series for cos(x) on |x| ≤ π/4.
 @ private
-fn _cos_series(float x) → float {
+fn cos_series(float x) → float {
     var float term ← 1.0
     var float sum ← 1.0
     const float x2 ← x * x
@@ -497,7 +497,7 @@ fn _cos_series(float x) → float {
 
 # Why: Taylor series for e^r on |r| ≤ ln2/2 (20 terms).
 @ private
-fn _exp_series(float x) → float {
+fn exp_series(float x) → float {
     var float term ← 1.0
     var float sum ← 1.0
     var float n ← 1.0
@@ -511,7 +511,7 @@ fn _exp_series(float x) → float {
 
 # Why: ln(m) = 2·atanh((m−1)/(m+1)) for m in [√½, √2], where |s| ≤ 0.172.
 @ private
-fn _ln_series(float m) → float {
+fn ln_series(float m) → float {
     const float f ← m - 1.0
     const float s ← f / (2.0 + f)
     const float s2 ← s * s
@@ -528,7 +528,7 @@ fn _ln_series(float m) → float {
 
 # Why: Newton–Raphson square root for m in [1, 4); 6 steps from (m+1)/2 reach f64 precision.
 @ private
-fn _sqrt_newton(float m) → float {
+fn sqrt_newton(float m) → float {
     var float guess ← (m + 1.0) / 2.0
     var int i ← 0
     while i < 6 {

@@ -449,7 +449,7 @@ fn temp_dir() → string {
 }
 
 @ private
-fn _join_two(string base, string segment) → string {
+fn join_two(string base, string segment) → string {
     if base.ends_with("/") {
         return "§§"(base, segment)
     }
@@ -479,13 +479,13 @@ fn glob(string root, string pattern) → list<string> ⇥ string {
             for from candidatos const base {
                 const list<string> entries ← list_dir(base)
                 for from entries const entry {
-                    proximos.append(_join_two(base, entry))
+                    proximos.append(join_two(base, entry))
                 }
             }
         }
         else {
             for from candidatos const base {
-                const string path ← _join_two(base, segment)
+                const string path ← join_two(base, segment)
                 if exists(path) {
                     proximos.append(path)
                 }

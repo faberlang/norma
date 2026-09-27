@@ -25,19 +25,19 @@ class Request {
     }
 
     fn query_field(string name) → string ∪ null {
-        return _query_field(self.query, name)
+        return decode_query_field(self.query, name)
     }
 }
 
 # Build a Request from a raw request-target (`path` or `path?query`).
 @ public
 fn from_target(string method, string target, headers.Headers headers, string body) → Request {
-    const string path ← _target_path(target)
-    const string query ← _target_query(target)
+    const string path ← target_path(target)
+    const string query ← target_query(target)
     return Request { method = method, path = path, query = query, headers = headers, body = body }
 }
 
-fn _target_path(string target) → string {
+fn target_path(string target) → string {
     var int i ← 0
     while i < target.length() {
         const string c ← target.slice(i, i + 1)
@@ -49,7 +49,7 @@ fn _target_path(string target) → string {
     return target
 }
 
-fn _target_query(string target) → string {
+fn target_query(string target) → string {
     var int i ← 0
     while i < target.length() {
         const string c ← target.slice(i, i + 1)
@@ -72,8 +72,8 @@ fn _target_query(string target) → string {
     return ""
 }
 
-fn _query_field(string query, string name) → string ∪ null {
-    const string want ← _percent_decode(name)
+fn decode_query_field(string query, string name) → string ∪ null {
+    const string want ← percent_decode(name)
     var int i ← 0
     while i ≤ query.length() {
         var int amp ← i
@@ -96,8 +96,8 @@ fn _query_field(string query, string name) → string ∪ null {
             key ← pair.slice(0, eq)
             val ← pair.slice(eq + 1, pair.length())
         }
-        if _percent_decode(key) ≡ want {
-            return _percent_decode(val)
+        if percent_decode(key) ≡ want {
+            return percent_decode(val)
         }
         if amp ≥ query.length() {
             return null
@@ -107,7 +107,7 @@ fn _query_field(string query, string name) → string ∪ null {
     return null
 }
 
-fn _percent_decode(string s) → string {
+fn percent_decode(string s) → string {
     var string out ← ""
     var int i ← 0
     while i < s.length() {
@@ -117,14 +117,14 @@ fn _percent_decode(string s) → string {
             i ← i + 1
         }
         elif c ≡ "%" and i + 2 < s.length() {
-            const int hi ← _hex_value(s.slice(i + 1, i + 2))
-            const int lo ← _hex_value(s.slice(i + 2, i + 3))
+            const int hi ← hex_value(s.slice(i + 1, i + 2))
+            const int lo ← hex_value(s.slice(i + 2, i + 3))
             if hi < 0 or lo < 0 {
                 out ← out + c
                 i ← i + 1
             }
             else {
-                out ← out + _byte_char(hi * 16 + lo)
+                out ← out + byte_char(hi * 16 + lo)
                 i ← i + 3
             }
         }
@@ -136,7 +136,7 @@ fn _percent_decode(string s) → string {
     return out
 }
 
-fn _hex_value(string c) → int {
+fn hex_value(string c) → int {
     if c ≡ "0" then return 0
     if c ≡ "1" then return 1
     if c ≡ "2" then return 2
@@ -158,7 +158,7 @@ fn _hex_value(string c) → int {
 
 # ASCII byte → length-1 textus. Query decoding is an ASCII-percent floor;
 # bytes outside the printable ASCII range are left as `?`.
-fn _byte_char(int n) → string {
+fn byte_char(int n) → string {
     if n < 32 or n > 126 then return "?"
     const string printable ← " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
     return printable.slice(n - 32, n - 31)
@@ -191,11 +191,11 @@ describe "request" {
     }
 
     test "percent decoding keeps malformed and nonprintable bytes safe" {
-        assert _percent_decode("%20%21%7E") ≡ " !~"
-        assert _percent_decode("%22") ≡ "\""
-        assert _percent_decode("%5C") ≡ "\\"
-        assert _percent_decode("%00") ≡ "?"
-        assert _percent_decode("%G0%") ≡ "%G0%"
-        assert _percent_decode("+") ≡ " "
+        assert percent_decode("%20%21%7E") ≡ " !~"
+        assert percent_decode("%22") ≡ "\""
+        assert percent_decode("%5C") ≡ "\\"
+        assert percent_decode("%00") ≡ "?"
+        assert percent_decode("%G0%") ≡ "%G0%"
+        assert percent_decode("+") ≡ " "
     }
 }

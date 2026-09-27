@@ -95,23 +95,23 @@ fn session_timeout(int timeout_ms) → Client {
 # is dropped. Port, when present, must be between 1 and 65535.
 @ public
 fn split(string url) → Url {
-    const int sep ← _find_scheme_sep(url)
+    const int sep ← find_scheme_sep(url)
     if sep < 0 then return Url { }
-    const string scheme ← _ascii_lower(url.slice(0, sep))
-    if not _is_scheme(scheme) then return Url { }
+    const string scheme ← ascii_lower(url.slice(0, sep))
+    if not is_scheme(scheme) then return Url { }
     const string rest ← url.slice(sep + 3, url.length())
-    const int auth_end ← _authority_end(rest)
+    const int auth_end ← authority_end(rest)
     if auth_end < 0 then return Url { }
     const string authority ← rest.slice(0, auth_end)
     const string remainder ← rest.slice(auth_end, rest.length())
-    const string hostport ← _strip_userinfo(authority)
-    const string host ← _ascii_lower(_host_of(hostport))
+    const string hostport ← strip_userinfo(authority)
+    const string host ← ascii_lower(host_of(hostport))
     if host.length() ≡ 0 then return Url { }
-    if not _is_host(host) then return Url { }
-    const int ∪ null port ← _port_of(hostport, scheme)
+    if not is_host(host) then return Url { }
+    const int ∪ null port ← port_of(hostport, scheme)
     if port is null then return Url { }
-    const string path ← _remainder_path(remainder)
-    const string query ← _remainder_query(remainder)
+    const string path ← remainder_path(remainder)
+    const string query ← remainder_query(remainder)
     return Url {
         scheme = scheme,
         host = host,
@@ -129,10 +129,10 @@ fn is_absolute(Url url) → bool {
 # Host header value: omit the port when it is the scheme default.
 @ public
 fn host_header(Url url) → string {
-    if _is_default_port(url.scheme, url.port) {
-        return _host_literal(url.host)
+    if is_default_port(url.scheme, url.port) {
+        return host_literal(url.host)
     }
-    return "§:§"(_host_literal(url.host), url.port ↦ string)
+    return "§:§"(host_literal(url.host), url.port ↦ string)
 }
 
 # Origin-form request target (`/path` or `/path?query`).
@@ -161,77 +161,77 @@ fn headers_from_map(map<string, string> pairs) → headers.Headers {
 
 @ public
 fn get(string url) → response.Response {
-    return _no_body("http:get", 0, url, headers.empty())
+    return no_body("http:get", 0, url, headers.empty())
 }
 
 @ public
 fn get_with(string url, headers.Headers headers) → response.Response {
-    return _no_body("http:get", 0, url, headers)
+    return no_body("http:get", 0, url, headers)
 }
 
 @ public
 fn get_on(Client client, string url) → response.Response {
-    return _no_body("http:get", client.agent, url, headers.empty())
+    return no_body("http:get", client.agent, url, headers.empty())
 }
 
 @ public
 fn post(string url, string body) → response.Response {
-    return _with_body("http:post", 0, url, headers.empty(), body)
+    return with_body("http:post", 0, url, headers.empty(), body)
 }
 
 @ public
 fn post_with(string url, headers.Headers headers, string body) → response.Response {
-    return _with_body("http:post", 0, url, headers, body)
+    return with_body("http:post", 0, url, headers, body)
 }
 
 @ public
 fn post_on(Client client, string url, string body) → response.Response {
-    return _with_body("http:post", client.agent, url, headers.empty(), body)
+    return with_body("http:post", client.agent, url, headers.empty(), body)
 }
 
 @ public
 fn put(string url, string body) → response.Response {
-    return _with_body("http:put", 0, url, headers.empty(), body)
+    return with_body("http:put", 0, url, headers.empty(), body)
 }
 
 @ public
 fn put_with(string url, headers.Headers headers, string body) → response.Response {
-    return _with_body("http:put", 0, url, headers, body)
+    return with_body("http:put", 0, url, headers, body)
 }
 
 @ public
 fn put_on(Client client, string url, string body) → response.Response {
-    return _with_body("http:put", client.agent, url, headers.empty(), body)
+    return with_body("http:put", client.agent, url, headers.empty(), body)
 }
 
 @ public
 fn delete(string url) → response.Response {
-    return _no_body("http:delete", 0, url, headers.empty())
+    return no_body("http:delete", 0, url, headers.empty())
 }
 
 @ public
 fn delete_with(string url, headers.Headers headers) → response.Response {
-    return _no_body("http:delete", 0, url, headers)
+    return no_body("http:delete", 0, url, headers)
 }
 
 @ public
 fn delete_on(Client client, string url) → response.Response {
-    return _no_body("http:delete", client.agent, url, headers.empty())
+    return no_body("http:delete", client.agent, url, headers.empty())
 }
 
 @ public
 fn patch(string url, string body) → response.Response {
-    return _with_body("http:patch", 0, url, headers.empty(), body)
+    return with_body("http:patch", 0, url, headers.empty(), body)
 }
 
 @ public
 fn patch_with(string url, headers.Headers headers, string body) → response.Response {
-    return _with_body("http:patch", 0, url, headers, body)
+    return with_body("http:patch", 0, url, headers, body)
 }
 
 @ public
 fn patch_on(Client client, string url, string body) → response.Response {
-    return _with_body("http:patch", client.agent, url, headers.empty(), body)
+    return with_body("http:patch", client.agent, url, headers.empty(), body)
 }
 
 @ public
@@ -241,39 +241,39 @@ fn send_request(string method, string url, map<string, string> pairs, string bod
 
 @ public
 fn send(string method, string url, headers.Headers headers, string body) → response.Response {
-    return _generic(0, method, url, headers, body)
+    return generic(0, method, url, headers, body)
 }
 
 @ public
 fn send_on(Client client, string method, string url, headers.Headers headers, string body) → response.Response {
-    return _generic(client.agent, method, url, headers, body)
+    return generic(client.agent, method, url, headers, body)
 }
 
 # Open a streaming receive. The body is not buffered; pull chunks with
 # receive / Receive.next. Designed for text/event-stream consumption.
 @ public
 fn open(string method, string url, headers.Headers headers, string body) → Receive {
-    return _open(0, method, url, headers, body)
+    return open_stream(0, method, url, headers, body)
 }
 
 @ public
 fn open_on(Client client, string method, string url, headers.Headers headers, string body) → Receive {
-    return _open(client.agent, method, url, headers, body)
+    return open_stream(client.agent, method, url, headers, body)
 }
 
 @ public
 fn receive(Receive stream) → Chunk {
     const list<value> args ↤ [stream.reader ↦ value]
-    return _chunk_of(call 'http:read' (args) ↦ value)
+    return chunk_of(call 'http:read' (args) ↦ value)
 }
 
 @ public
 fn receive_n(Receive stream, int max_bytes) → Chunk {
     const list<value> args ↤ [stream.reader ↦ value, max_bytes ↦ value]
-    return _chunk_of(call 'http:read' (args) ↦ value)
+    return chunk_of(call 'http:read' (args) ↦ value)
 }
 
-fn _require_url(string url, string verb) → void {
+fn require_url(string url, string verb) → void {
     const Url parsed ← split(url)
     if not is_absolute(parsed) {
         panic "norma:http/client.§: invalid URL"(verb)
@@ -281,67 +281,67 @@ fn _require_url(string url, string verb) → void {
     return
 }
 
-fn _no_body(string route, int agent, string url, headers.Headers headers) → response.Response {
-    _require_url(url, route)
+fn no_body(string route, int agent, string url, headers.Headers headers) → response.Response {
+    require_url(url, route)
     var list<value> args ← []
     if agent > 0 {
         args.append(agent ↦ value)
     }
     args.append(url ↦ value)
     if headers.length() > 0 {
-        args.append(_headers_carrier(headers) ↦ value)
+        args.append(headers_carrier(headers) ↦ value)
     }
     if route ≡ "http:get" {
-        return _response_of(call 'http:get' (args) ↦ value)
+        return response_of(call 'http:get' (args) ↦ value)
     }
-    return _response_of(call 'http:delete' (args) ↦ value)
+    return response_of(call 'http:delete' (args) ↦ value)
 }
 
-fn _with_body(string route, int agent, string url, headers.Headers headers, string body) → response.Response {
-    _require_url(url, route)
+fn with_body(string route, int agent, string url, headers.Headers headers, string body) → response.Response {
+    require_url(url, route)
     var list<value> args ← []
     if agent > 0 {
         args.append(agent ↦ value)
     }
     args.append(url ↦ value)
     if headers.length() > 0 {
-        args.append(_headers_carrier(headers) ↦ value)
+        args.append(headers_carrier(headers) ↦ value)
     }
     args.append(body ↦ value)
     if route ≡ "http:post" {
-        return _response_of(call 'http:post' (args) ↦ value)
+        return response_of(call 'http:post' (args) ↦ value)
     }
     if route ≡ "http:put" {
-        return _response_of(call 'http:put' (args) ↦ value)
+        return response_of(call 'http:put' (args) ↦ value)
     }
-    return _response_of(call 'http:patch' (args) ↦ value)
+    return response_of(call 'http:patch' (args) ↦ value)
 }
 
-fn _generic(int agent, string method, string url, headers.Headers headers, string body) → response.Response {
-    _require_url(url, "http:request")
-    const value raw ← _dispatch_generic("http:request", agent, method, url, headers, body)
-    return _response_of(raw)
+fn generic(int agent, string method, string url, headers.Headers headers, string body) → response.Response {
+    require_url(url, "http:request")
+    const value raw ← dispatch_generic("http:request", agent, method, url, headers, body)
+    return response_of(raw)
 }
 
-fn _open(int agent, string method, string url, headers.Headers headers, string body) → Receive {
-    _require_url(url, "http:request_open")
-    const value raw ← _dispatch_generic("http:request_open", agent, method, url, headers, body)
+fn open_stream(int agent, string method, string url, headers.Headers headers, string body) → Receive {
+    require_url(url, "http:request_open")
+    const value raw ← dispatch_generic("http:request_open", agent, method, url, headers, body)
     const map<string, value> fields ↤ raw
     return Receive {
         reader = fields["reader"] ↦ int,
         status = fields["status"] ↦ int,
-        headers = _headers_from_carrier(fields["headers"])
+        headers = headers_from_carrier(fields["headers"])
     }
 }
 
-fn _dispatch_generic(string route, int agent, string method, string url, headers.Headers headers, string body) → value {
+fn dispatch_generic(string route, int agent, string method, string url, headers.Headers headers, string body) → value {
     var list<value> args ← []
     if agent > 0 {
         args.append(agent ↦ value)
     }
     args.append(method ↦ value)
     args.append(url ↦ value)
-    args.append(_headers_carrier(headers) ↦ value)
+    args.append(headers_carrier(headers) ↦ value)
     args.append(body ↦ value)
     if route ≡ "http:request_open" {
         return call 'http:request_open' (args) ↦ value
@@ -349,24 +349,24 @@ fn _dispatch_generic(string route, int agent, string method, string url, headers
     return call 'http:request' (args) ↦ value
 }
 
-fn _response_of(value raw) → response.Response {
+fn response_of(value raw) → response.Response {
     const map<string, value> fields ↤ raw
     return response.of(
         fields["status"] ↦ int,
-        _headers_from_carrier(fields["headers"]),
-        _body_text(fields["body"])
+        headers_from_carrier(fields["headers"]),
+        body_text(fields["body"])
     )
 }
 
-fn _chunk_of(value raw) → Chunk {
+fn chunk_of(value raw) → Chunk {
     const map<string, value> fields ↤ raw
     return Chunk {
-        text = _body_text(fields["bytes"]),
+        text = body_text(fields["bytes"]),
         done = fields["done"] ↦ bool
     }
 }
 
-fn _headers_carrier(headers.Headers headers) → list<value> {
+fn headers_carrier(headers.Headers headers) → list<value> {
     var list<value> out ← []
     for from headers.entries const entry {
         var map<string, value> row ← [] ∷ map<string, value>
@@ -377,7 +377,7 @@ fn _headers_carrier(headers.Headers headers) → list<value> {
     return out
 }
 
-fn _headers_from_carrier(value raw) → headers.Headers {
+fn headers_from_carrier(value raw) → headers.Headers {
     var headers.Headers out ← headers.empty()
     if raw not is list<value> then return out
     const list<value> items ↤ raw
@@ -393,7 +393,7 @@ fn _headers_from_carrier(value raw) → headers.Headers {
     return out
 }
 
-fn _body_text(value raw) → string {
+fn body_text(value raw) → string {
     if raw is null then return ""
     if raw is string then return raw ↦ string
     do {
@@ -410,7 +410,7 @@ fn _body_text(value raw) → string {
     }
 }
 
-fn _find_scheme_sep(string url) → int {
+fn find_scheme_sep(string url) → int {
     var int i ← 0
     while i + 2 < url.length() {
         if url.slice(i, i + 3) ≡ "://" {
@@ -421,13 +421,13 @@ fn _find_scheme_sep(string url) → int {
     return -1
 }
 
-fn _is_scheme(string scheme) → bool {
+fn is_scheme(string scheme) → bool {
     if scheme.length() ≡ 0 then return false
-    if not _is_alpha(scheme.slice(0, 1)) then return false
+    if not is_alpha(scheme.slice(0, 1)) then return false
     var int i ← 1
     while i < scheme.length() {
         const string c ← scheme.slice(i, i + 1)
-        if not _is_alpha(c) and not _is_digit(c) and c ≠ "+" and c ≠ "-" and c ≠ "." {
+        if not is_alpha(c) and not is_digit(c) and c ≠ "+" and c ≠ "-" and c ≠ "." {
             return false
         }
         i ← i + 1
@@ -435,7 +435,7 @@ fn _is_scheme(string scheme) → bool {
     return true
 }
 
-fn _authority_end(string rest) → int {
+fn authority_end(string rest) → int {
     if rest.length() ≡ 0 then return -1
     var int i ← 0
     var bool v6 ← false
@@ -455,7 +455,7 @@ fn _authority_end(string rest) → int {
     return rest.length()
 }
 
-fn _strip_userinfo(string authority) → string {
+fn strip_userinfo(string authority) → string {
     var int at ← -1
     var int i ← 0
     var bool v6 ← false
@@ -476,7 +476,7 @@ fn _strip_userinfo(string authority) → string {
     return authority.slice(at + 1, authority.length())
 }
 
-fn _host_of(string hostport) → string {
+fn host_of(string hostport) → string {
     if hostport.length() ≡ 0 then return ""
     if hostport.slice(0, 1) ≡ "[" {
         var int i ← 1
@@ -498,7 +498,7 @@ fn _host_of(string hostport) → string {
     return hostport
 }
 
-fn _port_of(string hostport, string scheme) → int ∪ null {
+fn port_of(string hostport, string scheme) → int ∪ null {
     if hostport.length() ≡ 0 then return null
     var string digits ← ""
     if hostport.slice(0, 1) ≡ "[" {
@@ -514,7 +514,7 @@ fn _port_of(string hostport, string scheme) → int ∪ null {
         }
         if not closed then return null
         if i ≡ hostport.length() {
-            return _default_port(scheme)
+            return default_port(scheme)
         }
         if hostport.slice(i, i + 1) ≠ ":" then return null
         digits ← hostport.slice(i + 1, hostport.length())
@@ -530,14 +530,14 @@ fn _port_of(string hostport, string scheme) → int ∪ null {
             i ← i + 1
         }
         if colon < 0 {
-            return _default_port(scheme)
+            return default_port(scheme)
         }
         digits ← hostport.slice(colon + 1, hostport.length())
     }
     if digits.length() ≡ 0 then return null
     var int i ← 0
     while i < digits.length() {
-        if not _is_digit(digits.slice(i, i + 1)) then return null
+        if not is_digit(digits.slice(i, i + 1)) then return null
         i ← i + 1
     }
     do {
@@ -550,18 +550,18 @@ fn _port_of(string hostport, string scheme) → int ∪ null {
     }
 }
 
-fn _default_port(string scheme) → int {
+fn default_port(string scheme) → int {
     if scheme ≡ "http" then return 80
     if scheme ≡ "https" then return 443
     return 0
 }
 
-fn _is_default_port(string scheme, int port) → bool {
-    const int def ← _default_port(scheme)
+fn is_default_port(string scheme, int port) → bool {
+    const int def ← default_port(scheme)
     return def > 0 and port ≡ def
 }
 
-fn _is_host(string host) → bool {
+fn is_host(string host) → bool {
     if host.length() ≡ 0 then return false
     var int i ← 0
     while i < host.length() {
@@ -574,7 +574,7 @@ fn _is_host(string host) → bool {
     return true
 }
 
-fn _host_literal(string host) → string {
+fn host_literal(string host) → string {
     var int i ← 0
     while i < host.length() {
         if host.slice(i, i + 1) ≡ ":" {
@@ -585,7 +585,7 @@ fn _host_literal(string host) → string {
     return host
 }
 
-fn _remainder_path(string remainder) → string {
+fn remainder_path(string remainder) → string {
     if remainder.length() ≡ 0 then return "/"
     const string first ← remainder.slice(0, 1)
     if first ≡ "?" or first ≡ "#" then return "/"
@@ -602,7 +602,7 @@ fn _remainder_path(string remainder) → string {
     return remainder
 }
 
-fn _remainder_query(string remainder) → string {
+fn remainder_query(string remainder) → string {
     var int i ← 0
     while i < remainder.length() {
         const string c ← remainder.slice(i, i + 1)
@@ -625,17 +625,17 @@ fn _remainder_query(string remainder) → string {
     return ""
 }
 
-fn _ascii_lower(string s) → string {
+fn ascii_lower(string s) → string {
     var string out ← ""
     var int i ← 0
     while i < s.length() {
-        out ← out + _lower_char(s.slice(i, i + 1))
+        out ← out + lower_char(s.slice(i, i + 1))
         i ← i + 1
     }
     return out
 }
 
-fn _lower_char(string c) → string {
+fn lower_char(string c) → string {
     const string upper ← "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     const string lower ← "abcdefghijklmnopqrstuvwxyz"
     var int i ← 0
@@ -648,10 +648,10 @@ fn _lower_char(string c) → string {
     return c
 }
 
-fn _is_alpha(string c) → bool {
+fn is_alpha(string c) → bool {
     return "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ".contains(c)
 }
 
-fn _is_digit(string c) → bool {
+fn is_digit(string c) → bool {
     return "0123456789".contains(c)
 }

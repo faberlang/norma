@@ -74,7 +74,7 @@ fn is_instant(value v) → bool {
 
 # Get value by key from a map (returns null if missing or non-map).
 @ private
-fn _get(value v, string key) → value {
+fn map_lookup(value v, string key) → value {
     if v is null then return null
     if v not is map<string, value> then return null
     const map<string, value> tab ↤ v
@@ -84,7 +84,7 @@ fn _get(value v, string key) → value {
 
 @ public
 fn get(value v, string key) → value {
-    return _get(v, key)
+    return map_lookup(v, key)
 }
 
 # Pluck value by index from a list (returns null if out of bounds or
@@ -142,7 +142,7 @@ fn find_part(value current, string part) → value {
 # Require a string child at clavis; throw on missing or non-string.
 @ public
 fn require_string(value v, string key) → string ⇥ string {
-    const value child ← _get(v, key)
+    const value child ← map_lookup(v, key)
     if child is null then throw "missing key: §"(key)
     if child not is string then throw "key not textus: §"(key)
     return child ↦ string

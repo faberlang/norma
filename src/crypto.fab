@@ -33,9 +33,9 @@ locale = "en"
 @ public
 fn digest(string alg, bytes data) → bytes ⇥ string {
     if data.length() > 67108864 then throw "norma:crypto.digest: input exceeds 67108864-byte limit"
-    if alg ≡ "sha256" then return _sha256(data)
-    if alg ≡ "sha384" then return _sha384(data)
-    if alg ≡ "sha512" then return _sha512(data)
+    if alg ≡ "sha256" then return sha256(data)
+    if alg ≡ "sha384" then return sha384(data)
+    if alg ≡ "sha512" then return sha512(data)
     throw "norma:crypto.digest: algorithm must be sha256, sha384, or sha512"
 }
 
@@ -44,37 +44,37 @@ fn digest(string alg, bytes data) → bytes ⇥ string {
 # -------------------------------------------------------------------------
 
 @ private
-fn _rotate_right32(uint<u32> x, uint<u32> n) → uint<u32> {
+fn rotate_right32(uint<u32> x, uint<u32> n) → uint<u32> {
     return (x ⇒ n) ∨ (x ⇐ (32 - n))
 }
 
 @ private
-fn _rotate_right64(uint<u64> x, uint<u64> n) → uint<u64> {
+fn rotate_right64(uint<u64> x, uint<u64> n) → uint<u64> {
     return (x ⇒ n) ∨ (x ⇐ (64 - n))
 }
 
 @ private
-fn _sigma0_32(uint<u32> x) → uint<u32> {
-    return _rotate_right32(x, 7) ⊻ _rotate_right32(x, 18) ⊻ (x ⇒ 3)
+fn sigma0_32(uint<u32> x) → uint<u32> {
+    return rotate_right32(x, 7) ⊻ rotate_right32(x, 18) ⊻ (x ⇒ 3)
 }
 
 @ private
-fn _sigma1_32(uint<u32> x) → uint<u32> {
-    return _rotate_right32(x, 17) ⊻ _rotate_right32(x, 19) ⊻ (x ⇒ 10)
+fn sigma1_32(uint<u32> x) → uint<u32> {
+    return rotate_right32(x, 17) ⊻ rotate_right32(x, 19) ⊻ (x ⇒ 10)
 }
 
 @ private
-fn _Sigma0_32(uint<u32> x) → uint<u32> {
-    return _rotate_right32(x, 2) ⊻ _rotate_right32(x, 13) ⊻ _rotate_right32(x, 22)
+fn Sigma0_32(uint<u32> x) → uint<u32> {
+    return rotate_right32(x, 2) ⊻ rotate_right32(x, 13) ⊻ rotate_right32(x, 22)
 }
 
 @ private
-fn _Sigma1_32(uint<u32> x) → uint<u32> {
-    return _rotate_right32(x, 6) ⊻ _rotate_right32(x, 11) ⊻ _rotate_right32(x, 25)
+fn Sigma1_32(uint<u32> x) → uint<u32> {
+    return rotate_right32(x, 6) ⊻ rotate_right32(x, 11) ⊻ rotate_right32(x, 25)
 }
 
 @ private
-fn _word32(list<int<u8>> buf, int off) → uint<u32> {
+fn word32(list<int<u8>> buf, int off) → uint<u32> {
     var uint<u32> w ↤ buf[off]
     w ← w ⇐ 8
     w ← w ∨ (buf[off + 1] ↦ uint<u32>)
@@ -86,21 +86,21 @@ fn _word32(list<int<u8>> buf, int off) → uint<u32> {
 }
 
 @ private
-fn _schedule32(list<int<u8>> buf, int init) → list<uint<u32>> {
+fn schedule32(list<int<u8>> buf, int init) → list<uint<u32>> {
     var list<uint<u32>> w ← []
     for range 0‥16 const i {
-        w.append(_word32(buf, init + i * 4))
+        w.append(word32(buf, init + i * 4))
     }
     for range 16‥64 const i {
-        const uint<u32> s0 ← _sigma0_32(w[i - 15])
-        const uint<u32> s1 ← _sigma1_32(w[i - 2])
+        const uint<u32> s0 ← sigma0_32(w[i - 15])
+        const uint<u32> s1 ← sigma1_32(w[i - 2])
         w.append(s1 + w[i - 7] + s0 + w[i - 16])
     }
     return w
 }
 
 @ private
-fn _compress32(list<uint<u32>> state, list<uint<u32>> w, list<uint<u32>> k) → list<uint<u32>> {
+fn compress32(list<uint<u32>> state, list<uint<u32>> w, list<uint<u32>> k) → list<uint<u32>> {
     var uint<u32> a ← state[0]
     var uint<u32> b ← state[1]
     var uint<u32> c ← state[2]
@@ -110,10 +110,10 @@ fn _compress32(list<uint<u32>> state, list<uint<u32>> w, list<uint<u32>> k) → 
     var uint<u32> g ← state[6]
     var uint<u32> h ← state[7]
     for range 0‥64 const i {
-        const uint<u32> s1 ← _Sigma1_32(e)
+        const uint<u32> s1 ← Sigma1_32(e)
         const uint<u32> choose ← (e ∧ f) ⊻ ((¬e) ∧ g)
         const uint<u32> t1 ← h + s1 + choose + k[i] + w[i]
-        const uint<u32> s0 ← _Sigma0_32(a)
+        const uint<u32> s0 ← Sigma0_32(a)
         const uint<u32> majority ← (a ∧ b) ⊻ (a ∧ c) ⊻ (b ∧ c)
         const uint<u32> t2 ← s0 + majority
         h ← g
@@ -138,7 +138,7 @@ fn _compress32(list<uint<u32>> state, list<uint<u32>> w, list<uint<u32>> k) → 
 }
 
 @ private
-fn _serialize32(list<uint<u32>> h) → list<int<u8>> {
+fn serialize32(list<uint<u32>> h) → list<int<u8>> {
     var list<int<u8>> out ← []
     for range 0‥8 const i {
         const uint<u32> word ← h[i]
@@ -151,7 +151,7 @@ fn _serialize32(list<uint<u32>> h) → list<int<u8>> {
 }
 
 @ private
-fn _pad32(bytes data) → list<int<u8>> {
+fn pad32(bytes data) → list<int<u8>> {
     const int bit_len ← data.length() * 8
     var list<int<u8>> padded ← []
     for range 0‥data.length() const i {
@@ -169,47 +169,47 @@ fn _pad32(bytes data) → list<int<u8>> {
 }
 
 @ private
-fn _K32() → list<uint<u32>> {
+fn K32() → list<uint<u32>> {
     return [1116352408, 1899447441, 3049323471, 3921009573, 961987163, 1508970993, 2453635748, 2870763221, 3624381080, 310598401, 607225278, 1426881987, 1925078388, 2162078206, 2614888103, 3248222580, 3835390401, 4022224774, 264347078, 604807628, 770255983, 1249150122, 1555081692, 1996064986, 2554220882, 2821834349, 2952996808, 3210313671, 3336571891, 3584528711, 113926993, 338241895, 666307205, 773529912, 1294757372, 1396182291, 1695183700, 1986661051, 2177026350, 2456956037, 2730485921, 2820302411, 3259730800, 3345764771, 3516065817, 3600352804, 4094571909, 275423344, 430227734, 506948616, 659060556, 883997877, 958139571, 1322822218, 1537002063, 1747873779, 1955562222, 2024104815, 2227730452, 2361852424, 2428436474, 2756734187, 3204031479, 3329325298]
 }
 
 @ private
-fn _sha256(bytes data) → bytes {
-    const list<int<u8>> padded ← _pad32(data)
-    const list<uint<u32>> k ← _K32()
+fn sha256(bytes data) → bytes {
+    const list<int<u8>> padded ← pad32(data)
+    const list<uint<u32>> k ← K32()
     var list<uint<u32>> state ← [1779033703, 3144134277, 1013904242, 2773480762, 1359893119, 2600822924, 528734635, 1541459225]
     const int n_blocks ← padded.length() / 64
     for range 0‥n_blocks const bi {
-        const list<uint<u32>> w ← _schedule32(padded, bi * 64)
-        state ← _compress32(state, w, k)
+        const list<uint<u32>> w ← schedule32(padded, bi * 64)
+        state ← compress32(state, w, k)
     }
-    const list<int<u8>> out ← _serialize32(state)
+    const list<int<u8>> out ← serialize32(state)
     const bytes result ← out
     return result
 }
 
 @ private
-fn _sigma0_64(uint<u64> x) → uint<u64> {
-    return _rotate_right64(x, 1) ⊻ _rotate_right64(x, 8) ⊻ (x ⇒ 7)
+fn sigma0_64(uint<u64> x) → uint<u64> {
+    return rotate_right64(x, 1) ⊻ rotate_right64(x, 8) ⊻ (x ⇒ 7)
 }
 
 @ private
-fn _sigma1_64(uint<u64> x) → uint<u64> {
-    return _rotate_right64(x, 19) ⊻ _rotate_right64(x, 61) ⊻ (x ⇒ 6)
+fn sigma1_64(uint<u64> x) → uint<u64> {
+    return rotate_right64(x, 19) ⊻ rotate_right64(x, 61) ⊻ (x ⇒ 6)
 }
 
 @ private
-fn _Sigma0_64(uint<u64> x) → uint<u64> {
-    return _rotate_right64(x, 28) ⊻ _rotate_right64(x, 34) ⊻ _rotate_right64(x, 39)
+fn Sigma0_64(uint<u64> x) → uint<u64> {
+    return rotate_right64(x, 28) ⊻ rotate_right64(x, 34) ⊻ rotate_right64(x, 39)
 }
 
 @ private
-fn _Sigma1_64(uint<u64> x) → uint<u64> {
-    return _rotate_right64(x, 14) ⊻ _rotate_right64(x, 18) ⊻ _rotate_right64(x, 41)
+fn Sigma1_64(uint<u64> x) → uint<u64> {
+    return rotate_right64(x, 14) ⊻ rotate_right64(x, 18) ⊻ rotate_right64(x, 41)
 }
 
 @ private
-fn _word64(list<int<u8>> buf, int off) → uint<u64> {
+fn word64(list<int<u8>> buf, int off) → uint<u64> {
     var uint<u64> w ↤ buf[off]
     w ← w ⇐ 8
     w ← w ∨ (buf[off + 1] ↦ uint<u64>)
@@ -229,21 +229,21 @@ fn _word64(list<int<u8>> buf, int off) → uint<u64> {
 }
 
 @ private
-fn _schedule64(list<int<u8>> buf, int init) → list<uint<u64>> {
+fn schedule64(list<int<u8>> buf, int init) → list<uint<u64>> {
     var list<uint<u64>> w ← []
     for range 0‥16 const i {
-        w.append(_word64(buf, init + i * 8))
+        w.append(word64(buf, init + i * 8))
     }
     for range 16‥80 const i {
-        const uint<u64> s0 ← _sigma0_64(w[i - 15])
-        const uint<u64> s1 ← _sigma1_64(w[i - 2])
+        const uint<u64> s0 ← sigma0_64(w[i - 15])
+        const uint<u64> s1 ← sigma1_64(w[i - 2])
         w.append(s1 + w[i - 7] + s0 + w[i - 16])
     }
     return w
 }
 
 @ private
-fn _compress64(list<uint<u64>> state, list<uint<u64>> w, list<uint<u64>> k) → list<uint<u64>> {
+fn compress64(list<uint<u64>> state, list<uint<u64>> w, list<uint<u64>> k) → list<uint<u64>> {
     var uint<u64> a ← state[0]
     var uint<u64> b ← state[1]
     var uint<u64> c ← state[2]
@@ -253,10 +253,10 @@ fn _compress64(list<uint<u64>> state, list<uint<u64>> w, list<uint<u64>> k) → 
     var uint<u64> g ← state[6]
     var uint<u64> h ← state[7]
     for range 0‥80 const i {
-        const uint<u64> s1 ← _Sigma1_64(e)
+        const uint<u64> s1 ← Sigma1_64(e)
         const uint<u64> choose ← (e ∧ f) ⊻ ((¬e) ∧ g)
         const uint<u64> t1 ← h + s1 + choose + k[i] + w[i]
-        const uint<u64> s0 ← _Sigma0_64(a)
+        const uint<u64> s0 ← Sigma0_64(a)
         const uint<u64> majority ← (a ∧ b) ⊻ (a ∧ c) ⊻ (b ∧ c)
         const uint<u64> t2 ← s0 + majority
         h ← g
@@ -282,7 +282,7 @@ fn _compress64(list<uint<u64>> state, list<uint<u64>> w, list<uint<u64>> k) → 
 
 # n_words is 8 for SHA-512 and 6 for SHA-384 truncation.
 @ private
-fn _serialize64(list<uint<u64>> h, int n_words) → list<int<u8>> {
+fn serialize64(list<uint<u64>> h, int n_words) → list<int<u8>> {
     var list<int<u8>> out ← []
     for range 0‥n_words const i {
         const uint<u64> word ← h[i]
@@ -299,7 +299,7 @@ fn _serialize64(list<uint<u64>> h, int n_words) → list<int<u8>> {
 }
 
 @ private
-fn _pad64(bytes data) → list<int<u8>> {
+fn pad64(bytes data) → list<int<u8>> {
     const int bit_len ← data.length() * 8
     var list<int<u8>> padded ← []
     for range 0‥data.length() const i {
@@ -321,35 +321,35 @@ fn _pad64(bytes data) → list<int<u8>> {
 }
 
 @ private
-fn _K64() → list<uint<u64>> {
+fn K64() → list<uint<u64>> {
     return [4794697086780616226, 8158064640168781261, 13096744586834688815, 16840607885511220156, 4131703408338449720, 6480981068601479193, 10538285296894168987, 12329834152419229976, 15566598209576043074, 1334009975649890238, 2608012711638119052, 6128411473006802146, 8268148722764581231, 9286055187155687089, 11230858885718282805, 13951009754708518548, 16472876342353939154, 17275323862435702243, 1135362057144423861, 2597628984639134821, 3308224258029322869, 5365058923640841347, 6679025012923562964, 8573033837759648693, 10970295158949994411, 12119686244451234320, 12683024718118986047, 13788192230050041572, 14330467153632333762, 15395433587784984357, 489312712824947311, 1452737877330783856, 2861767655752347644, 3322285676063803686, 5560940570517711597, 5996557281743188959, 7280758554555802590, 8532644243296465576, 9350256976987008742, 10552545826968843579, 11727347734174303076, 12113106623233404929, 14000437183269869457, 14369950271660146224, 15101387698204529176, 15463397548674623760, 17586052441742319658, 1182934255886127544, 1847814050463011016, 2177327727835720531, 2830643537854262169, 3796741975233480872, 4115178125766777443, 5681478168544905931, 6601373596472566643, 7507060721942968483, 8399075790359081724, 8693463985226723168, 9568029438360202098, 10144078919501101548, 10430055236837252648, 11840083180663258601, 13761210420658862357, 14299343276471374635, 14566680578165727644, 15097957966210449927, 16922976911328602910, 17689382322260857208, 500013540394364858, 748580250866718886, 1242879168328830382, 1977374033974150939, 2944078676154940804, 3659926193048069267, 4368137639120453308, 4836135668995329356, 5532061633213252278, 6448918945643986474, 6902733635092675308, 7801388544844847127]
 }
 
 @ private
-fn _sha512_engine(bytes data, list<uint<u64>> iv, int n_words) → bytes {
-    const list<int<u8>> padded ← _pad64(data)
-    const list<uint<u64>> k ← _K64()
+fn sha512_engine(bytes data, list<uint<u64>> iv, int n_words) → bytes {
+    const list<int<u8>> padded ← pad64(data)
+    const list<uint<u64>> k ← K64()
     var list<uint<u64>> state ← iv
     const int n_blocks ← padded.length() / 128
     for range 0‥n_blocks const bi {
-        const list<uint<u64>> w ← _schedule64(padded, bi * 128)
-        state ← _compress64(state, w, k)
+        const list<uint<u64>> w ← schedule64(padded, bi * 128)
+        state ← compress64(state, w, k)
     }
-    const list<int<u8>> out ← _serialize64(state, n_words)
+    const list<int<u8>> out ← serialize64(state, n_words)
     const bytes result ← out
     return result
 }
 
 @ private
-fn _sha512(bytes data) → bytes {
+fn sha512(bytes data) → bytes {
     const list<uint<u64>> iv ← [7640891576956012808, 13503953896175478587, 4354685564936845355, 11912009170470909681, 5840696475078001361, 11170449401992604703, 2270897969802886507, 6620516959819538809]
-    return _sha512_engine(data, iv, 8)
+    return sha512_engine(data, iv, 8)
 }
 
 @ private
-fn _sha384(bytes data) → bytes {
+fn sha384(bytes data) → bytes {
     const list<uint<u64>> iv ← [14680500436340154072, 7105036623409894663, 10473403895298186519, 1526699215303891257, 7436329637833083697, 10282925794625328401, 15784041429090275239, 5167115440072839076]
-    return _sha512_engine(data, iv, 6)
+    return sha512_engine(data, iv, 6)
 }
 
 # =========================================================================
