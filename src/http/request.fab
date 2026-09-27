@@ -14,11 +14,11 @@ import from "norma:http/headers" headers
 
 @ public
 class Request {
-    string method = ""
-    string path = ""
-    string query = ""
-    headers.Headers headers = headers.Headers { }
-    string body = ""
+    var string method = ""
+    var string path = ""
+    var string query = ""
+    var headers.Headers headers = headers.Headers { }
+    var string body = ""
 
     fn header(string name) → string ∪ null {
         return self.headers.get(name)

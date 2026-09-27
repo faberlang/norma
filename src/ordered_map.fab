@@ -47,8 +47,8 @@ locale = "en"
 # lista, instead of O(n log n) sort-on-each-iteration.
 @ public
 class SortedMap<K, V> {
-    list<K> index = []
-    map<K, V> entries = [] ∷ map<K, V>
+    var list<K> index = []
+    var map<K, V> entries = [] ∷ map<K, V>
 
     # =========================================================================
     # STATE (nominal / present predicate)

@@ -10,6 +10,6 @@ locale = "en"
 
 @ public
 class ScanResult {
-    value payload
-    int index
+    var value payload
+    var int index
 }

@@ -41,8 +41,8 @@ locale = "en"
 # Double-ended queue over T. See module header for the two-lista scheme.
 @ public
 class Deque<T> {
-    list<T> head = []
-    list<T> tail = []
+    var list<T> head = []
+    var list<T> tail = []
 
     # =========================================================================
     # STATE (nominal / present predicate)

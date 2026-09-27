@@ -17,8 +17,8 @@ locale = "en"
 
 @ public
 class Diagnostic {
-    string severity
-    string message
+    var string severity
+    var string message
 }
 
 @ public

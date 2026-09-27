@@ -12,7 +12,7 @@ import from "norma:net/endpoint" endpoint
 
 @ public
 class Socket {
-    int id = 0
+    var int id = 0
 
     # Draw bytes (up to n if provided, otherwise whatever is available)
     fn read_bytes(int n optional) → bytes {

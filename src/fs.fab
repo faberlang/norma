@@ -22,20 +22,20 @@ locale = "en"
 # Maps to: stat(), lstat()
 @ public
 class FileStatus {
-    int mode
+    var int mode
     # permission bits (e.g., 0o755)
-    int link_count
+    var int link_count
     # hard link count
-    int owner
+    var int owner
     # owner uid
-    int group
+    var int group
     # group gid
-    int byte_length
+    var int byte_length
     # size in bytes
-    int modified
+    var int modified
     # mtime (ms since epoch)
-    bool is_directory
-    bool is_symlink
+    var bool is_directory
+    var bool is_symlink
 }
 
 # =========================================================================

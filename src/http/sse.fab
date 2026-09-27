@@ -12,10 +12,10 @@ locale = "en"
 
 @ public
 class Event {
-    string name = ""
-    string data = ""
-    string id = ""
-    string retry = ""
+    var string name = ""
+    var string data = ""
+    var string id = ""
+    var string retry = ""
 }
 
 @ public

@@ -12,7 +12,7 @@ import from "norma:net/connection" connection
 
 @ public
 class Listener {
-    int id = 0
+    var int id = 0
 
     # Accept next incoming connection
     fn accept() → connection.Socket {

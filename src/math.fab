@@ -386,8 +386,8 @@ fn _scale2(float v, int k) → float {
 # Why: Quadrant (mod 4) and remainder in [-π/4, π/4] of a reduced angle.
 @ private
 class AngleReduction {
-    int quadrant
-    float angle
+    var int quadrant
+    var float angle
 }
 
 # Why: 2/π as 24-bit big-endian chunks: 2/π = Σ c[i]·2^(−24(i+1)); 1296 bits

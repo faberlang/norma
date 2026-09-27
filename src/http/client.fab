@@ -32,27 +32,27 @@ import from "norma:http/response" response
 # URL genus elsewhere — design killed that leaf for v1.
 @ public
 class Url {
-    string scheme = ""
-    string host = ""
-    int port = 0
-    string path = ""
-    string query = ""
+    var string scheme = ""
+    var string host = ""
+    var int port = 0
+    var string path = ""
+    var string query = ""
 }
 
 # Reuse holder. `agent` is the http:agent handle; 0 means ephemeral
 # (the provider builds a one-shot agent for that call).
 @ public
 class Client {
-    int agent = 0
+    var int agent = 0
 }
 
 # Incremental receive handle from http:request_open. `next` / `next_n`
 # pull one chunk via http:read; they never drain the remainder.
 @ public
 class Receive {
-    int reader = 0
-    int status = 0
-    headers.Headers headers = headers.Headers { }
+    var int reader = 0
+    var int status = 0
+    var headers.Headers headers = headers.Headers { }
 
     fn next() → Chunk {
         return receive(self)
@@ -68,8 +68,8 @@ class Receive {
 # terminal read; a later receive after done fails at the provider.
 @ public
 class Chunk {
-    string text = ""
-    bool done = false
+    var string text = ""
+    var bool done = false
 }
 
 @ public

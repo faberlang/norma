@@ -33,7 +33,7 @@ locale = "en"
 # Maps to: Bun.spawn() result
 @ public
 class Subprocess {
-    int pid
+    var int pid
 }
 
 # =========================================================================

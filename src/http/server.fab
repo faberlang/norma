@@ -38,7 +38,7 @@ import from "norma:http/sse" sse
 # Opaque listener handle from http:listen.
 @ public
 class Listener {
-    int handle = 0
+    var int handle = 0
 
     fn accept() → Incoming {
         return accept_incoming(self.handle)
@@ -52,15 +52,15 @@ class Listener {
 # One accepted request plus the provider ids needed to respond.
 @ public
 class Incoming {
-    string id = ""
-    int connection = 0
-    httpreq.Request req = httpreq.Request { }
+    var string id = ""
+    var int connection = 0
+    var httpreq.Request req = httpreq.Request { }
 }
 
 # Open chunked writer from http:respond_open.
 @ public
 class Stream {
-    int writer = 0
+    var int writer = 0
 
     fn write(bytes data) → void {
         return write_chunk(self, data)
