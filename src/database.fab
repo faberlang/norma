@@ -82,7 +82,7 @@ interface Connection {
 
     # Stem capi- · cell: future singular (async first row or nihil)
     @ future
-    fn first_row(string sql, list<value> params) → series ∪ null
+    fn first_row(string sql, list<value> params) → series ∪ none
 
     # Stem quaer- · cell: future plural (async stream)
     @ future
@@ -129,7 +129,7 @@ interface Transaction {
 
     # Stem capi- · future singular
     @ future
-    fn first_row(string sql, list<value> params) → series ∪ null
+    fn first_row(string sql, list<value> params) → series ∪ none
 
     # Stem quaer- · future plural
     @ future

@@ -34,7 +34,7 @@ fn decode_base64(string data) → bytes {
 
 # Attempt to decode base64 (returns nihil on invalid input)
 @ public
-fn try_decode_base64(string data) → bytes ∪ null {
+fn try_decode_base64(string data) → bytes ∪ none {
     panic "norma:encoding.try_decode_base64 is deferred pending Stage 2 dispatch"
 }
 
@@ -56,7 +56,7 @@ fn decode_hex(string data) → bytes {
 
 # Attempt to decode hex (returns nihil on invalid input)
 @ public
-fn try_decode_hex(string data) → bytes ∪ null {
+fn try_decode_hex(string data) → bytes ∪ none {
     panic "norma:encoding.try_decode_hex is deferred pending Stage 2 dispatch"
 }
 

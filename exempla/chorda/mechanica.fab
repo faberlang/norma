@@ -71,7 +71,7 @@ main {
     # tempta — try UTF-8 decode (mori deferred)
     # -----------------------------------------------------------------------
     do {
-        const string ∪ null decoded ← chorda.try_decode(|68 65 6c 6c 6f|)
+        const string ∪ none decoded ← chorda.try_decode(|68 65 6c 6c 6f|)
         assert false
     }
     catch err {
@@ -79,7 +79,7 @@ main {
     }
 
     do {
-        const string ∪ null decoded ← chorda.try_decode(|ff fe|)
+        const string ∪ none decoded ← chorda.try_decode(|ff fe|)
         assert false
     }
     catch err {

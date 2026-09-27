@@ -17,7 +17,7 @@ fn stringify(json document) → string {
 }
 
 fn encode(value node) → string {
-    if node is null then return "null"
+    if node is none then return "null"
     if node is bool {
         if node ↦ bool then return "true"
         return "false"
@@ -63,8 +63,8 @@ fn quote(string raw) → string {
     var int index ← 0
     while index ≺ raw.length() {
         const string c ← raw.slice(index, index + 1)
-        const string ∪ null escaped ← lexer.escape_char(c)
-        if escaped not is null {
+        const string ∪ none escaped ← lexer.escape_char(c)
+        if escaped not is none {
             parts.append(escaped coalesce "")
         }
         elif lexer.is_control(c) {

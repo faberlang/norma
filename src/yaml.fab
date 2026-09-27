@@ -47,7 +47,7 @@ fn parse(string yaml) → value {
 
 # Attempt to parse YAML string (returns null on error)
 @ public
-fn try_parse(string yaml) → value ∪ null {
+fn try_parse(string yaml) → value ∪ none {
     panic "norma:yaml.try_parse is deferred pending Stage 2 dispatch"
 }
 

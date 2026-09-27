@@ -36,7 +36,7 @@ class Headers {
     }
 
     # First value whose name matches under ASCII case-fold; nihil if absent.
-    fn get(string name) → string ∪ null {
+    fn get(string name) → string ∪ none {
         const string folded ← ascii_lower(name)
         for from self.entries const entry {
             if ascii_lower(entry.name) ≡ folded {

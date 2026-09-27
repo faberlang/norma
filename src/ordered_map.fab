@@ -70,7 +70,7 @@ class SortedMap<K, V> {
     # =========================================================================
 
     # Get value by key; nihil if absent. Reuses the tabula lookup stem.
-    fn get(K key) → V ∪ null {
+    fn get(K key) → V ∪ none {
         return self.entries.get(key)
     }
 
@@ -116,7 +116,7 @@ class SortedMap<K, V> {
         var list<V> out ← []
         for from self.index const k {
             # has verified by construction; get cannot miss.
-            const V ∪ null v ← self.entries.get(k)
+            const V ∪ none v ← self.entries.get(k)
             if v ≡ null then continue
             out.append(v)
         }
@@ -175,7 +175,7 @@ fn insert<K>(list<K> index, K key) → void {
 fn remove<K>(list<K> index, K key) → void {
     var int i ← 0
     while i < index.length() {
-        const K ∪ null extans ← index.get(i)
+        const K ∪ none extans ← index.get(i)
         if extans ≡ null {
             i ← i + 1
             continue
@@ -204,7 +204,7 @@ fn remove_at<K>(list<K> index, int positio) → void {
     var list<K> out ← []
     var int i ← 0
     while i < index.length() {
-        const K ∪ null extans ← index.get(i)
+        const K ∪ none extans ← index.get(i)
         if extans ≡ null {
             i ← i + 1
             continue

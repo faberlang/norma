@@ -68,7 +68,7 @@ class Deque<T> {
         self.head.append(v)
     }
 
-    fn pop_back() → T ∪ null {
+    fn pop_back() → T ∪ none {
         if not self.tail.is_empty() then return self.tail.remove_last()
         if not self.head.is_empty() {
             # Rebalance: reverse head into tail so the head-side elements
@@ -81,7 +81,7 @@ class Deque<T> {
         return null
     }
 
-    fn pop_front() → T ∪ null {
+    fn pop_front() → T ∪ none {
         if not self.head.is_empty() then return self.head.remove_last()
         if not self.tail.is_empty() {
             # Rebalance: reverse tail into head so the tail-side elements
@@ -99,13 +99,13 @@ class Deque<T> {
     # =========================================================================
 
     # `head` stores the head-side reversed, so its tail is the queue head.
-    fn first() → T ∪ null {
+    fn first() → T ∪ none {
         if not self.head.is_empty() then return self.head.last()
         if not self.tail.is_empty() then return self.tail.first()
         return null
     }
 
-    fn last() → T ∪ null {
+    fn last() → T ∪ none {
         if not self.tail.is_empty() then return self.tail.last()
         if not self.head.is_empty() then return self.head.first()
         return null

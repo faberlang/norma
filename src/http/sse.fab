@@ -62,8 +62,8 @@ fn parse(string wire) → list<Event> ⇥ string {
         const string line ← src.slice(i, line_end_pos)
         i ← after_line(src, line_end_pos)
         if line.length() ≡ 0 {
-            const Event ∪ null ev ← finish_event(name, data, id, retry, last_id, has_data, has_id)
-            if ev not is null {
+            const Event ∪ none ev ← finish_event(name, data, id, retry, last_id, has_data, has_id)
+            if ev not is none {
                 const Event ready ↤ ev
                 events.append(ready)
             }
@@ -116,8 +116,8 @@ fn parse(string wire) → list<Event> ⇥ string {
         }
     }
     if has_data {
-        const Event ∪ null ev ← finish_event(name, data, id, retry, last_id, has_data, has_id)
-        if ev not is null {
+        const Event ∪ none ev ← finish_event(name, data, id, retry, last_id, has_data, has_id)
+        if ev not is none {
             const Event ready ↤ ev
             events.append(ready)
         }
@@ -192,7 +192,7 @@ fn is_digits(string s) → bool {
     return true
 }
 
-fn finish_event(string name, string data, string id, string retry, string last_id, bool has_data, bool has_id) → Event ∪ null {
+fn finish_event(string name, string data, string id, string retry, string last_id, bool has_data, bool has_id) → Event ∪ none {
     if not has_data then return null
     var string payload ← data
     if payload.length() > 0 and payload.slice(payload.length() - 1, payload.length()) ≡ "\n" {

@@ -18,7 +18,7 @@ class Response {
     var headers.Headers headers = headers.Headers { }
     var string body = ""
 
-    fn header(string name) → string ∪ null {
+    fn header(string name) → string ∪ none {
         return self.headers.get(name)
     }
 

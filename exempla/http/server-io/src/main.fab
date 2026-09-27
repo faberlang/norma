@@ -25,8 +25,8 @@ import from "norma:processus" processus
 fn arg_at(int index, string fallback) → string {
     const list<string> args ← processus.argv()
     if args.length() > index {
-        const string ∪ null item ← args.get(index)
-        if item not is null {
+        const string ∪ none item ← args.get(index)
+        if item not is none {
             return item ↦ string
         }
     }

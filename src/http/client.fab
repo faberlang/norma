@@ -108,8 +108,8 @@ fn split(string url) → Url {
     const string host ← ascii_lower(host_of(hostport))
     if host.length() ≡ 0 then return Url { }
     if not is_host(host) then return Url { }
-    const int ∪ null port ← port_of(hostport, scheme)
-    if port is null then return Url { }
+    const int ∪ none port ← port_of(hostport, scheme)
+    if port is none then return Url { }
     const string path ← remainder_path(remainder)
     const string query ← remainder_query(remainder)
     return Url {
@@ -150,8 +150,8 @@ fn headers_from_map(map<string, string> pairs) → headers.Headers {
     var headers.Headers out ← headers.empty()
     const list<string> names ← pairs.keys()
     for from names const name {
-        const string ∪ null value ← pairs.get(name)
-        if value not is null {
+        const string ∪ none value ← pairs.get(name)
+        if value not is none {
             if out.append(name, value ↦ string) {
             }
         }
@@ -394,7 +394,7 @@ fn headers_from_carrier(value raw) → headers.Headers {
 }
 
 fn body_text(value raw) → string {
-    if raw is null then return ""
+    if raw is none then return ""
     if raw is string then return raw ↦ string
     do {
         const bytes data ↤ raw
@@ -498,7 +498,7 @@ fn host_of(string hostport) → string {
     return hostport
 }
 
-fn port_of(string hostport, string scheme) → int ∪ null {
+fn port_of(string hostport, string scheme) → int ∪ none {
     if hostport.length() ≡ 0 then return null
     var string digits ← ""
     if hostport.slice(0, 1) ≡ "[" {

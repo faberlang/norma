@@ -65,7 +65,7 @@ fn is_control(string c) → bool {
 # Returns nihil when the char needs no escaping (caller emits it raw).
 
 @ public
-fn escape_char(string c) → string ∪ null {
+fn escape_char(string c) → string ∪ none {
     if c ≡ «\"» then return «\\\"»
     if c ≡ "\\" then return "\\\\"
     if c ≡ "\n" then return "\\n"
@@ -85,7 +85,7 @@ fn escape_char(string c) → string ∪ null {
 @ public
 fn needs_escape(string c) → bool {
     if c ≡ «\"» or c ≡ "\\" then return true
-    if escape_char(c) not is null then return true
+    if escape_char(c) not is none then return true
     return is_control(c)
 }
 
@@ -109,7 +109,7 @@ fn hex_digit(int digit) → string {
 # signals a syntax error) and treats "u" as a sentinel for \uXXXX handling.
 
 @ public
-fn unescape_char(string s) → string ∪ null {
+fn unescape_char(string s) → string ∪ none {
     if s ≡ «\"» then return «\"»
     if s ≡ "\\" then return "\\"
     if s ≡ "/" then return "/"
@@ -127,7 +127,7 @@ fn unescape_char(string s) → string ∪ null {
 # Single-hex-digit → numeric value. Returns null for non-hex chars.
 
 @ public
-fn hex_value(string c) → int ∪ null {
+fn hex_value(string c) → int ∪ none {
     const string lower ← "0123456789abcdef"
     const string upper ← "0123456789ABCDEF"
     var int digit ← 0

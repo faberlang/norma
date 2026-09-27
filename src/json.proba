@@ -88,7 +88,7 @@ describe "JSON parsing" {
         )
         const value tree ← document ↦ value
         const map<string, value> root ↤ tree
-        assert root.get("nothing") is null
+        assert root.get("nothing") is none
         const map<string, value> object ↤ root.get("object")
         const list<value> array ↤ root.get("array")
         assert object.length() ≡ 0
@@ -114,8 +114,8 @@ describe "JSON parsing" {
     }
 
     test "try_parse returns null on malformed input" {
-        assert json_codec.try_parse("{]") is null
-        assert json_codec.try_parse("{\"ok\":true}") not is null
+        assert json_codec.try_parse("{]") is none
+        assert json_codec.try_parse("{\"ok\":true}") not is none
     }
 }
 

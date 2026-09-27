@@ -327,7 +327,7 @@ fn headers_from_carrier(value raw) → headers.Headers {
 # Accept bodies arrive as octeti. `value ↦ bytes` is a recorded radix
 # codegen gap (H6 gate); text bodies still decode. Octeti stays empty.
 fn body_text(value raw) → string {
-    if raw is null then return ""
+    if raw is none then return ""
     if raw is string then return raw ↦ string
     return ""
 }

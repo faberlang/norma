@@ -26,7 +26,7 @@ fn parse(string wire) → json ⇥ string {
 }
 
 @ public
-fn try_parse(string wire) → json ∪ null {
+fn try_parse(string wire) → json ∪ none {
     do {
         return parse(wire)
     }
@@ -147,8 +147,8 @@ fn parse_string(string wire, int start) → cursor.ScanResult ⇥ string {
                 index ← unicode.index
             }
             else {
-                const string ∪ null replacement ← lexer.unescape_char(escaped)
-                if replacement is null {
+                const string ∪ none replacement ← lexer.unescape_char(escaped)
+                if replacement is none {
                     throw "invalid JSON escape at position §"(index)
                 }
                 decoded ← decoded + replacement coalesce ""
@@ -192,8 +192,8 @@ fn parse_hex_quad(string wire, int start) → int ⇥ string {
     var int scalar ← 0
     var int offset ← 0
     while offset ≺ 4 {
-        const int ∪ null digit ← lexer.hex_value(wire.slice(start + offset, start + offset + 1))
-        if digit is null {
+        const int ∪ none digit ← lexer.hex_value(wire.slice(start + offset, start + offset + 1))
+        if digit is none {
             throw "invalid Unicode escape at position §"(start - 2)
         }
         scalar ← scalar * 16 + digit coalesce 0

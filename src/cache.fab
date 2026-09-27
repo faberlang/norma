@@ -23,7 +23,7 @@ locale = "en"
 # Get value by key (returns nihil if not found)
 @ future
 @ public
-fn get(string key) → string ∪ null {
+fn get(string key) → string ∪ none {
     panic "norma:cache.get is deferred pending Stage 2 dispatch"
 }
 

@@ -20,11 +20,11 @@ class Request {
     var headers.Headers headers = headers.Headers { }
     var string body = ""
 
-    fn header(string name) → string ∪ null {
+    fn header(string name) → string ∪ none {
         return self.headers.get(name)
     }
 
-    fn query_field(string name) → string ∪ null {
+    fn query_field(string name) → string ∪ none {
         return decode_query_field(self.query, name)
     }
 }
@@ -72,7 +72,7 @@ fn target_query(string target) → string {
     return ""
 }
 
-fn decode_query_field(string query, string name) → string ∪ null {
+fn decode_query_field(string query, string name) → string ∪ none {
     const string want ← percent_decode(name)
     var int i ← 0
     while i ≤ query.length() {
@@ -181,13 +181,13 @@ describe "request" {
         assert req.body ≡ "body"
         assert req.headers.entries[0].name ≡ "X-Trace"
         assert req.headers.entries[0].value ≡ "yes"
-        const string ∪ null query_value ← req.query_field("q")
-        assert query_value not is null
+        const string ∪ none query_value ← req.query_field("q")
+        assert query_value not is none
         assert (query_value ↦ string) ≡ "hello world"
-        const string ∪ null tag_value ← req.query_field("tag")
-        assert tag_value not is null
+        const string ∪ none tag_value ← req.query_field("tag")
+        assert tag_value not is none
         assert (tag_value ↦ string) ≡ "+"
-        assert req.query_field("missing") is null
+        assert req.query_field("missing") is none
     }
 
     test "percent decoding keeps malformed and nonprintable bytes safe" {

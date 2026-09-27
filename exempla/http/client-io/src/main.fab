@@ -16,8 +16,8 @@ import from "norma:processus" processus
 fn origin() → string {
     const list<string> args ← processus.argv()
     if args.length() > 0 {
-        const string ∪ null first ← args.get(0)
-        if first not is null {
+        const string ∪ none first ← args.get(0)
+        if first not is none {
             return first ↦ string
         }
     }
@@ -51,8 +51,8 @@ main {
     print patched.status
     print "patch-body"
     print patched.body
-    const string ∪ null echo ← patched.header("x-echo-test")
-    if echo is null {
+    const string ∪ none echo ← patched.header("x-echo-test")
+    if echo is none {
         print "patch-echo-missing"
     }
     else {

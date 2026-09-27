@@ -25,7 +25,7 @@ import from "norma:text" text
 
 @ public
 fn is_null(value v) → bool {
-    return v is null
+    return v is none
 }
 
 @ public
@@ -75,7 +75,7 @@ fn is_instant(value v) → bool {
 # Get value by key from a map (returns null if missing or non-map).
 @ private
 fn map_lookup(value v, string key) → value {
-    if v is null then return null
+    if v is none then return null
     if v not is map<string, value> then return null
     const map<string, value> tab ↤ v
     const value got ← tab.get(key)
@@ -91,7 +91,7 @@ fn get(value v, string key) → value {
 # non-list).
 @ public
 fn get_index(value v, int index) → value {
-    if v is null then return null
+    if v is none then return null
     if v not is list<value> then return null
     const list<value> items ↤ v
     const value got ← items.get(index)
@@ -108,7 +108,7 @@ fn find(value v, string path) → value {
     var value current ← v
     for from parts const pars {
         current ← find_part(current, pars)
-        if current is null then return null
+        if current is none then return null
     }
     return current
 }
@@ -117,7 +117,7 @@ fn find(value v, string path) → value {
 # to list indexing. Non-collection variants return null.
 @ public
 fn find_part(value current, string part) → value {
-    if current is null then return null
+    if current is none then return null
     if current is map<string, value> {
         const map<string, value> tab ↤ current
         const value got ← tab.get(part)
@@ -143,7 +143,7 @@ fn find_part(value current, string part) → value {
 @ public
 fn require_string(value v, string key) → string ⇥ string {
     const value child ← map_lookup(v, key)
-    if child is null then throw "missing key: §"(key)
+    if child is none then throw "missing key: §"(key)
     if child not is string then throw "key not textus: §"(key)
     return child ↦ string
 }

@@ -42,6 +42,6 @@ fn parse(string wire) → json ⇥ string {
 # Why: Attempting to parse, returning null on failure instead of throwing.
 
 @ public
-fn try_parse(string wire) → json ∪ null {
+fn try_parse(string wire) → json ∪ none {
     return parser.try_parse(wire)
 }
