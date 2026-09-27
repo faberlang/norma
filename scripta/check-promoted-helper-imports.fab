@@ -55,7 +55,7 @@ main {
         faber ← faber_env
     }
     if faber_env.length() ≡ 0 {
-        if solum.exists(faber) ↦ bool is false {
+        if solum.exists(faber) ↦ bool ≡ false {
             const string container ← root + "/../../../radix/target/debug/faber"
             if solum.exists(container) ↦ bool {
                 faber ← container
@@ -70,7 +70,7 @@ main {
     }
 
     # Executable check for the pinned faber binary
-    if solum.exists(faber) ↦ bool is false {
+    if solum.exists(faber) ↦ bool ≡ false {
         consolum.warn_line("check-promoted-helper-imports: missing executable faber at " + faber)
         processus.exit_process(1)
     }
@@ -96,7 +96,7 @@ main {
         # Fail-closed corpus resolution: a listed module that no longer
         # exists in the live corpus aborts before the smoke runs.
         const string corpus_file ← lib_home + "/norma/src/" + module + ".fab"
-        if solum.exists(corpus_file) ↦ bool is false {
+        if solum.exists(corpus_file) ↦ bool ≡ false {
             consolum.warn_line("check-promoted-helper-imports: listed module norma:" + module + " does not resolve in the live corpus (missing " + corpus_file + ")")
             processus.exit_process(1)
         }
