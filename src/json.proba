@@ -7,16 +7,16 @@ import from "./json" json_codec
 
 @ json
 class Payload {
-    string name
-    list<int> counts
-    bool active
+    var string name
+    var list<int> counts
+    var bool active
 }
 
 @ json
 class EscapedText {
-    string control
-    string text
-    string unicode
+    var string control
+    var string text
+    var string unicode
 }
 
 fn rejects(string wire) → bool {
