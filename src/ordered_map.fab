@@ -165,14 +165,14 @@ fn from_map<K, V>(map<K, V> source_map) → SortedMap<K, V> {
 # goal). The append-then-sort keeps the index sorted; duplicates can't occur
 # here because callers check has first.
 @ private
-fn insert<K>(list<K> index, K key) → void {
+fn insert<K>(mut list<K> index, K key) → void {
     index.append(key)
     index.sort()
 }
 
 # Remove a key from the sorted index.
 @ private
-fn remove<K>(list<K> index, K key) → void {
+fn remove<K>(mut list<K> index, K key) → void {
     var int i ← 0
     while i < index.length() {
         const K ∪ none extans ← index.get(i)
@@ -200,7 +200,7 @@ fn equals<K>(K a, K b) → bool {
 # The rebuild mutates the receiver in place: a parameter binding cannot be
 # reassigned (SEM020), so the original is drained and refilled.
 @ private
-fn remove_at<K>(list<K> index, int positio) → void {
+fn remove_at<K>(mut list<K> index, int positio) → void {
     var list<K> out ← []
     var int i ← 0
     while i < index.length() {
