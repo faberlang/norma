@@ -40,7 +40,8 @@ fn pad4(int n) → string {
 @ private
 fn field(instant t, int start, int end) → int {
     const string wire ↤ t
-    return wire.slice(start, end) ↦ int
+    # An instant's canonical wire has digits at every civil position, so the default never applies.
+    return wire.slice(start, end) ↦ int ⊥ 0
 }
 
 # Why: Build canonical UTC RFC3339 wire from civil components (always ends with Z).
@@ -55,7 +56,7 @@ fn wire(int year, int month, int day, int hour, int minute, int second) → stri
 
 # Verb: parse from "solvere" (to loosen, untangle)
 @ public
-fn parse(string wire) → instant {
+fn parse(string wire) → instant ⇥ string {
     return wire ↦ instant
 }
 

@@ -107,6 +107,8 @@ fn hex_digit(int digit) → string {
 # unescape_char maps a single escape letter (the char following \) back
 # to the literal it represents. Returns nihil for unknown letters (caller
 # signals a syntax error) and treats "u" as a sentinel for \uXXXX handling.
+# The `⊥ ""` defaults on the control bytes 8 and 12 are unreachable (both are
+# ASCII); they only satisfy D17.8.
 
 @ public
 fn unescape_char(string s) → string ∪ none {
@@ -116,8 +118,8 @@ fn unescape_char(string s) → string ∪ none {
     if s ≡ "n" then return "\n"
     if s ≡ "r" then return "\r"
     if s ≡ "t" then return "\t"
-    if s ≡ "b" then return ([8] ↦ bytes) ↦ string
-    if s ≡ "f" then return ([12] ↦ bytes) ↦ string
+    if s ≡ "b" then return ([8] ↦ bytes) ↦ string ⊥ ""
+    if s ≡ "f" then return ([12] ↦ bytes) ↦ string ⊥ ""
     return null
 }
 

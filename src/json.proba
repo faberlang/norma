@@ -38,12 +38,60 @@ fn parse_valid(string wire) → json {
     }
 }
 
+# Why: a failing conversion inside a test must fail the test, not be defaulted
+# away, so these helpers panic like parse_valid does.
+fn map_of(value tree) → map<string, value> {
+    do {
+        const map<string, value> root ↤ tree
+        return root
+    }
+    catch err {
+        panic err
+    }
+}
+
+fn byte_text(int code) → string {
+    do {
+        return ([code] ↦ bytes) ↦ string
+    }
+    catch err {
+        panic err
+    }
+}
+
+fn payload_of(json document) → Payload {
+    do {
+        return document ↦ Payload
+    }
+    catch err {
+        panic err
+    }
+}
+
+fn escaped_of(json document) → EscapedText {
+    do {
+        return document ↦ EscapedText
+    }
+    catch err {
+        panic err
+    }
+}
+
+fn json_of(EscapedText payload) → json {
+    do {
+        return payload ↦ json
+    }
+    catch err {
+        panic err
+    }
+}
+
 describe "JSON parsing" {
     test "parses a typed object with nested values" {
         const json document ← parse_valid(
             "{\"name\":\"Ada\",\"counts\":[1,2,3],\"active\":true}"
         )
-        const Payload payload ← document ↦ Payload
+        const Payload payload ← payload_of(document)
         assert payload.name ≡ "Ada"
         assert payload.counts.length() ≡ 3
         assert (payload.counts.get(1) coalesce 0) ≡ 2
@@ -55,7 +103,7 @@ describe "JSON parsing" {
             " \n { \"zero\" : 0, \"negative\" : -12, \"fraction\" : 1.25, \"exponent\" : 2e3 } \t "
         )
         const value tree ← document ↦ value
-        const map<string, value> root ↤ tree
+        const map<string, value> root ← map_of(tree)
         assert (root.get("zero") ↦ int) ≡ 0
         assert (root.get("negative") ↦ int) ≡ -12
         assert (root.get("fraction") ↦ float) ≈ 1.25
@@ -67,7 +115,7 @@ describe "JSON parsing" {
             "{\"text\":\"line\\nquote: \\\" slash: \\\\ solidus: \\/\"}"
         )
         const value tree ← document ↦ value
-        const map<string, value> root ↤ tree
+        const map<string, value> root ← map_of(tree)
         assert (root.get("text") ↦ string) ≡ "line\nquote: \" slash: \\ solidus: /"
     }
 
@@ -76,7 +124,7 @@ describe "JSON parsing" {
             "{\"bmp\":\"\\u03BB\",\"pair\":\"\\uD834\\uDD1E\",\"raw\":\"λ\"}"
         )
         const value tree ← document ↦ value
-        const map<string, value> root ↤ tree
+        const map<string, value> root ← map_of(tree)
         assert (root.get("bmp") ↦ string) ≡ "λ"
         assert (root.get("pair") ↦ string) ≡ "𝄞"
         assert (root.get("raw") ↦ string) ≡ "λ"
@@ -87,7 +135,7 @@ describe "JSON parsing" {
             "{\"nothing\":null,\"object\":{},\"array\":[]}"
         )
         const value tree ← document ↦ value
-        const map<string, value> root ↤ tree
+        const map<string, value> root ← map_of(tree)
         assert root.get("nothing") is none
         const map<string, value> object ↤ root.get("object")
         const list<value> array ↤ root.get("array")
@@ -134,9 +182,9 @@ describe "JSON serialization" {
     }
 
     test "escapes strings and preserves Unicode" {
-        const string control ← ([1] ↦ bytes) ↦ string
-        const string backspace ← ([8] ↦ bytes) ↦ string
-        const string formfeed ← ([12] ↦ bytes) ↦ string
+        const string control ← byte_text(1)
+        const string backspace ← byte_text(8)
+        const string formfeed ← byte_text(12)
         const EscapedText payload ← EscapedText {
             control = control,
             text = «line§quote: § slash: § tab:§ back:§ form:§»(
@@ -144,11 +192,11 @@ describe "JSON serialization" {
             ),
             unicode = "λ𝄞"
         }
-        const json document ← payload ↦ json
+        const json document ← json_of(payload)
         const string wire ← json_codec.stringify(document)
         const string expected ← «{"control":"\\u0001","text":"line\\nquote: \\" slash: \\\\ tab:\\t back:\\b form:\\f","unicode":"λ𝄞"}»
         assert wire ≡ expected
-        const EscapedText roundtrip ← parse_valid(wire) ↦ EscapedText
+        const EscapedText roundtrip ← escaped_of(parse_valid(wire))
         assert roundtrip.control ≡ payload.control
         assert roundtrip.text ≡ payload.text
         assert roundtrip.unicode ≡ payload.unicode
@@ -162,7 +210,7 @@ describe "JSON serialization" {
         }
         const json reparsed ← parse_valid(json_codec.stringify(original))
         const value tree ← reparsed ↦ value
-        const map<string, value> root ↤ tree
+        const map<string, value> root ← map_of(tree)
         assert (root.get("model") ↦ string) ≡ "gpt-test"
         assert (root.get("stream") ↦ bool) ≡ false
         const list<value> messages ↤ root.get("messages")

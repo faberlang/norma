@@ -330,7 +330,8 @@ fn bits(float x) → int<u64> {
 @ private
 fn biased_exponent(float x) → int {
     const int<u64> field ← (bits(x) ⇒ 52) ∧ (2047 ∷ int<u64>)
-    return field ↦ int
+    # The 11-bit mask keeps field below 2048, so the default never applies.
+    return field ↦ int ⊥ 0
 }
 
 # Why: NaN test on the bit fields — independent of each lane's NaN comparison.
@@ -358,7 +359,8 @@ fn unit_mantissa(float x) → float {
 # Why: Exact 2^k for normal exponents k in [-1022, 1023].
 @ private
 fn pow2(int k) → float {
-    const int<u64> field ← (k + 1023) ↦ int<u64>
+    # k ≥ -1022 keeps k + 1023 non-negative, so the default never applies.
+    const int<u64> field ← (k + 1023) ↦ int<u64> ⊥ 0
     const f64 wide ← (field ⇐ 52) ↦ f64 via Bits
     return wide
 }
@@ -404,7 +406,8 @@ fn two_over_pi() → list<int> {
 fn reduce_half_pi(float a) → AngleReduction {
     const int mask ← 16777215
     const int<u64> fraction ← bits(a) ∧ (4503599627370495 ∷ int<u64>)
-    const int mantissa ← (fraction ↦ int) + 4503599627370496
+    # fraction is masked to 52 bits, so the default never applies.
+    const int mantissa ← (fraction ↦ int ⊥ 0) + 4503599627370496
     const int e ← biased_exponent(a) - 1075
     const int q ← (e + 2400) / 24 - 100
     const int s ← e - 24 * q

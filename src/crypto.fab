@@ -137,19 +137,23 @@ fn compress32(list<wrapping<u32>> state, list<wrapping<u32>> w, list<wrapping<u3
     return result
 }
 
+# Why: byte extraction wraps by definition, so each byte goes through
+# `wrapping<u8>` (mod 2^8, cannot fail) before the `int<u8>` label. A bare
+# `word ↦ int<u8>` is magnitude-checked and would abort on any word above 255.
 @ private
 fn serialize32(list<wrapping<u32>> h) → list<int<u8>> {
     var list<int<u8>> out ← []
     for range 0‥8 const i {
         const wrapping<u32> word ← h[i]
-        out.append((word ⇒ 24) ↦ int<u8>)
-        out.append((word ⇒ 16) ↦ int<u8>)
-        out.append((word ⇒ 8) ↦ int<u8>)
-        out.append(word ↦ int<u8>)
+        out.append(((word ⇒ 24) ↦ wrapping<u8>) ↦ int<u8>)
+        out.append(((word ⇒ 16) ↦ wrapping<u8>) ↦ int<u8>)
+        out.append(((word ⇒ 8) ↦ wrapping<u8>) ↦ int<u8>)
+        out.append((word ↦ wrapping<u8>) ↦ int<u8>)
     }
     return out
 }
 
+# The length bytes use the same wrapping extraction as serialize32.
 @ private
 fn pad32(bytes data) → list<int<u8>> {
     const int bit_len ← data.length() * 8
@@ -163,7 +167,7 @@ fn pad32(bytes data) → list<int<u8>> {
     }
     for range 0‥8 const i {
         const int shift ← (7 - i) * 8
-        padded.append((bit_len ⇒ shift) ↦ int<u8>)
+        padded.append(((bit_len ⇒ shift) ↦ wrapping<u8>) ↦ int<u8>)
     }
     return padded
 }
@@ -286,14 +290,14 @@ fn serialize64(list<wrapping<u64>> h, int n_words) → list<int<u8>> {
     var list<int<u8>> out ← []
     for range 0‥n_words const i {
         const wrapping<u64> word ← h[i]
-        out.append((word ⇒ 56) ↦ int<u8>)
-        out.append((word ⇒ 48) ↦ int<u8>)
-        out.append((word ⇒ 40) ↦ int<u8>)
-        out.append((word ⇒ 32) ↦ int<u8>)
-        out.append((word ⇒ 24) ↦ int<u8>)
-        out.append((word ⇒ 16) ↦ int<u8>)
-        out.append((word ⇒ 8) ↦ int<u8>)
-        out.append(word ↦ int<u8>)
+        out.append(((word ⇒ 56) ↦ wrapping<u8>) ↦ int<u8>)
+        out.append(((word ⇒ 48) ↦ wrapping<u8>) ↦ int<u8>)
+        out.append(((word ⇒ 40) ↦ wrapping<u8>) ↦ int<u8>)
+        out.append(((word ⇒ 32) ↦ wrapping<u8>) ↦ int<u8>)
+        out.append(((word ⇒ 24) ↦ wrapping<u8>) ↦ int<u8>)
+        out.append(((word ⇒ 16) ↦ wrapping<u8>) ↦ int<u8>)
+        out.append(((word ⇒ 8) ↦ wrapping<u8>) ↦ int<u8>)
+        out.append((word ↦ wrapping<u8>) ↦ int<u8>)
     }
     return out
 }
@@ -315,7 +319,7 @@ fn pad64(bytes data) → list<int<u8>> {
     }
     for range 0‥8 const i {
         const int shift ← (7 - i) * 8
-        padded.append((bit_len ⇒ shift) ↦ int<u8>)
+        padded.append(((bit_len ⇒ shift) ↦ wrapping<u8>) ↦ int<u8>)
     }
     return padded
 }

@@ -176,7 +176,8 @@ fn colon_at(string line) → int {
 fn has_nul(string s) → bool {
     var int i ← 0
     while i < s.length() {
-        if s.slice(i, i + 1) ≡ (|00| ↦ string) then return true
+        # NUL is valid UTF-8, so the conversion cannot fail; the default only satisfies D17.8.
+        if s.slice(i, i + 1) ≡ (|00| ↦ string ⊥ "") then return true
         i ← i + 1
     }
     return false
@@ -307,7 +308,7 @@ describe "sse" {
     }
 
     test "parse leading bom stripped" {
-        const string bom ↤ |ef bb bf|
+        const string bom ↤ |ef bb bf| ⊥ ""
         const list<Event> evs ← must_parse(bom + "data: hello\n\n")
         assert evs.length() ≡ 1
         assert evs[0].data ≡ "hello"
@@ -349,7 +350,7 @@ describe "sse" {
     }
 
     test "rejects nul in id" {
-        const string nul ↤ |00|
+        const string nul ↤ |00| ⊥ ""
         assert parse_msg("id: a" + nul + "b\ndata: hello\n\n") ≡ "norma:http/sse.parse: illegal id"
     }
 }

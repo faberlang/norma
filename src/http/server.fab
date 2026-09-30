@@ -147,16 +147,24 @@ fn bind_full(int port, int max_body_bytes, string host) → Listener {
 
 @ public
 fn incoming_of(value raw) → Incoming {
-    const map<string, value> fields ↤ raw
-    return Incoming {
-        id = fields["id"] ↦ string,
-        connection = fields["connection"] ↦ int,
-        req = httpreq.from_target(
-            fields["method"] ↦ string,
-            fields["path"] ↦ string,
-            headers_from_carrier(fields["headers"]),
-            body_text(fields["body"])
-        )
+    # Why: a carrier that is not {id, connection, method, path, headers, body}
+    # is a broken host contract, not caller input, so it panics instead of
+    # defaulting an id or connection.
+    do {
+        const map<string, value> fields ↤ raw
+        return Incoming {
+            id = fields["id"] ↦ string,
+            connection = fields["connection"] ↦ int,
+            req = httpreq.from_target(
+                fields["method"] ↦ string,
+                fields["path"] ↦ string,
+                headers_from_carrier(fields["headers"]),
+                body_text(fields["body"])
+            )
+        }
+    }
+    catch err {
+        panic "norma:http/server.incoming_of: malformed accept response: §"(err)
     }
 }
 
@@ -311,24 +319,30 @@ fn headers_carrier(headers.Headers headers) → list<value> {
 fn headers_from_carrier(value raw) → headers.Headers {
     var headers.Headers out ← headers.empty()
     if raw not is list<value> then return out
-    const list<value> items ↤ raw
-    for from items const item {
-        if item is map<string, value> {
-            const map<string, value> row ↤ item
-            const string name ↤ row["name"]
-            const string header_value ↤ row["value"]
-            if out.append(name, header_value) {
+    do {
+        const list<value> items ↤ raw
+        for from items const item {
+            if item is map<string, value> {
+                const map<string, value> row ↤ item
+                const string name ↤ row["name"]
+                const string header_value ↤ row["value"]
+                if out.append(name, header_value) {
+                }
             }
         }
+        return out
     }
-    return out
+    catch err {
+        panic "norma:http/server: malformed headers carrier: §"(err)
+    }
 }
 
 # Accept bodies arrive as octeti. `value ↦ bytes` is a recorded radix
 # codegen gap (H6 gate); text bodies still decode. Octeti stays empty.
 fn body_text(value raw) → string {
     if raw is none then return ""
-    if raw is string then return raw ↦ string
+    # Guarded by the `is` test, so the default never applies.
+    if raw is string then return raw ↦ string ⊥ ""
     return ""
 }
 

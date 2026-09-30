@@ -16,15 +16,34 @@ fn stringify(json document) → string {
     return encode(document ↦ value)
 }
 
+# Each scalar extraction below follows an `is` test on the same node in encode,
+# so its `⊥` default never applies; it only satisfies D17.8. The extractions are
+# separate functions to keep encode inside its complexity budget.
+fn as_bool(value node) → bool {
+    return node ↦ bool ⊥ false
+}
+
+fn as_text(value node) → string {
+    return node ↦ string ⊥ ""
+}
+
+fn as_int(value node) → int {
+    return node ↦ int ⊥ 0
+}
+
+fn as_float(value node) → float {
+    return node ↦ float ⊥ 0.0
+}
+
 fn encode(value node) → string {
     if node is none then return "null"
     if node is bool {
-        if node ↦ bool then return "true"
+        if as_bool(node) then return "true"
         return "false"
     }
-    if node is string then return quote(node ↦ string)
-    if node is int then return (node ↦ int) ↦ string
-    if node is float then return (node ↦ float) ↦ string
+    if node is string then return quote(as_text(node))
+    if node is int then return as_int(node) ↦ string
+    if node is float then return as_float(node) ↦ string
     do {
         const map<string, value> fields ↤ node
         return encode_object(fields)

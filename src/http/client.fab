@@ -326,11 +326,19 @@ fn generic(int agent, string method, string url, headers.Headers headers, string
 fn open_stream(int agent, string method, string url, headers.Headers headers, string body) → Receive {
     require_url(url, "http:request_open")
     const value raw ← dispatch_generic("http:request_open", agent, method, url, headers, body)
-    const map<string, value> fields ↤ raw
-    return Receive {
-        reader = fields["reader"] ↦ int,
-        status = fields["status"] ↦ int,
-        headers = headers_from_carrier(fields["headers"])
+    # Why: a carrier that is not {reader, status, headers} is a broken host
+    # contract, not caller input, so it panics (like require_url) instead of
+    # defaulting a reader or status.
+    do {
+        const map<string, value> fields ↤ raw
+        return Receive {
+            reader = fields["reader"] ↦ int,
+            status = fields["status"] ↦ int,
+            headers = headers_from_carrier(fields["headers"])
+        }
+    }
+    catch err {
+        panic "norma:http/client.open: malformed http:request_open response: §"(err)
     }
 }
 
@@ -350,26 +358,36 @@ fn dispatch_generic(string route, int agent, string method, string url, headers.
 }
 
 fn response_of(value raw) → response.Response {
-    const map<string, value> fields ↤ raw
-    return response.of(
-        fields["status"] ↦ int,
-        headers_from_carrier(fields["headers"]),
-        body_text(fields["body"])
-    )
+    do {
+        const map<string, value> fields ↤ raw
+        return response.of(
+            fields["status"] ↦ int,
+            headers_from_carrier(fields["headers"]),
+            body_text(fields["body"])
+        )
+    }
+    catch err {
+        panic "norma:http/client: malformed response carrier: §"(err)
+    }
 }
 
 fn chunk_of(value raw) → Chunk {
-    const map<string, value> fields ↤ raw
-    return Chunk {
-        text = body_text(fields["bytes"]),
-        done = fields["done"] ↦ bool
+    do {
+        const map<string, value> fields ↤ raw
+        return Chunk {
+            text = body_text(fields["bytes"]),
+            done = fields["done"] ↦ bool
+        }
+    }
+    catch err {
+        panic "norma:http/client.receive: malformed http:read response: §"(err)
     }
 }
 
 fn headers_carrier(headers.Headers headers) → list<value> {
     var list<value> out ← []
     for from headers.entries const entry {
-        var map<string, value> row ← empty
+        var map<string, value> row ← {}
         row.put("name", entry.name ↦ value)
         row.put("value", entry.value ↦ value)
         out.append(row ↦ value)
@@ -380,22 +398,28 @@ fn headers_carrier(headers.Headers headers) → list<value> {
 fn headers_from_carrier(value raw) → headers.Headers {
     var headers.Headers out ← headers.empty()
     if raw not is list<value> then return out
-    const list<value> items ↤ raw
-    for from items const item {
-        if item is map<string, value> {
-            const map<string, value> row ↤ item
-            const string name ↤ row["name"]
-            const string header_value ↤ row["value"]
-            if out.append(name, header_value) {
+    do {
+        const list<value> items ↤ raw
+        for from items const item {
+            if item is map<string, value> {
+                const map<string, value> row ↤ item
+                const string name ↤ row["name"]
+                const string header_value ↤ row["value"]
+                if out.append(name, header_value) {
+                }
             }
         }
+        return out
     }
-    return out
+    catch err {
+        panic "norma:http/client: malformed headers carrier: §"(err)
+    }
 }
 
 fn body_text(value raw) → string {
     if raw is none then return ""
-    if raw is string then return raw ↦ string
+    # Guarded by the `is` test, so the default never applies.
+    if raw is string then return raw ↦ string ⊥ ""
     do {
         const bytes data ↤ raw
         do {

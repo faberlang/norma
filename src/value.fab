@@ -71,13 +71,15 @@ fn is_instant(value v) → bool {
 # All accessors return null for missing keys, out-of-bounds indices, and
 # non-collection variants. Callers distinguish "absent" from "wrong shape"
 # via the predicates above if they care.
+# Each `↤` extraction below follows an `is` test on the same value, so its
+# `⊥ empty` default never applies; it only satisfies D17.8.
 
 # Get value by key from a map (returns null if missing or non-map).
 @ private
 fn map_lookup(value v, string key) → value {
     if v is none then return null
     if v not is map<string, value> then return null
-    const map<string, value> tab ↤ v
+    const map<string, value> tab ↤ v ⊥ empty
     const value got ← tab.get(key)
     return got
 }
@@ -93,7 +95,7 @@ fn get(value v, string key) → value {
 fn get_index(value v, int index) → value {
     if v is none then return null
     if v not is list<value> then return null
-    const list<value> items ↤ v
+    const list<value> items ↤ v ⊥ empty
     const value got ← items.get(index)
     return got
 }
@@ -119,7 +121,7 @@ fn find(value v, string path) → value {
 fn find_part(value current, string part) → value {
     if current is none then return null
     if current is map<string, value> {
-        const map<string, value> tab ↤ current
+        const map<string, value> tab ↤ current ⊥ empty
         const value got ← tab.get(part)
         return got
     }
