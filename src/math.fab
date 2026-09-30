@@ -323,7 +323,7 @@ fn LN2_LO() → float {
 @ private
 fn bits(float x) → int<u64> {
     const f64 wide ← x ↦ f64
-    return wide ↦ int<u64, Bits>
+    return wide ↦ u64 via Bits
 }
 
 # Why: Biased exponent field (0 = zero/subnormal, 2047 = ∞/NaN).
@@ -351,7 +351,7 @@ fn is_finite(float x) → bool {
 fn unit_mantissa(float x) → float {
     const int<u64> fraction ← bits(x) ∧ (4503599627370495 ∷ int<u64>)
     const int<u64> unit ← fraction ∨ (4607182418800017408 ∷ int<u64>)
-    const f64 wide ← unit ↦ float<f64, Bits>
+    const f64 wide ← unit ↦ f64 via Bits
     return wide
 }
 
@@ -359,7 +359,7 @@ fn unit_mantissa(float x) → float {
 @ private
 fn pow2(int k) → float {
     const int<u64> field ← (k + 1023) ↦ int<u64>
-    const f64 wide ← (field ⇐ 52) ↦ float<f64, Bits>
+    const f64 wide ← (field ⇐ 52) ↦ f64 via Bits
     return wide
 }
 
