@@ -28,8 +28,8 @@ fn as_text(value node) → string {
 }
 
 # Integers render through `inf`: it holds every `int` exactly, so the digits
-# match `int ↦ string`, and a node beyond `int` loses nothing. (The runner tests
-# `is int` true for such a node; Rust does not, and takes the fallback below.)
+# match `int ↦ string`, and a node beyond `int` loses nothing. (`is int` is true
+# only for an integer that fits `int`; a larger node takes the fallback below.)
 fn as_integer(value node) → inf {
     return node ↦ inf ⊥ 0
 }
@@ -47,8 +47,9 @@ fn encode(value node) → string {
     if node is string then return quote(as_text(node))
     if node is int then return as_integer(node) ↦ string
     if node is float then return as_float(node) ↦ string
-    # On Rust an integer beyond `int` is not `is int`; the scalar tests above
-    # have removed every other scalar, so only such an `inf` converts here.
+    # An integer beyond `int` is not `is int` (the carrier law: `is int` holds
+    # only when the integer fits i64); the scalar tests above have removed every
+    # other scalar, so only such an `inf` converts here.
     do {
         const inf big ↤ node
         return big ↦ string
