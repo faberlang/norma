@@ -321,7 +321,7 @@ fn LN2_LO() → float {
 
 # Why: Raw IEEE binary64 payload of x.
 @ private
-fn bits(float x) → int<u64> {
+fn bits(float x) → u64 {
     const f64 wide ← x ↦ f64
     return wide ↦ u64 via Bits
 }
@@ -329,7 +329,7 @@ fn bits(float x) → int<u64> {
 # Why: Biased exponent field (0 = zero/subnormal, 2047 = ∞/NaN).
 @ private
 fn biased_exponent(float x) → int {
-    const int<u64> field ← (bits(x) ⇒ 52) ∧ (2047 ∷ int<u64>)
+    const u64 field ← (bits(x) ⇒ 52) ∧ (2047 ∷ u64)
     # The 11-bit mask keeps field below 2048, so the default never applies.
     return field ↦ int ⊥ 0
 }
@@ -337,8 +337,8 @@ fn biased_exponent(float x) → int {
 # Why: NaN test on the bit fields — independent of each lane's NaN comparison.
 @ private
 fn is_nan(float x) → bool {
-    const int<u64> fraction ← bits(x) ∧ (4503599627370495 ∷ int<u64>)
-    return biased_exponent(x) ≡ 2047 and fraction ≠ (0 ∷ int<u64>)
+    const u64 fraction ← bits(x) ∧ (4503599627370495 ∷ u64)
+    return biased_exponent(x) ≡ 2047 and fraction ≠ (0 ∷ u64)
 }
 
 # Why: Finite test on the exponent field (excludes ±∞ and NaN).
@@ -350,8 +350,8 @@ fn is_finite(float x) → bool {
 # Why: Replace the exponent of normal x with 0 — mantissa in [1, 2).
 @ private
 fn unit_mantissa(float x) → float {
-    const int<u64> fraction ← bits(x) ∧ (4503599627370495 ∷ int<u64>)
-    const int<u64> unit ← fraction ∨ (4607182418800017408 ∷ int<u64>)
+    const u64 fraction ← bits(x) ∧ (4503599627370495 ∷ u64)
+    const u64 unit ← fraction ∨ (4607182418800017408 ∷ u64)
     const f64 wide ← unit ↦ f64 via Bits
     return wide
 }
@@ -360,7 +360,7 @@ fn unit_mantissa(float x) → float {
 @ private
 fn pow2(int k) → float {
     # k ≥ -1022 keeps k + 1023 non-negative, so the default never applies.
-    const int<u64> field ← (k + 1023) ↦ int<u64> ⊥ 0
+    const u64 field ← (k + 1023) ↦ u64 ⊥ 0
     const f64 wide ← (field ⇐ 52) ↦ f64 via Bits
     return wide
 }
@@ -405,7 +405,7 @@ fn two_over_pi() → list<int> {
 @ private
 fn reduce_half_pi(float a) → AngleReduction {
     const int mask ← 16777215
-    const int<u64> fraction ← bits(a) ∧ (4503599627370495 ∷ int<u64>)
+    const u64 fraction ← bits(a) ∧ (4503599627370495 ∷ u64)
     # fraction is masked to 52 bits, so the default never applies.
     const int mantissa ← (fraction ↦ int ⊥ 0) + 4503599627370496
     const int e ← biased_exponent(a) - 1075

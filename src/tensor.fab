@@ -77,6 +77,6 @@ fn sum<size Shape>(tensor<int, Shape> grid) → int {
 
 # Why: Total sum of f32 fractus tensor elements — delegates to grid.summa().
 @ public
-fn sum_f32<size Shape>(tensor<float<f32>, Shape> grid) → float<f32> {
+fn sum_f32<size Shape>(tensor<f32, Shape> grid) → f32 {
     return grid.sum()
 }

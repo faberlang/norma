@@ -209,24 +209,24 @@ fn scalar_to_string(int scalar) → string ⇥ string {
     if scalar ≥ 55296 and scalar ≤ 57343 {
         throw "invalid Unicode scalar"
     }
-    var list<int<u8>> octets ← empty
+    var list<u8> octets ← empty
     if scalar ≤ 127 {
-        octets.append(scalar ↦ int<u8>)
+        octets.append(scalar ↦ u8)
     }
     elif scalar ≤ 2047 {
-        octets.append((192 + scalar / 64) ↦ int<u8>)
-        octets.append((128 + scalar % 64) ↦ int<u8>)
+        octets.append((192 + scalar / 64) ↦ u8)
+        octets.append((128 + scalar % 64) ↦ u8)
     }
     elif scalar ≤ 65535 {
-        octets.append((224 + scalar / 4096) ↦ int<u8>)
-        octets.append((128 + (scalar / 64) % 64) ↦ int<u8>)
-        octets.append((128 + scalar % 64) ↦ int<u8>)
+        octets.append((224 + scalar / 4096) ↦ u8)
+        octets.append((128 + (scalar / 64) % 64) ↦ u8)
+        octets.append((128 + scalar % 64) ↦ u8)
     }
     else {
-        octets.append((240 + scalar / 262144) ↦ int<u8>)
-        octets.append((128 + (scalar / 4096) % 64) ↦ int<u8>)
-        octets.append((128 + (scalar / 64) % 64) ↦ int<u8>)
-        octets.append((128 + scalar % 64) ↦ int<u8>)
+        octets.append((240 + scalar / 262144) ↦ u8)
+        octets.append((128 + (scalar / 4096) % 64) ↦ u8)
+        octets.append((128 + (scalar / 64) % 64) ↦ u8)
+        octets.append((128 + scalar % 64) ↦ u8)
     }
     const bytes encoded ← octets ↦ bytes
     return encoded ↦ string

@@ -74,7 +74,7 @@ fn Sigma1_32(wrapping<u32> x) → wrapping<u32> {
 }
 
 @ private
-fn word32(list<int<u8>> buf, int off) → wrapping<u32> {
+fn word32(list<u8> buf, int off) → wrapping<u32> {
     var wrapping<u32> w ↤ buf[off]
     w ← w ⇐ 8
     w ← w ∨ (buf[off + 1] ↦ wrapping<u32>)
@@ -86,7 +86,7 @@ fn word32(list<int<u8>> buf, int off) → wrapping<u32> {
 }
 
 @ private
-fn schedule32(list<int<u8>> buf, int init) → list<wrapping<u32>> {
+fn schedule32(list<u8> buf, int init) → list<wrapping<u32>> {
     var list<wrapping<u32>> w ← []
     for range 0‥16 const i {
         w.append(word32(buf, init + i * 4))
@@ -141,33 +141,33 @@ fn compress32(list<wrapping<u32>> state, list<wrapping<u32>> w, list<wrapping<u3
 # `wrapping<u8>` (mod 2^8, cannot fail) before the `int<u8>` label. A bare
 # `word ↦ int<u8>` is magnitude-checked and would abort on any word above 255.
 @ private
-fn serialize32(list<wrapping<u32>> h) → list<int<u8>> {
-    var list<int<u8>> out ← []
+fn serialize32(list<wrapping<u32>> h) → list<u8> {
+    var list<u8> out ← []
     for range 0‥8 const i {
         const wrapping<u32> word ← h[i]
-        out.append(((word ⇒ 24) ↦ wrapping<u8>) ↦ int<u8>)
-        out.append(((word ⇒ 16) ↦ wrapping<u8>) ↦ int<u8>)
-        out.append(((word ⇒ 8) ↦ wrapping<u8>) ↦ int<u8>)
-        out.append((word ↦ wrapping<u8>) ↦ int<u8>)
+        out.append(((word ⇒ 24) ↦ wrapping<u8>) ↦ u8)
+        out.append(((word ⇒ 16) ↦ wrapping<u8>) ↦ u8)
+        out.append(((word ⇒ 8) ↦ wrapping<u8>) ↦ u8)
+        out.append((word ↦ wrapping<u8>) ↦ u8)
     }
     return out
 }
 
 # The length bytes use the same wrapping extraction as serialize32.
 @ private
-fn pad32(bytes data) → list<int<u8>> {
+fn pad32(bytes data) → list<u8> {
     const int bit_len ← data.length() * 8
-    var list<int<u8>> padded ← []
+    var list<u8> padded ← []
     for range 0‥data.length() const i {
-        padded.append(data.get(i) coalesce (0 ∷ int<u8>))
+        padded.append(data.get(i) coalesce (0 ∷ u8))
     }
-    padded.append(0x80 ∷ int<u8>)
+    padded.append(0x80 ∷ u8)
     while (padded.length() % 64) ≠ 56 {
-        padded.append(0 ∷ int<u8>)
+        padded.append(0 ∷ u8)
     }
     for range 0‥8 const i {
         const int shift ← (7 - i) * 8
-        padded.append(((bit_len ⇒ shift) ↦ wrapping<u8>) ↦ int<u8>)
+        padded.append(((bit_len ⇒ shift) ↦ wrapping<u8>) ↦ u8)
     }
     return padded
 }
@@ -179,7 +179,7 @@ fn K32() → list<wrapping<u32>> {
 
 @ private
 fn sha256(bytes data) → bytes {
-    const list<int<u8>> padded ← pad32(data)
+    const list<u8> padded ← pad32(data)
     const list<wrapping<u32>> k ← K32()
     var list<wrapping<u32>> state ← [1779033703, 3144134277, 1013904242, 2773480762, 1359893119, 2600822924, 528734635, 1541459225]
     const int n_blocks ← padded.length() / 64
@@ -187,7 +187,7 @@ fn sha256(bytes data) → bytes {
         const list<wrapping<u32>> w ← schedule32(padded, bi * 64)
         state ← compress32(state, w, k)
     }
-    const list<int<u8>> out ← serialize32(state)
+    const list<u8> out ← serialize32(state)
     const bytes result ← out
     return result
 }
@@ -213,7 +213,7 @@ fn Sigma1_64(wrapping<u64> x) → wrapping<u64> {
 }
 
 @ private
-fn word64(list<int<u8>> buf, int off) → wrapping<u64> {
+fn word64(list<u8> buf, int off) → wrapping<u64> {
     var wrapping<u64> w ↤ buf[off]
     w ← w ⇐ 8
     w ← w ∨ (buf[off + 1] ↦ wrapping<u64>)
@@ -233,7 +233,7 @@ fn word64(list<int<u8>> buf, int off) → wrapping<u64> {
 }
 
 @ private
-fn schedule64(list<int<u8>> buf, int init) → list<wrapping<u64>> {
+fn schedule64(list<u8> buf, int init) → list<wrapping<u64>> {
     var list<wrapping<u64>> w ← []
     for range 0‥16 const i {
         w.append(word64(buf, init + i * 8))
@@ -286,40 +286,40 @@ fn compress64(list<wrapping<u64>> state, list<wrapping<u64>> w, list<wrapping<u6
 
 # n_words is 8 for SHA-512 and 6 for SHA-384 truncation.
 @ private
-fn serialize64(list<wrapping<u64>> h, int n_words) → list<int<u8>> {
-    var list<int<u8>> out ← []
+fn serialize64(list<wrapping<u64>> h, int n_words) → list<u8> {
+    var list<u8> out ← []
     for range 0‥n_words const i {
         const wrapping<u64> word ← h[i]
-        out.append(((word ⇒ 56) ↦ wrapping<u8>) ↦ int<u8>)
-        out.append(((word ⇒ 48) ↦ wrapping<u8>) ↦ int<u8>)
-        out.append(((word ⇒ 40) ↦ wrapping<u8>) ↦ int<u8>)
-        out.append(((word ⇒ 32) ↦ wrapping<u8>) ↦ int<u8>)
-        out.append(((word ⇒ 24) ↦ wrapping<u8>) ↦ int<u8>)
-        out.append(((word ⇒ 16) ↦ wrapping<u8>) ↦ int<u8>)
-        out.append(((word ⇒ 8) ↦ wrapping<u8>) ↦ int<u8>)
-        out.append((word ↦ wrapping<u8>) ↦ int<u8>)
+        out.append(((word ⇒ 56) ↦ wrapping<u8>) ↦ u8)
+        out.append(((word ⇒ 48) ↦ wrapping<u8>) ↦ u8)
+        out.append(((word ⇒ 40) ↦ wrapping<u8>) ↦ u8)
+        out.append(((word ⇒ 32) ↦ wrapping<u8>) ↦ u8)
+        out.append(((word ⇒ 24) ↦ wrapping<u8>) ↦ u8)
+        out.append(((word ⇒ 16) ↦ wrapping<u8>) ↦ u8)
+        out.append(((word ⇒ 8) ↦ wrapping<u8>) ↦ u8)
+        out.append((word ↦ wrapping<u8>) ↦ u8)
     }
     return out
 }
 
 @ private
-fn pad64(bytes data) → list<int<u8>> {
+fn pad64(bytes data) → list<u8> {
     const int bit_len ← data.length() * 8
-    var list<int<u8>> padded ← []
+    var list<u8> padded ← []
     for range 0‥data.length() const i {
-        padded.append(data.get(i) coalesce (0 ∷ int<u8>))
+        padded.append(data.get(i) coalesce (0 ∷ u8))
     }
-    padded.append(0x80 ∷ int<u8>)
+    padded.append(0x80 ∷ u8)
     while (padded.length() % 128) ≠ 112 {
-        padded.append(0 ∷ int<u8>)
+        padded.append(0 ∷ u8)
     }
     # 128-bit length field: high 64 bits are zero under the 64 MiB limit.
     for range 0‥8 const i {
-        padded.append(0 ∷ int<u8>)
+        padded.append(0 ∷ u8)
     }
     for range 0‥8 const i {
         const int shift ← (7 - i) * 8
-        padded.append(((bit_len ⇒ shift) ↦ wrapping<u8>) ↦ int<u8>)
+        padded.append(((bit_len ⇒ shift) ↦ wrapping<u8>) ↦ u8)
     }
     return padded
 }
@@ -331,7 +331,7 @@ fn K64() → list<wrapping<u64>> {
 
 @ private
 fn sha512_engine(bytes data, list<wrapping<u64>> iv, int n_words) → bytes {
-    const list<int<u8>> padded ← pad64(data)
+    const list<u8> padded ← pad64(data)
     const list<wrapping<u64>> k ← K64()
     var list<wrapping<u64>> state ← iv
     const int n_blocks ← padded.length() / 128
@@ -339,7 +339,7 @@ fn sha512_engine(bytes data, list<wrapping<u64>> iv, int n_words) → bytes {
         const list<wrapping<u64>> w ← schedule64(padded, bi * 128)
         state ← compress64(state, w, k)
     }
-    const list<int<u8>> out ← serialize64(state, n_words)
+    const list<u8> out ← serialize64(state, n_words)
     const bytes result ← out
     return result
 }
