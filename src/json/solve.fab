@@ -241,7 +241,18 @@ fn parse_number(string wire, int start) → cursor.ScanResult ⇥ string {
     }
     const string token ← wire.slice(start, end)
     if end ≠ integer_end then return result((token ↦ float) ↦ value, end)
-    return result((token ↦ int) ↦ value, end)
+    return result(integer_value(token), end)
+}
+
+# An integer token keeps every digit: one that fits `int` is an `int`, anything
+# longer is an `inf`. Nineteen digits can still fit, so those compare first.
+fn integer_value(string token) → value ⇥ string {
+    if token.length() ≤ 18 then return (token ↦ int) ↦ value
+    const inf exact ← token ↦ inf
+    const inf lowest ← -9223372036854775808
+    const inf highest ← 9223372036854775807
+    if exact ≥ lowest and exact ≤ highest then return (exact ↦ int) ↦ value
+    return exact ↦ value
 }
 
 fn scan_integer_part(string wire, int start) → int ⇥ string {

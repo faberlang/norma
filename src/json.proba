@@ -110,6 +110,20 @@ describe "JSON parsing" {
         assert (root.get("exponent") ↦ float) ≈ 2000.0
     }
 
+    test "reads integers at and beyond the int boundary exactly" {
+        const json document ← parse_valid(
+            «{"max":9223372036854775807,"min":-9223372036854775808,"over":9223372036854775808,"under":-9223372036854775809,"wide":18446744073709551616}»
+        )
+        const value tree ← document ↦ value
+        const map<string, value> root ← map_of(tree)
+        assert (root.get("max") ↦ int) ≡ 9223372036854775807
+        assert (root.get("min") ↦ int) ≡ -9223372036854775807 - 1
+        const inf over ← 9223372036854775807
+        assert (root.get("over") ↦ inf) ≡ over + 1
+        assert (root.get("under") ↦ inf) ≡ -over - 2
+        assert (root.get("wide") ↦ inf) ≡ over * 2 + 2
+    }
+
     test "decodes ordinary string escapes" {
         const json document ← parse_valid(
             "{\"text\":\"line\\nquote: \\\" slash: \\\\ solidus: \\/\"}"
@@ -200,6 +214,25 @@ describe "JSON serialization" {
         assert roundtrip.control ≡ payload.control
         assert roundtrip.text ≡ payload.text
         assert roundtrip.unicode ≡ payload.unicode
+    }
+
+    test "serializes integers at and beyond the int boundary as bare numbers" {
+        const string wire ← «{"max":9223372036854775807,"min":-9223372036854775808,"over":9223372036854775808,"under":-9223372036854775809}»
+        assert json_codec.stringify(parse_valid(wire)) ≡ wire
+    }
+
+    test "round trips a thousand-digit integer" {
+        var string digits ← "9"
+        for range 1‥1000 const i {
+            digits ← digits + "7"
+        }
+        const string wire ← «{"n":§}»(digits)
+        const json document ← parse_valid(wire)
+        assert json_codec.stringify(document) ≡ wire
+        const value tree ← document ↦ value
+        const map<string, value> root ← map_of(tree)
+        assert ((root.get("n") ↦ inf) ↦ string) ≡ digits
+        assert json_codec.stringify(parse_valid(json_codec.stringify(document))) ≡ wire
     }
 
     test "round trips through the public facade" {
