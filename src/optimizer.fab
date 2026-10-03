@@ -20,6 +20,6 @@ locale = "en"
 @ public
 fn sgd_step<size Shape>(tensor<f32, Shape> param, tensor<f32, Shape> grad, f32 lr) → tensor<f32, Shape> {
     const tensor<f32, Shape> lr_fill ← param.fill(lr)
-    const tensor<f32, Shape> scaled ← grad.multiply(lr_fill)
-    return param.subtract(scaled)
+    const tensor<f32, Shape> scaled ← grad ⊙ lr_fill
+    return param - scaled
 }

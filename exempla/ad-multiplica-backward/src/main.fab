@@ -13,7 +13,7 @@ locale = "en"
 @ radix lane "air"
 @ radix backward "multiply_backward"
 fn multiply(tensor<f32, [2]> a, tensor<f32, [2]> b) → tensor<f32, [2]> {
-    return a.multiply(b)
+    return a ⊙ b
 }
 
 main {
