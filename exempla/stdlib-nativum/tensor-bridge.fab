@@ -34,6 +34,6 @@ main {
     ]
     const tensor<f32, [2, 3]> shaped ← tensor.construct<tensor<f32, [2, 3]>>(data)
     const tensor<f32, [2, 3]> filled ← tensor.creata<tensor<f32, [2, 3]>>(0.0 ∷ f32)
-    print tensor.product(shaped.shape())
+    print tensor.product(shaped.shape() ↦ list<int>)
     print filled.length()
 }
