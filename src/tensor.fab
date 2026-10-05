@@ -33,9 +33,8 @@ fn construct<T, size Shape>(list<T> data) → tensor<T, Shape> ⇥ string {
 # Shaped construction uses compiler-owned static spellings:
 #   tensor.creata<tensor<T, Figura>>(fill)
 #   tensor.structa<tensor<T, Figura>>(data)
-# Dynamic runtime shapes use receiver methods:
-#   seed.crea(fill, shape)
-#   seed.strue(data, shape)
+# Data-driven construction is the conversion (the target type is the operand):
+#   data ↦ tensor<T, Figura>
 
 # Why: Product of dimension sizes; empty shape → 1 (scalar degenerate).
 @ public
@@ -52,17 +51,23 @@ fn product(list<int> shape) → int {
 # =========================================================================
 
 # Verb: apply from "applicare" (to apply) — Perfectum
-# Why: Map f over every element preserving shape (flatten → walk → reshape).
+# Why: Map f over every element preserving shape (flatten → walk → rebuild).
+# The rebuild conversion carries the count check the receiver method hid;
+# mapped holds exactly the flattened grid's elements, so the handler only
+# pins the strict context — the fallback returns the untouched grid.
 @ public
 fn apply<T, size Shape>(tensor<T, Shape> grid, (T) → T f) → tensor<T, Shape> {
-    const list<int> shape ← grid.shape()
     const list<T> flat ↤ grid
     var list<T> mapped ← []
     for from flat const elem {
         mapped.append(f(elem))
     }
-    const tensor<T, []> seed ← empty
-    return seed.from_flat(mapped, shape)
+    do {
+        return mapped ↦ tensor<T, Shape>
+    }
+    catch err {
+        return grid
+    }
 }
 
 # =========================================================================
