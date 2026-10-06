@@ -112,21 +112,21 @@ fn find_crlf(bytes data, int start) → int {
 fn parse_size_line(bytes data, int start, int end) → int ⇥ string {
     if start ≥ end then throw "norma:http/chunked.decode: invalid size line"
     var int i ← start
-    var int size ← 0
+    var int extent ← 0
     var int digits ← 0
     while i < end {
         const int d ← hex_digit(byte_at(data, i))
         if d < 0 then break
         digits ← digits + 1
         if digits > 8 then throw "norma:http/chunked.decode: invalid size line"
-        size ← size * 16 + d
+        extent ← extent * 16 + d
         i ← i + 1
     }
     if digits ≡ 0 then throw "norma:http/chunked.decode: invalid size line"
     if i < end {
         parse_extensions(data, i, end)
     }
-    return size
+    return extent
 }
 
 fn hex_digit(int n) → int {
