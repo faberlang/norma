@@ -87,7 +87,7 @@ class SortedMap<K, V> {
     # Reuses the tabula insert stem.
     fn put(K key, V value) → void {
         if not self.entries.has(key) {
-            insert<K>(self.index, key)
+            insert<K>(mut self.index, key)
         }
         self.entries.put(key, value)
     }
@@ -97,7 +97,7 @@ class SortedMap<K, V> {
     fn delete(K key) → void {
         if self.entries.has(key) {
             self.entries.delete(key)
-            remove<K>(self.index, key)
+            remove<K>(mut self.index, key)
         }
     }
 
@@ -181,7 +181,7 @@ fn remove<K>(mut list<K> index, K key) → void {
             continue
         }
         if equals<K>(extans, key) {
-            remove_at<K>(index, i)
+            remove_at<K>(mut index, i)
             return
         }
         i ← i + 1
