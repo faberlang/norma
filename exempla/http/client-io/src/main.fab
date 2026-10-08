@@ -15,7 +15,7 @@ import from "norma:processus" processus
 
 fn origin() → string {
     const list<string> args ← processus.argv()
-    if args.length() > 0 {
+    if args.length() ≻ 0 {
         const string ∪ none first ← args.get(0)
         if first not is none {
             return first ↦ string
@@ -73,7 +73,7 @@ main {
     var string acc ← ""
     var int pulls ← 0
     var bool finished ← false
-    while pulls < 16 and not finished {
+    while pulls ≺ 16 and not finished {
         const client.Chunk chunk ← client.receive_n(stream, 16)
         acc ← acc + chunk.text
         finished ← chunk.done
@@ -92,7 +92,7 @@ main {
     print pulls
     print "stream-acc"
     print acc
-    if pulls < 2 {
+    if pulls ≺ 2 {
         panic "client-io: streaming receive did not yield incrementally"
     }
     if not acc.contains("data: one") {

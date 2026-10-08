@@ -468,7 +468,7 @@ fn glob(string root, string pattern) → list<string> ⇥ string {
     const list<string> segments ← pattern.split("/")
     var list<string> candidatos ← [root]
     var int index ← 0
-    while index < segments.length() {
+    while index ≺ segments.length() {
         const string segment ← segments.get(index) coalesce ""
         if segment ≡ "" {
             throw "empty path segment in solum.glob pattern"

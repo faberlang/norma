@@ -19,9 +19,9 @@ main {
 
     var int status ← 0
     var int pos ← 0
-    while pos < tracked.length() {
+    while pos ≺ tracked.length() {
         var int end ← pos
-        while end < tracked.length() and tracked.slice(end, end + 1) ≠ "\n" {
+        while end ≺ tracked.length() and tracked.slice(end, end + 1) ≠ "\n" {
             end ← end + 1
         }
         const string file ← tracked.slice(pos, end)

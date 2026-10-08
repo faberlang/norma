@@ -23,7 +23,7 @@ main {
     do {
         const float val ← aleator.random_float()
         assert val ≥ 0.0
-        assert val < 1.0
+        assert val ≺ 1.0
     }
     catch err {
         print "aleator.random_float not available"

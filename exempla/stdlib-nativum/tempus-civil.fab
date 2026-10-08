@@ -74,7 +74,7 @@ main {
         assert false
     }
     catch err {
-        assert err.length() > 0
+        assert err.length() ≻ 0
     }
 
     # -----------------------------------------------------------------------
@@ -85,7 +85,7 @@ main {
         assert false
     }
     catch err {
-        assert err.length() > 0
+        assert err.length() ≻ 0
     }
 
     # -----------------------------------------------------------------------
@@ -96,7 +96,7 @@ main {
         assert false
     }
     catch err {
-        assert err.length() > 0
+        assert err.length() ≻ 0
     }
 
     # -----------------------------------------------------------------------
@@ -107,7 +107,7 @@ main {
         assert false
     }
     catch err {
-        assert err.length() > 0
+        assert err.length() ≻ 0
     }
 
     # -----------------------------------------------------------------------
@@ -118,7 +118,7 @@ main {
         assert false
     }
     catch err {
-        assert err.length() > 0
+        assert err.length() ≻ 0
     }
 
     # -----------------------------------------------------------------------
@@ -129,7 +129,7 @@ main {
         assert false
     }
     catch err {
-        assert err.length() > 0
+        assert err.length() ≻ 0
     }
 
     # -----------------------------------------------------------------------
@@ -140,7 +140,7 @@ main {
         assert false
     }
     catch err {
-        assert err.length() > 0
+        assert err.length() ≻ 0
     }
 
     print tempus.render(t)

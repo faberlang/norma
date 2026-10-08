@@ -85,7 +85,7 @@ main {
     # is the NaN probe; out-of-domain input yields NaN or ±∞, never 0.0.
     assert neg_sqrt ≠ neg_sqrt
     assert neg_log ≠ neg_log
-    assert pole_tan > 1.0e15
+    assert pole_tan ≻ 1.0e15
     assert zero_log ≡ -∞
     assert pow_cat ≡ 8.0
     assert pow_recv ≡ pow_cat

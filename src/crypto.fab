@@ -32,7 +32,7 @@ locale = "en"
 # the 64 MiB boundary fail through the ⇥ textus channel before padding.
 @ public
 fn digest(string alg, bytes data) → bytes ⇥ string {
-    if data.length() > 67108864 then throw "norma:crypto.digest: input exceeds 67108864-byte limit"
+    if data.length() ≻ 67108864 then throw "norma:crypto.digest: input exceeds 67108864-byte limit"
     if alg ≡ "sha256" then return sha256(data)
     if alg ≡ "sha384" then return sha384(data)
     if alg ≡ "sha512" then return sha512(data)

@@ -24,7 +24,7 @@ import from "norma:processus" processus
 
 fn arg_at(int index, string fallback) → string {
     const list<string> args ← processus.argv()
-    if args.length() > index {
+    if args.length() ≻ index {
         const string ∪ none item ← args.get(index)
         if item not is none {
             return item ↦ string
@@ -37,7 +37,7 @@ fn arg_at(int index, string fallback) → string {
 fn stall_frame() → bytes {
     var string block ← "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"
     var int i ← 0
-    while i < 10 {
+    while i ≺ 10 {
         block ← block + block
         i ← i + 1
     }
@@ -68,7 +68,7 @@ main {
         print "frame-bytes"
         print frame.length()
         var int i ← 0
-        while i < n {
+        while i ≺ n {
             print "write-start"
             print i
             server.write_chunk(stream, frame)
@@ -79,7 +79,7 @@ main {
     }
     else {
         var int i ← 0
-        while i < n {
+        while i ≺ n {
             print "write-start"
             print i
             const sse.Event ev ← sse.Event {

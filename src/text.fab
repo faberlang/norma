@@ -30,7 +30,7 @@ fn reverse(string s) → string {
     var int i ← s.length()
     var string out ← ""
 
-    while i > 0 {
+    while i ≻ 0 {
         i ← i - 1
         out ← out + s.slice(i, i + 1)
     }
@@ -50,7 +50,7 @@ fn join(list<string> segments, string separator) → string {
     var int index ← 0
 
     for from segments const pars {
-        if index > 0 {
+        if index ≻ 0 {
             out ← out + separator
         }
 
@@ -113,7 +113,7 @@ fn chars(string s) → list<string> {
     var list<string> out ← []
     var int i ← 0
 
-    while i < s.length() {
+    while i ≺ s.length() {
         out.append(s.slice(i, i + 1))
         i ← i + 1
     }
@@ -131,7 +131,7 @@ fn keep_if(string s, (string) → bool pred) → string {
     var list<string> kept ← []
     var int i ← 0
 
-    while i < s.length() {
+    while i ≺ s.length() {
         const string c ← s.slice(i, i + 1)
         if pred(c) {
             kept.append(c)
@@ -156,14 +156,14 @@ fn keep_between(string s, string lower optional, string upper optional) → stri
 
     # Start optimistic for each scalar and rule it out only when a present
     # bound excludes it.
-    while i < s.length() {
+    while i ≺ s.length() {
         const string c ← s.slice(i, i + 1)
         var bool keep ← true
 
-        if lower not is none and c < lower {
+        if lower not is none and c ≺ lower {
             keep ← false
         }
-        if upper not is none and c > upper {
+        if upper not is none and c ≻ upper {
             keep ← false
         }
         if keep {
@@ -186,7 +186,7 @@ fn drop_if(string s, (string) → bool pred) → string {
     var list<string> kept ← []
     var int i ← 0
 
-    while i < s.length() {
+    while i ≺ s.length() {
         const string c ← s.slice(i, i + 1)
         if pred(c) ≡ false {
             kept.append(c)
@@ -211,14 +211,14 @@ fn drop_between(string s, string lower optional, string upper optional) → stri
 
     # Start with each scalar inside the purged interval; present bounds can
     # prove it lies outside and should be kept.
-    while i < s.length() {
+    while i ≺ s.length() {
         const string c ← s.slice(i, i + 1)
         var bool drop ← true
 
-        if lower not is none and c < lower {
+        if lower not is none and c ≺ lower {
             drop ← false
         }
-        if upper not is none and c > upper {
+        if upper not is none and c ≻ upper {
             drop ← false
         }
         if drop ≡ false {
@@ -264,7 +264,7 @@ fn delimiter_end(string document, string delimiter, int search_from) → int {
     const string nl ← newline()
     var int pos ← search_from
 
-    while pos < document.length() {
+    while pos ≺ document.length() {
         if document.slice(pos, pos + 1) ≡ nl {
             const int line_start ← pos + 1
 
@@ -295,7 +295,7 @@ fn trim_trailing_newlines(string s) → string {
     var int len ← s.length()
     const string nl ← newline()
 
-    while len > 0 and s.slice(len - 1, len) ≡ nl {
+    while len ≻ 0 and s.slice(len - 1, len) ≡ nl {
         len ← len - 1
     }
 
@@ -317,24 +317,24 @@ fn split_frontmatter(string document, string delimiter) → list<string> ⇥ str
     # Opening-fence validation is one cohesive guard paragraph. After this
     # block, delimiter slicing is safe and semantically meaningful.
     if delim_len ≡ 0 then throw "empty delimiter"
-    if document.length() < delim_len then throw "missing opening delimiter"
+    if document.length() ≺ delim_len then throw "missing opening delimiter"
     if document.slice(0, delim_len) ≠ delimiter then throw "missing opening delimiter"
 
     var int meta_start ← delim_len
     const string nl ← newline()
 
-    if meta_start < document.length() and document.slice(meta_start, meta_start + 1) ≡ nl {
+    if meta_start ≺ document.length() and document.slice(meta_start, meta_start + 1) ≡ nl {
         meta_start ← meta_start + 1
     }
 
     const int close_line ← delimiter_end(document, delimiter, delim_len)
 
-    if close_line < 0 then throw "missing closing delimiter"
+    if close_line ≺ 0 then throw "missing closing delimiter"
 
     const string metadata ← trim_trailing_newlines(document.slice(meta_start, close_line))
     var int corpus_start ← (close_line + 1) + delim_len
 
-    if corpus_start < document.length() and document.slice(corpus_start, corpus_start + 1) ≡ nl {
+    if corpus_start ≺ document.length() and document.slice(corpus_start, corpus_start + 1) ≡ nl {
         corpus_start ← corpus_start + 1
     }
 

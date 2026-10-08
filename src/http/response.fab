@@ -23,23 +23,23 @@ class Response {
     }
 
     fn is_informational() → bool {
-        return self.status ≥ 100 and self.status < 200
+        return self.status ≥ 100 and self.status ≺ 200
     }
 
     fn is_ok() → bool {
-        return self.status ≥ 200 and self.status < 300
+        return self.status ≥ 200 and self.status ≺ 300
     }
 
     fn is_redirect() → bool {
-        return self.status ≥ 300 and self.status < 400
+        return self.status ≥ 300 and self.status ≺ 400
     }
 
     fn is_client_error() → bool {
-        return self.status ≥ 400 and self.status < 500
+        return self.status ≥ 400 and self.status ≺ 500
     }
 
     fn is_server_error() → bool {
-        return self.status ≥ 500 and self.status < 600
+        return self.status ≥ 500 and self.status ≺ 600
     }
 }
 

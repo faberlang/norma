@@ -96,12 +96,12 @@ fn session_timeout(int timeout_ms) → Client {
 @ public
 fn split(string url) → Url {
     const int sep ← find_scheme_sep(url)
-    if sep < 0 then return Url { }
+    if sep ≺ 0 then return Url { }
     const string scheme ← ascii_lower(url.slice(0, sep))
     if not is_scheme(scheme) then return Url { }
     const string rest ← url.slice(sep + 3, url.length())
     const int auth_end ← authority_end(rest)
-    if auth_end < 0 then return Url { }
+    if auth_end ≺ 0 then return Url { }
     const string authority ← rest.slice(0, auth_end)
     const string remainder ← rest.slice(auth_end, rest.length())
     const string hostport ← strip_userinfo(authority)
@@ -123,7 +123,7 @@ fn split(string url) → Url {
 
 @ public
 fn is_absolute(Url url) → bool {
-    return url.scheme.length() > 0 and url.host.length() > 0
+    return url.scheme.length() ≻ 0 and url.host.length() ≻ 0
 }
 
 # Host header value: omit the port when it is the scheme default.
@@ -284,11 +284,11 @@ fn require_url(string url, string verb) → void {
 fn no_body(string route, int agent, string url, headers.Headers headers) → response.Response {
     require_url(url, route)
     var list<value> args ← []
-    if agent > 0 {
+    if agent ≻ 0 {
         args.append(agent ↦ value)
     }
     args.append(url ↦ value)
-    if headers.length() > 0 {
+    if headers.length() ≻ 0 {
         args.append(headers_carrier(headers) ↦ value)
     }
     if route ≡ "http:get" {
@@ -300,11 +300,11 @@ fn no_body(string route, int agent, string url, headers.Headers headers) → res
 fn with_body(string route, int agent, string url, headers.Headers headers, string body) → response.Response {
     require_url(url, route)
     var list<value> args ← []
-    if agent > 0 {
+    if agent ≻ 0 {
         args.append(agent ↦ value)
     }
     args.append(url ↦ value)
-    if headers.length() > 0 {
+    if headers.length() ≻ 0 {
         args.append(headers_carrier(headers) ↦ value)
     }
     args.append(body ↦ value)
@@ -344,7 +344,7 @@ fn open_stream(int agent, string method, string url, headers.Headers headers, st
 
 fn dispatch_generic(string route, int agent, string method, string url, headers.Headers headers, string body) → value {
     var list<value> args ← []
-    if agent > 0 {
+    if agent ≻ 0 {
         args.append(agent ↦ value)
     }
     args.append(method ↦ value)
@@ -436,7 +436,7 @@ fn body_text(value raw) → string {
 
 fn find_scheme_sep(string url) → int {
     var int i ← 0
-    while i + 2 < url.length() {
+    while i + 2 ≺ url.length() {
         if url.slice(i, i + 3) ≡ "://" {
             return i
         }
@@ -449,7 +449,7 @@ fn is_scheme(string scheme) → bool {
     if scheme.length() ≡ 0 then return false
     if not is_alpha(scheme.slice(0, 1)) then return false
     var int i ← 1
-    while i < scheme.length() {
+    while i ≺ scheme.length() {
         const string c ← scheme.slice(i, i + 1)
         if not is_alpha(c) and not is_digit(c) and c ≠ "+" and c ≠ "-" and c ≠ "." {
             return false
@@ -463,7 +463,7 @@ fn authority_end(string rest) → int {
     if rest.length() ≡ 0 then return -1
     var int i ← 0
     var bool v6 ← false
-    while i < rest.length() {
+    while i ≺ rest.length() {
         const string c ← rest.slice(i, i + 1)
         if c ≡ "[" {
             v6 ← true
@@ -483,7 +483,7 @@ fn strip_userinfo(string authority) → string {
     var int at ← -1
     var int i ← 0
     var bool v6 ← false
-    while i < authority.length() {
+    while i ≺ authority.length() {
         const string c ← authority.slice(i, i + 1)
         if c ≡ "[" {
             v6 ← true
@@ -496,7 +496,7 @@ fn strip_userinfo(string authority) → string {
         }
         i ← i + 1
     }
-    if at < 0 then return authority
+    if at ≺ 0 then return authority
     return authority.slice(at + 1, authority.length())
 }
 
@@ -504,7 +504,7 @@ fn host_of(string hostport) → string {
     if hostport.length() ≡ 0 then return ""
     if hostport.slice(0, 1) ≡ "[" {
         var int i ← 1
-        while i < hostport.length() {
+        while i ≺ hostport.length() {
             if hostport.slice(i, i + 1) ≡ "]" {
                 return hostport.slice(1, i)
             }
@@ -513,7 +513,7 @@ fn host_of(string hostport) → string {
         return ""
     }
     var int i ← 0
-    while i < hostport.length() {
+    while i ≺ hostport.length() {
         if hostport.slice(i, i + 1) ≡ ":" {
             return hostport.slice(0, i)
         }
@@ -528,7 +528,7 @@ fn port_of(string hostport, string scheme) → int ∪ none {
     if hostport.slice(0, 1) ≡ "[" {
         var int i ← 1
         var bool closed ← false
-        while i < hostport.length() {
+        while i ≺ hostport.length() {
             if hostport.slice(i, i + 1) ≡ "]" {
                 closed ← true
                 i ← i + 1
@@ -546,27 +546,27 @@ fn port_of(string hostport, string scheme) → int ∪ none {
     else {
         var int colon ← -1
         var int i ← 0
-        while i < hostport.length() {
+        while i ≺ hostport.length() {
             if hostport.slice(i, i + 1) ≡ ":" {
                 if colon ≥ 0 then return null
                 colon ← i
             }
             i ← i + 1
         }
-        if colon < 0 {
+        if colon ≺ 0 {
             return default_port(scheme)
         }
         digits ← hostport.slice(colon + 1, hostport.length())
     }
     if digits.length() ≡ 0 then return null
     var int i ← 0
-    while i < digits.length() {
+    while i ≺ digits.length() {
         if not is_digit(digits.slice(i, i + 1)) then return null
         i ← i + 1
     }
     do {
         const int n ↤ digits
-        if n < 1 or n > 65535 then return null
+        if n ≺ 1 or n ≻ 65535 then return null
         return n
     }
     catch err {
@@ -582,13 +582,13 @@ fn default_port(string scheme) → int {
 
 fn is_default_port(string scheme, int port) → bool {
     const int def ← default_port(scheme)
-    return def > 0 and port ≡ def
+    return def ≻ 0 and port ≡ def
 }
 
 fn is_host(string host) → bool {
     if host.length() ≡ 0 then return false
     var int i ← 0
-    while i < host.length() {
+    while i ≺ host.length() {
         const string c ← host.slice(i, i + 1)
         if c ≡ " " or c ≡ "/" or c ≡ "?" or c ≡ "#" or c ≡ "@" or c ≡ "[" or c ≡ "]" {
             return false
@@ -600,7 +600,7 @@ fn is_host(string host) → bool {
 
 fn host_literal(string host) → string {
     var int i ← 0
-    while i < host.length() {
+    while i ≺ host.length() {
         if host.slice(i, i + 1) ≡ ":" {
             return "[§]"(host)
         }
@@ -614,7 +614,7 @@ fn remainder_path(string remainder) → string {
     const string first ← remainder.slice(0, 1)
     if first ≡ "?" or first ≡ "#" then return "/"
     var int i ← 0
-    while i < remainder.length() {
+    while i ≺ remainder.length() {
         const string c ← remainder.slice(i, i + 1)
         if c ≡ "?" or c ≡ "#" {
             const string path ← remainder.slice(0, i)
@@ -628,7 +628,7 @@ fn remainder_path(string remainder) → string {
 
 fn remainder_query(string remainder) → string {
     var int i ← 0
-    while i < remainder.length() {
+    while i ≺ remainder.length() {
         const string c ← remainder.slice(i, i + 1)
         if c ≡ "#" {
             return ""
@@ -636,7 +636,7 @@ fn remainder_query(string remainder) → string {
         if c ≡ "?" {
             const int start ← i + 1
             var int j ← start
-            while j < remainder.length() {
+            while j ≺ remainder.length() {
                 if remainder.slice(j, j + 1) ≡ "#" {
                     return remainder.slice(start, j)
                 }
@@ -652,7 +652,7 @@ fn remainder_query(string remainder) → string {
 fn ascii_lower(string s) → string {
     var string out ← ""
     var int i ← 0
-    while i < s.length() {
+    while i ≺ s.length() {
         out ← out + lower_char(s.slice(i, i + 1))
         i ← i + 1
     }
@@ -663,7 +663,7 @@ fn lower_char(string c) → string {
     const string upper ← "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
     const string lower ← "abcdefghijklmnopqrstuvwxyz"
     var int i ← 0
-    while i < 26 {
+    while i ≺ 26 {
         if upper.slice(i, i + 1) ≡ c {
             return lower.slice(i, i + 1)
         }

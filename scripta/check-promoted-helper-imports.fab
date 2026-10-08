@@ -33,7 +33,7 @@ fn find_promoted_row(string via) → string {
     const list<value> rows ← solum.read_lines(via) ↦ list<value>
     const int n ← rows.length()
     var int idx ← 0
-    while idx < n {
+    while idx ≺ n {
         const string row ← rows[idx] ↦ string
         if row.starts_with("| Compile/import-evidenced native helpers |") {
             return row
@@ -51,7 +51,7 @@ main {
     const map<string, value> fr ← processus.captura(["sh", "-c", "printf '%s' \"$FABER\""]) ↦ map<string, value>
     const string faber_env ← fr["stdout"] ↦ string
     var string faber ← root + "/../radix/target/debug/faber"
-    if faber_env.length() > 0 {
+    if faber_env.length() ≻ 0 {
         faber ← faber_env
     }
     if faber_env.length() ≡ 0 {
@@ -65,7 +65,7 @@ main {
     const map<string, value> lr ← processus.captura(["sh", "-c", "printf '%s' \"$FABER_LIBRARY_HOME\""]) ↦ map<string, value>
     const string lib_env ← lr["stdout"] ↦ string
     var string lib_home ← root + "/.."
-    if lib_env.length() > 0 {
+    if lib_env.length() ≻ 0 {
         lib_home ← lib_env
     }
 
@@ -118,7 +118,7 @@ main {
     for from promoted const module {
         var string safe ← ""
         var int i ← 0
-        while i < module.length() {
+        while i ≺ module.length() {
             const string c ← module.slice(i, i + 1)
             if c ≡ "/" {
                 safe ← safe + "_"
@@ -138,10 +138,10 @@ main {
             print "ok: norma:" + module
         } else {
             consolum.warn_line("check-promoted-helper-imports: failed import smoke for norma:" + module)
-            if check_stdout.length() > 0 {
+            if check_stdout.length() ≻ 0 {
                 consolum.warn_line(check_stdout)
             }
-            if check_stderr.length() > 0 {
+            if check_stderr.length() ≻ 0 {
                 consolum.warn_line(check_stderr)
             }
             status ← 1

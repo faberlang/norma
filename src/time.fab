@@ -21,7 +21,7 @@ locale = "en"
 # Why: Pad a single-digit field to two decimal characters for RFC3339 wire.
 @ private
 fn pad2(int n) → string {
-    if n < 10 then return "0§"(n ↦ string)
+    if n ≺ 10 then return "0§"(n ↦ string)
 
     return n ↦ string
 }
@@ -30,7 +30,7 @@ fn pad2(int n) → string {
 @ private
 fn pad4(int n) → string {
     var string out ↤ n
-    while out.length() < 4 {
+    while out.length() ≺ 4 {
         out ← "0§"(out)
     }
     return out

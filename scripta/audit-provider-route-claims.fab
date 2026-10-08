@@ -50,7 +50,7 @@ import from "faber:json" json
 fn contains_route(list<string> xs, string x) → bool {
     const int n ← xs.length()
     var int i ← 0
-    while i < n {
+    while i ≺ n {
         if xs[i] ≡ x {
             return true
         }
@@ -63,7 +63,7 @@ fn difference(list<string> a, list<string> b) → list<string> {
     var list<string> out ← empty
     const int n ← a.length()
     var int i ← 0
-    while i < n {
+    while i ≺ n {
         if contains_route(b, a[i]) ≡ false {
             out.append(a[i])
         }
@@ -76,7 +76,7 @@ fn intersect(list<string> a, list<string> b) → list<string> {
     var list<string> out ← empty
     const int n ← a.length()
     var int i ← 0
-    while i < n {
+    while i ≺ n {
         if contains_route(b, a[i]) {
             out.append(a[i])
         }
@@ -89,7 +89,7 @@ fn intersect(list<string> a, list<string> b) → list<string> {
 fn lines_contain(list<string> lines, string needle) → bool {
     const int n ← lines.length()
     var int i ← 0
-    while i < n {
+    while i ≺ n {
         if lines[i].contains(needle) {
             return true
         }
@@ -108,14 +108,14 @@ fn collect_fab(string dir) → list<string> {
     const list<string> sorted ← names.sorted() ↦ list<string>
     const int n ← sorted.length()
     var int i ← 0
-    while i < n {
+    while i ≺ n {
         const string name ← sorted[i]
         const string path ← dir + "/" + name
         if solum.is_directory(path) ↦ bool {
             const list<string> sub ← collect_fab(path)
             const int sn ← sub.length()
             var int j ← 0
-            while j < sn {
+            while j ≺ sn {
                 out.append(sub[j])
                 j ← j + 1
             }
@@ -142,15 +142,15 @@ fn call_routes(string text) → list<string> {
     const list<string> lines ← text.split("\n")
     const int line_count ← lines.length()
     var int li ← 0
-    while li < line_count {
+    while li ≺ line_count {
         const string line ← lines[li]
         if line.contains("call") {
             const int n ← line.length()
             var int i ← 0
-            while i < n {
+            while i ≺ n {
                 if line.slice(i, i + 4) ≡ "call" {
                     var bool boundary ← true
-                    if i > 0 {
+                    if i ≻ 0 {
                         if word_chars.contains(line.slice(i - 1, i)) {
                             boundary ← false
                         }
@@ -159,7 +159,7 @@ fn call_routes(string text) → list<string> {
                         # skip Python \s within the line
                         var int j ← i + 4
                         var bool scanning ← true
-                        while j < n and scanning {
+                        while j ≺ n and scanning {
                             const string c ← line.slice(j, j + 1)
                             if c ≡ " " or c ≡ "\t" {
                                 j ← j + 1
@@ -167,12 +167,12 @@ fn call_routes(string text) → list<string> {
                                 scanning ← false
                             }
                         }
-                        if j < n {
+                        if j ≺ n {
                             if line.slice(j, j + 1) ≡ "'" {
                                 var int k ← j + 1
                                 var bool closed ← false
                                 var string route ← ""
-                                while k < n and closed ≡ false {
+                                while k ≺ n and closed ≡ false {
                                     const string c2 ← line.slice(k, k + 1)
                                     if c2 ≡ "'" {
                                         closed ← true
@@ -181,7 +181,7 @@ fn call_routes(string text) → list<string> {
                                         k ← k + 1
                                     }
                                 }
-                                if closed and route.length() > 0 {
+                                if closed and route.length() ≻ 0 {
                                     routes.append(route)
                                 }
                             }
@@ -201,12 +201,12 @@ fn source_routes(string src) → list<string> {
     const list<string> files ← collect_fab(src)
     const int n ← files.length()
     var int i ← 0
-    while i < n {
+    while i ≺ n {
         const string text ← solum.read_file(files[i]) ↦ string
         const list<string> found ← call_routes(text)
         const int fc ← found.length()
         var int j ← 0
-        while j < fc {
+        while j ≺ fc {
             if contains_route(all, found[j]) ≡ false {
                 all.append(found[j])
             }
@@ -224,7 +224,7 @@ fn routes_with_prefix(list<string> all, string family) → list<string> {
     var list<string> out ← empty
     const int n ← all.length()
     var int i ← 0
-    while i < n {
+    while i ≺ n {
         if all[i].starts_with(prefix) {
             out.append(all[i])
         }
@@ -249,7 +249,7 @@ fn manifest_routes(string host, string family) → list<string> {
     var list<string> routes ← empty
     const int n ← calls.length()
     var int i ← 0
-    while i < n {
+    while i ≺ n {
         const map<string, value> entry ← calls[i] ↦ map<string, value>
         const string route ← entry["route"] ↦ string
         routes.append(route)
@@ -273,7 +273,7 @@ fn dispatch_corpus(string host, string family) → list<string> {
     const int src_len ← source.length()
     var int pos ← 0
     var bool marker_found ← false
-    while pos < src_len and marker_found ≡ false {
+    while pos ≺ src_len and marker_found ≡ false {
         if source.slice(pos, pos + marker_len) ≡ marker {
             marker_found ← true
         } else {
@@ -286,7 +286,7 @@ fn dispatch_corpus(string host, string family) → list<string> {
     }
     var int open_brace ← pos + marker_len
     var bool brace_found ← false
-    while open_brace < src_len and brace_found ≡ false {
+    while open_brace ≺ src_len and brace_found ≡ false {
         if source.slice(open_brace, open_brace + 1) ≡ "{" {
             brace_found ← true
         } else {
@@ -303,7 +303,7 @@ fn dispatch_corpus(string host, string family) → list<string> {
     const int route_prefix_len ← route_prefix.length()
     var int depth ← 1
     var int index ← open_brace + 1
-    while index < src_len and depth > 0 {
+    while index ≺ src_len and depth ≻ 0 {
         const string ch ← source.slice(index, index + 1)
         if ch ≡ "{" {
             depth ← depth + 1
@@ -318,7 +318,7 @@ fn dispatch_corpus(string host, string family) → list<string> {
                         var int k ← index + route_prefix_len
                         var string route ← route_prefix.slice(1, route_prefix_len)
                         var bool route_closed ← false
-                        while k < src_len and route_closed ≡ false {
+                        while k ≺ src_len and route_closed ≡ false {
                             const string c2 ← source.slice(k, k + 1)
                             if c2 ≡ "\"" {
                                 route_closed ← true
@@ -377,9 +377,9 @@ fn dirty_provider_paths(string host) → list<string> {
     var list<string> dirty ← empty
     const int n ← lines.length()
     var int i ← 0
-    while i < n {
+    while i ≺ n {
         const string line ← lines[i]
-        if line.length() > 0 {
+        if line.length() ≻ 0 {
             dirty.append(line)
         }
         i ← i + 1
@@ -393,8 +393,8 @@ fn repo_name(string host) → string {
     const int n ← parts.length()
     var string last ← host
     var int i ← 0
-    while i < n {
-        if parts[i].length() > 0 {
+    while i ≺ n {
+        if parts[i].length() ≻ 0 {
             last ← parts[i]
         }
         i ← i + 1
@@ -415,7 +415,7 @@ fn check_clean_provider_checkout(string host, list<string> stderr_lines) → boo
     stderr_lines.append("audit-provider-route-claims: " + name + " evidence checkout is dirty; commit or clean provider manifest/dispatch changes before accepting pinned evidence")
     const int n ← dirty.length()
     var int i ← 0
-    while i < n {
+    while i ≺ n {
         stderr_lines.append("  " + dirty[i])
         i ← i + 1
     }
@@ -441,7 +441,7 @@ fn run_audit(string root, string host, string expected_rev, list<string> stdout_
     const list<string> families ← ["aleator", "consolum", "processus", "solum", "tempus"]
     const int nf ← families.length()
     var int fi ← 0
-    while fi < nf {
+    while fi ≺ nf {
         const string family ← families[fi]
         const list<string> claimed ← routes_with_prefix(all_routes, family)
         const list<string> manifested ← manifest_routes(host, family)
@@ -488,7 +488,7 @@ fn run_audit(string root, string host, string expected_rev, list<string> stdout_
         const list<string> excluded_sorted ← excluded_list.sorted() ↦ list<string>
         const int el ← excluded_sorted.length()
         var int ei ← 0
-        while ei < el {
+        while ei ≺ el {
             stdout_lines.append("  excluded source-only: " + excluded_sorted[ei] + " (process exit is source-only until host exit has a protocol-visible terminal response)")
             ei ← ei + 1
         }
@@ -497,62 +497,62 @@ fn run_audit(string root, string host, string expected_rev, list<string> stdout_
         const list<string> exception_sorted ← exception_used.sorted() ↦ list<string>
         const int xl ← exception_sorted.length()
         var int xi ← 0
-        while xi < xl {
+        while xi ≺ xl {
             stdout_lines.append("  manifest-only exception: " + exception_sorted[xi] + " (deliberately direct-host: streamed SHA-256 file digest admitted with no Norma claim or wrapper)")
             xi ← xi + 1
         }
 
-        if unexpected_source_only.length() > 0 {
+        if unexpected_source_only.length() ≻ 0 {
             status ← 1
             stderr_lines.append("audit-provider-route-claims: " + family + " source routes missing from manifest:")
             const list<string> sorted ← unexpected_source_only.sorted() ↦ list<string>
             const int sn ← sorted.length()
             var int li ← 0
-            while li < sn {
+            while li ≺ sn {
                 stderr_lines.append("  " + sorted[li])
                 li ← li + 1
             }
         }
-        if missing_from_source.length() > 0 {
+        if missing_from_source.length() ≻ 0 {
             status ← 1
             stderr_lines.append("audit-provider-route-claims: " + family + " manifest routes missing from Norma source:")
             const list<string> sorted ← missing_from_source.sorted() ↦ list<string>
             const int sn ← sorted.length()
             var int li ← 0
-            while li < sn {
+            while li ≺ sn {
                 stderr_lines.append("  " + sorted[li])
                 li ← li + 1
             }
         }
-        if missing_from_dispatch.length() > 0 {
+        if missing_from_dispatch.length() ≻ 0 {
             status ← 1
             stderr_lines.append("audit-provider-route-claims: " + family + " manifest routes missing from provider dispatch:")
             const list<string> sorted ← missing_from_dispatch.sorted() ↦ list<string>
             const int sn ← sorted.length()
             var int li ← 0
-            while li < sn {
+            while li ≺ sn {
                 stderr_lines.append("  " + sorted[li])
                 li ← li + 1
             }
         }
-        if stale_exclusions.length() > 0 {
+        if stale_exclusions.length() ≻ 0 {
             status ← 1
             stderr_lines.append("audit-provider-route-claims: stale source-only exclusions for " + family + ":")
             const list<string> sorted ← stale_exclusions.sorted() ↦ list<string>
             const int sn ← sorted.length()
             var int li ← 0
-            while li < sn {
+            while li ≺ sn {
                 stderr_lines.append("  " + sorted[li])
                 li ← li + 1
             }
         }
-        if stale_exceptions.length() > 0 {
+        if stale_exceptions.length() ≻ 0 {
             status ← 1
             stderr_lines.append("audit-provider-route-claims: stale manifest-only exceptions for " + family + ":")
             const list<string> sorted ← stale_exceptions.sorted() ↦ list<string>
             const int sn ← sorted.length()
             var int li ← 0
-            while li < sn {
+            while li ≺ sn {
                 stderr_lines.append("  " + sorted[li])
                 li ← li + 1
             }
@@ -580,7 +580,7 @@ fn self_test_run() → int {
     const list<string> families ← ["aleator", "consolum", "processus", "solum", "tempus"]
     const int nf ← families.length()
     var int fi ← 0
-    while fi < nf {
+    while fi ≺ nf {
         const string family ← families[fi]
         const string provider_src ← host + "/crates/" + family + "/src"
         solum.create_dir(provider_src)
@@ -600,8 +600,8 @@ fn self_test_run() → int {
         var string calls_json ← ""
         const int rn ← routes.length()
         var int ri ← 0
-        while ri < rn {
-            if ri > 0 {
+        while ri ≺ rn {
+            if ri ≻ 0 {
                 calls_json ← calls_json + ", "
             }
             calls_json ← calls_json + "{\"route\": \"" + family + ":" + routes[ri] + "\"}"
@@ -624,7 +624,7 @@ fn self_test_run() → int {
     var string routes_fab ← ""
     const int nf2 ← families.length()
     var int f2 ← 0
-    while f2 < nf2 {
+    while f2 ≺ nf2 {
         const string family ← families[f2]
         var list<string> routes ← ["one"]
         if family ≡ "aleator" {
@@ -635,7 +635,7 @@ fn self_test_run() → int {
         }
         const int rn ← routes.length()
         var int ri ← 0
-        while ri < rn {
+        while ri ≺ rn {
             const string route ← family + ":" + routes[ri]
             const string safe ← route.replace(":", "_")
             routes_fab ← routes_fab + "fn " + safe + "() = call '" + route + "' ()\n"
@@ -784,20 +784,20 @@ main {
     const list<string> argv ← processus.argv() ↦ list<string>
     const int argc ← argv.length()
     var int ai ← 0
-    while ai < argc {
+    while ai ≺ argc {
         const string arg ← argv[ai]
         if arg ≡ "--self-test" {
             self_test ← true
         } else {
             if arg ≡ "--host-providers" {
                 ai ← ai + 1
-                if ai < argc {
+                if ai ≺ argc {
                     host ← argv[ai]
                 }
             } else {
                 if arg ≡ "--expected-rev" {
                     ai ← ai + 1
-                    if ai < argc {
+                    if ai ≺ argc {
                         expected_rev ← argv[ai]
                     }
                 }
@@ -824,13 +824,13 @@ main {
 
     const int so ← stdout_lines.length()
     var int oi ← 0
-    while oi < so {
+    while oi ≺ so {
         consolum.write_line(stdout_lines[oi])
         oi ← oi + 1
     }
     const int se ← stderr_lines.length()
     var int ei ← 0
-    while ei < se {
+    while ei ≺ se {
         consolum.warn_line(stderr_lines[ei])
         ei ← ei + 1
     }

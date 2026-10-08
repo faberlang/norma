@@ -121,7 +121,7 @@ class Deque<T> {
         # head is stored reversed (its tail is the queue head), so walk it
         # tail-first to emit in head order.
         var int i ← self.head.length()
-        while i > 0 {
+        while i ≻ 0 {
             i ← i - 1
             out.append(self.head.get(i))
         }

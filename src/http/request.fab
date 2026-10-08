@@ -39,7 +39,7 @@ fn from_target(string method, string target, headers.Headers headers, string bod
 
 fn target_path(string target) → string {
     var int i ← 0
-    while i < target.length() {
+    while i ≺ target.length() {
         const string c ← target.slice(i, i + 1)
         if c ≡ "?" or c ≡ "#" {
             return target.slice(0, i)
@@ -51,7 +51,7 @@ fn target_path(string target) → string {
 
 fn target_query(string target) → string {
     var int i ← 0
-    while i < target.length() {
+    while i ≺ target.length() {
         const string c ← target.slice(i, i + 1)
         if c ≡ "#" {
             return ""
@@ -59,7 +59,7 @@ fn target_query(string target) → string {
         if c ≡ "?" {
             const int start ← i + 1
             var int j ← start
-            while j < target.length() {
+            while j ≺ target.length() {
                 if target.slice(j, j + 1) ≡ "#" {
                     return target.slice(start, j)
                 }
@@ -77,13 +77,13 @@ fn decode_query_field(string query, string name) → string ∪ none {
     var int i ← 0
     while i ≤ query.length() {
         var int amp ← i
-        while amp < query.length() and query.slice(amp, amp + 1) ≠ "&" {
+        while amp ≺ query.length() and query.slice(amp, amp + 1) ≠ "&" {
             amp ← amp + 1
         }
         const string pair ← query.slice(i, amp)
         var int eq ← 0
         var bool has_eq ← false
-        while eq < pair.length() {
+        while eq ≺ pair.length() {
             if pair.slice(eq, eq + 1) ≡ "=" {
                 has_eq ← true
                 break
@@ -110,16 +110,16 @@ fn decode_query_field(string query, string name) → string ∪ none {
 fn percent_decode(string s) → string {
     var string out ← ""
     var int i ← 0
-    while i < s.length() {
+    while i ≺ s.length() {
         const string c ← s.slice(i, i + 1)
         if c ≡ "+" {
             out ← out + " "
             i ← i + 1
         }
-        elif c ≡ "%" and i + 2 < s.length() {
+        elif c ≡ "%" and i + 2 ≺ s.length() {
             const int hi ← hex_value(s.slice(i + 1, i + 2))
             const int lo ← hex_value(s.slice(i + 2, i + 3))
-            if hi < 0 or lo < 0 {
+            if hi ≺ 0 or lo ≺ 0 {
                 out ← out + c
                 i ← i + 1
             }
@@ -159,7 +159,7 @@ fn hex_value(string c) → int {
 # ASCII byte → length-1 textus. Query decoding is an ASCII-percent floor;
 # bytes outside the printable ASCII range are left as `?`.
 fn byte_char(int n) → string {
-    if n < 32 or n > 126 then return "?"
+    if n ≺ 32 or n ≻ 126 then return "?"
     const string printable ← " !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~"
     return printable.slice(n - 32, n - 31)
 }
