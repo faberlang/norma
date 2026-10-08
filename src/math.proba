@@ -24,7 +24,7 @@ fn is_nan(float x) → bool {
 
 describe "math catalog" {
     test "PI is positive" {
-        assert math.PI() > 0.0
+        assert math.PI() ≻ 0.0
     }
 
     test "add composes with PI helper" {
