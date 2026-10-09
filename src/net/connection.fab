@@ -15,37 +15,30 @@ class Socket {
     var int id = 0
 
     # Draw bytes (up to n if provided, otherwise whatever is available)
-    fn read_bytes(int n optional) → bytes {
-        panic "norma:net/connection.read_bytes is deferred pending Stage 2 dispatch"
-    }
+    @ unstable "deferred pending Stage 2 dispatch"
+    fn read_bytes(int n optional) → bytes
 
     @ future
-    fn read_bytes_async(int n optional) → bytes {
-        panic "norma:net/connection.read_bytes_async is deferred pending Stage 2 dispatch"
-    }
+    @ unstable "deferred pending Stage 2 dispatch"
+    fn read_bytes_async(int n optional) → bytes
 
     # Pour bytes
-    fn write_bytes(bytes data) → void {
-        panic "norma:net/connection.write_bytes is deferred pending Stage 2 dispatch"
-    }
+    @ unstable "deferred pending Stage 2 dispatch"
+    fn write_bytes(bytes data) → void
 
     @ future
-    fn write_bytes_async(bytes data) → void {
-        panic "norma:net/connection.write_bytes_async is deferred pending Stage 2 dispatch"
-    }
+    @ unstable "deferred pending Stage 2 dispatch"
+    fn write_bytes_async(bytes data) → void
 
     # Close connection
-    fn close() → void {
-        panic "norma:net/connection.close is deferred pending Stage 2 dispatch"
-    }
+    @ unstable "deferred pending Stage 2 dispatch"
+    fn close() → void
 
     # Remote endpoint
-    fn remote() → endpoint.Endpoint {
-        panic "norma:net/connection.remote is deferred pending Stage 2 dispatch"
-    }
+    @ unstable "deferred pending Stage 2 dispatch"
+    fn remote() → endpoint.Endpoint
 
     # Local endpoint
-    fn local() → endpoint.Endpoint {
-        panic "norma:net/connection.local is deferred pending Stage 2 dispatch"
-    }
+    @ unstable "deferred pending Stage 2 dispatch"
+    fn local() → endpoint.Endpoint
 }
