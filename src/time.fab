@@ -183,9 +183,8 @@ fn sleep(int ms) → void {
 # body becomes possible once cursor-return-from-function ships.
 @ cursor
 @ public
-fn interval(int ms) → cursor<instant> {
-    panic "norma:time.interval is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn interval(int ms) → cursor<instant>
 
 # =========================================================================
 # DURATION CONSTANTS (milliseconds — pure numeric literals)

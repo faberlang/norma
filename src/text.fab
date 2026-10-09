@@ -352,9 +352,8 @@ fn split_frontmatter(string document, string delimiter) → list<string> ⇥ str
 # Why: Collapse runs of ASCII spaces to a single space. This is
 # normalization, not byte encoding.
 @ public
-fn collapse_spaces(string s) → string {
-    panic "norma:text.collapse_spaces is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn collapse_spaces(string s) → string
 
 # Name: to_ascii (Latin locale: angustata) from angustare, "to narrow."
 # Morphologia: Perfectum result adjective; the returned value is narrowed to
@@ -362,18 +361,16 @@ fn collapse_spaces(string s) → string {
 # Why: Trust-boundary narrowing from textus to ascii.
 # Edge: Throws textus when any codepoint cannot be represented as ascii.
 @ public
-fn to_ascii(string s) → ascii ⇥ string {
-    panic "norma:text.to_ascii is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn to_ascii(string s) → ascii ⇥ string
 
 # Name: try_to_ascii (Latin locale: temptat) from temptare, "to try."
 # Morphologia: Praesens active verb; it attempts narrowing and reports
 # absence with nihil instead of throwing.
 # Why: Trust-boundary twin of to_ascii, distinct from mechanical try_decode.
 @ public
-fn try_to_ascii(string s) → ascii ∪ none {
-    panic "norma:text.try_to_ascii is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn try_to_ascii(string s) → ascii ∪ none
 
 # =========================================================================
 # SPLIT (limited — unbounded split stays on textus.divide)
@@ -385,9 +382,8 @@ fn try_to_ascii(string s) → ascii ∪ none {
 # Why: Split s by separator into at most limitem segments.
 # Edge: Unbounded split remains on textus.divide; this is the limited form.
 @ public
-fn split_n(string s, string separator, int limit) → list<string> {
-    panic "norma:text.split_n is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn split_n(string s, string separator, int limit) → list<string>
 
 # =========================================================================
 # MECHANICAL TRIO (UTF-8 textus ↔ octeti)
@@ -397,24 +393,21 @@ fn split_n(string s, string separator, int limit) → list<string> {
 # Morphologia: Imperativus mechanical verb shared with structured codecs.
 # Why: Materialize textus as UTF-8 octeti for outward or storable byte form.
 @ public
-fn encode(string s) → bytes {
-    panic "norma:text.encode is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn encode(string s) → bytes
 
 # Name: decode (Latin locale: solve) from solvere, "to loosen" or "to untangle."
 # Morphologia: Imperativus mechanical verb paired with encode.
 # Why: Interpret UTF-8 octeti as textus.
 # Edge: Invalid UTF-8 throws through the backing runtime.
 @ public
-fn decode(bytes data) → string {
-    panic "norma:text.decode is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn decode(bytes data) → string
 
 # Name: try_decode (Latin locale: tempta) from temptare, "to try" or "to attempt."
 # Morphologia: Imperativus mechanical verb; try decode without alternate
 # exit propagation.
 # Why: Decode UTF-8 when possible and return nihil on invalid bytes.
 @ public
-fn try_decode(bytes data) → string ∪ none {
-    panic "norma:text.try_decode is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn try_decode(bytes data) → string ∪ none

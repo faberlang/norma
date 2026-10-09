@@ -27,11 +27,11 @@ fn normalize_row(string row) → string {
 fn parse(string wire) → list<list<string>> {
     if wire.length() ≡ 0 then return empty
 
-    const list<string> rows ← text.split_n(wire, "\n", wire.length() + 1)
+    const list<string> rows ← wire.split("\n")
     var list<list<string>> map ← []
     for from rows const row {
         const string normalized ← normalize_row(row)
-        map.append(text.split_n(normalized, ",", normalized.length() + 1))
+        map.append(normalized.split(","))
     }
     return map
 }

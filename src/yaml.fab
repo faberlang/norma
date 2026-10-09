@@ -19,18 +19,16 @@ locale = "en"
 
 # Serialize value to YAML string
 @ public
-fn stringify(value value) → string {
-    panic "norma:yaml.stringify is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn stringify(value value) → string
 
 # Verb: stringify_all from "nectere" (to bind, tie together)
 # Why: Binding multiple documents into a single YAML stream.
 
 # Bind multiple documents into multi-doc YAML string
 @ public
-fn stringify_all(list<value> documents) → string {
-    panic "norma:yaml.stringify_all is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn stringify_all(list<value> documents) → string
 
 # =========================================================================
 # PARSING
@@ -39,23 +37,20 @@ fn stringify_all(list<value> documents) → string {
 
 # Parse YAML string to value (throws on error)
 @ public
-fn parse(string yaml) → value {
-    panic "norma:yaml.parse is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn parse(string yaml) → value
 
 # Verb: try_parse from "temptare" (to try, attempt)
 
 # Attempt to parse YAML string (returns null on error)
 @ public
-fn try_parse(string yaml) → value ∪ none {
-    panic "norma:yaml.try_parse is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn try_parse(string yaml) → value ∪ none
 
 # Verb: parse_all from "colligere" (to collect, gather)
 # Why: Gathering all documents from a multi-doc YAML stream.
 
 # Gather all documents from multi-doc YAML string
 @ public
-fn parse_all(string yaml) → list<value> {
-    panic "norma:yaml.parse_all is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn parse_all(string yaml) → list<value>

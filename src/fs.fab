@@ -231,16 +231,14 @@ fn mode(string path) → int {
 # to lower SolumStatus as a Tabula walk. The host gateway work is the
 # right moment to land that.
 @ public
-fn stat(string path) → FileStatus {
-    panic "norma:fs.stat is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn stat(string path) → FileStatus
 
 # Get file details (async — same materializer blocker as stat)
 @ future
 @ public
-fn stat_async(string path) → FileStatus {
-    panic "norma:fs.stat_async is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn stat_async(string path) → FileStatus
 
 # =========================================================================
 # FILE INFO - Symlinks

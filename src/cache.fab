@@ -23,51 +23,44 @@ locale = "en"
 # Get value by key (returns nihil if not found)
 @ future
 @ public
-fn get(string key) → string ∪ none {
-    panic "norma:cache.get is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn get(string key) → string ∪ none
 
 # Set value with optional TTL in seconds
 @ future
 @ public
-fn put(string key, string value, int ttl) → void {
-    panic "norma:cache.put is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn put(string key, string value, int ttl) → void
 
 # Set value only if key doesn't exist
 @ future
 @ public
-fn put_if_absent(string key, string value) → bool {
-    panic "norma:cache.put_if_absent is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn put_if_absent(string key, string value) → bool
 
 # Delete key(s)
 @ future
 @ public
-fn delete(list<string> keys) → int {
-    panic "norma:cache.delete is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn delete(list<string> keys) → int
 
 # Check if key exists
 @ future
 @ public
-fn exists(string key) → bool {
-    panic "norma:cache.exists is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn exists(string key) → bool
 
 # Get remaining TTL in seconds (-1 = no expiry, -2 = not found)
 @ future
 @ public
-fn ttl(string key) → int {
-    panic "norma:cache.ttl is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn ttl(string key) → int
 
 # Set expiry on existing key
 @ future
 @ public
-fn expire(string key, int seconds) → bool {
-    panic "norma:cache.expire is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn expire(string key, int seconds) → bool
 
 # =========================================================================
 # NUMERIC OPERATIONS
@@ -76,16 +69,14 @@ fn expire(string key, int seconds) → bool {
 # Increment by amount (default 1)
 @ future
 @ public
-fn increment(string key, int quantum) → int {
-    panic "norma:cache.increment is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn increment(string key, int quantum) → int
 
 # Decrement by 1
 @ future
 @ public
-fn decrement(string key) → int {
-    panic "norma:cache.decrement is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn decrement(string key) → int
 
 # =========================================================================
 # KEY QUERIES
@@ -94,9 +85,8 @@ fn decrement(string key) → int {
 # Find keys matching glob pattern
 @ future
 @ public
-fn find_keys(string pattern) → list<string> {
-    panic "norma:cache.find_keys is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn find_keys(string pattern) → list<string>
 
 # =========================================================================
 # PUB/SUB
@@ -105,17 +95,15 @@ fn find_keys(string pattern) → list<string> {
 # Publish message to topic, returns subscriber count
 @ future
 @ public
-fn publish(string topic, string message) → int {
-    panic "norma:cache.publish is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn publish(string topic, string message) → int
 
 # Subscribe to topic patterns
 # Pattern: * matches one segment, ** matches multiple
 @ future
 @ public
-fn subscribe(list<string> patterns) → Subscription {
-    panic "norma:cache.subscribe is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn subscribe(list<string> patterns) → Subscription
 
 # Pub/Sub subscription
 @ public

@@ -65,9 +65,8 @@ locale = "en"
 # Driver inferred from URL scheme.
 @ future
 @ public
-fn connect(string url) → Connection {
-    panic "norma:database.connect is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn connect(string url) → Connection
 
 # Database connection handle
 @ public

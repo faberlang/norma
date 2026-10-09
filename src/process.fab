@@ -49,9 +49,8 @@ class Subprocess {
 # a reserved keyword (TokenKind::Argumenta, used for CLI argument binding),
 # so a native body would need to rename it.
 @ public
-fn spawn(list<string> args, string directory optional, map<string, string> environment optional) → Subprocess {
-    panic "norma:process.spawn is deferred pending Stage 2 dispatch"
-}
+@ unstable "deferred pending Stage 2 dispatch"
+fn spawn(list<string> args, string directory optional, map<string, string> environment optional) → Subprocess
 
 # =========================================================================
 # SPAWN - Detached

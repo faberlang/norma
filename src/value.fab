@@ -15,8 +15,6 @@ locale = "en"
 # pattern that previously lived in json.fab and toml.fab is retired here
 # in favor of the flat `is` dispatch.
 
-import from "norma:text" text
-
 # =========================================================================
 # SHAPE PREDICATES
 # =========================================================================
@@ -104,9 +102,7 @@ fn get_index(value v, int index) → value {
 # key; numeric segments index lists. Returns null if any segment misses.
 @ public
 fn find(value v, string path) → value {
-    # chorda.split_n limited split: at most via.length()+1 segments,
-    # which is more than any dotted path can produce.
-    const list<string> parts ← text.split_n(path, ".", path.length() + 1) ↦ list<string>
+    const list<string> parts ← path.split(".")
     var value current ← v
     for from parts const pars {
         current ← find_part(current, pars)
