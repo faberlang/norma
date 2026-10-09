@@ -59,7 +59,7 @@ materializer blockers:
 | `src/processus.fab` | Process routes such as `dimitte`, `captura`, `exsequi`, and environment calls use `ad 'processus:*'`; `genera` is deferred because `Subprocessus` cannot be materialized yet. `processus:exi` is a source-only never-returning exit intent and is excluded from provider coverage until host exit has a protocol-visible terminal response. | Do not claim complete process lifecycle API or provider-covered process exit. |
 | `src/tempus.fab` | Clock and sleep routes use `ad`; `vigila` is deferred because live inbound cursor returns from functions are not available. | Do not claim timer streams/cursor route support. |
 | `src/crypta.fab` | Header describes gateway-dispatched routes, but sampled functions remain `mori` deferrals. | Do not claim crypto provider support. |
-| `docs/factory/nondum-mori-deferral-residual.md` | Runtime `mori` deferrals remain until free-function `@ nondum` support produces compile-time SEM017. | Public examples must not rely on deferred stubs without evidence. |
+| deferral mechanism | Free-function deferrals are bodiless `@ unstable` declarations refused at compile time (SEM017); class-method stubs may still panic at run time. | Public examples must not rely on deferred stubs without evidence. |
 
 This supports a source-library planning claim, not a public runnable API claim.
 

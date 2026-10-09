@@ -6,8 +6,8 @@ locale = "en"
 #
 # Etymology: fs — ground / base, local file I/O; Latin locale spelling `solum`.
 #
-# Operations route over `ad`; stat/stat_async remain explicit panic stubs until
-# Stage 2 can materialize FileStatus values.
+# Operations route over `ad`; stat/stat_async are bodiless `@ unstable` declarations (refused at
+# compile time) until Stage 2 can materialize FileStatus values.
 # Top-level path operations proxy norma:fs/path for compatibility.
 #
 # Sync and async wrappers use the same `ad` frame contract; `@ future` marks the

@@ -19,7 +19,7 @@ Allowed today:
   `./scripta/check-source`.
 - A module may be named as public source shape when the claim is about
   signatures, native Faber bodies, codegen templates, `ad` route intent, or
-  explicit `mori` deferral state.
+  explicit deferral state (`@ unstable` declarations).
 - `aleator`, `consolum`, `processus`, `solum`, and `tempus` may be described as
   route families with local provider manifest/dispatch coverage evidence in
   `faberlang/hosts` commit `e066ee0`, but not as public runnable support.
@@ -48,7 +48,7 @@ Blocked today:
 | Deferred HTTP codecs | `http/chunked`, `http/sse` | H1 structural leaves; bodies are H2 `mori` stubs | Source shape only | Chunked/SSE runtime behavior |
 | Deferred host-effect source shape | `arca`, `caelum`, `caelum/auscultator`, `caelum/connexus`, `crypta`, `http`, `http/server`, `http/client`, `pressura`, `thesaurus` | Public signatures and comments exist; client bodies are `mori "norma:... deferred pending Stage 2 dispatch"`; server bodies are `call 'http:*'` wrappers | Planned source shape only | Provider support, host gateway support, network/database/crypto/IPC/cache/compression runtime claims |
 | Deferred codec/mechanical routes | `codex`, `toml`, `yaml`; deferred portions of `chorda` | Public signatures exist; bodies are `mori` deferrals | Source facade or planned wire floor only | Encoding/TOML/YAML runtime behavior without conversion/provider evidence |
-| Deferral mechanism | 81 exact deferred `mori "norma:... deferred pending Stage ..."` stubs across 16 source files | `nondum-mori-deferral-residual.md` records `./scripta/audit-deferred-mori` output and keeps free-function `@ nondum` blocked on Radix SEM017 support | Runtime deferrals are known debt | Compile-time unavailability, unless Radix free-function `@ nondum` support lands |
+| Deferral mechanism | 58 bodiless `@ unstable "deferred pending Stage 2 dispatch"` free-function declarations across 12 source files; 11 class-method stubs in `src/net/connection.fab` and `src/net/listener.fab` still `panic` at run time (counts as of 2026-10-09; `rg 'deferred pending Stage' src` lists them) | Radix SEM017 `nondum_function_for_target` refuses any use of an `@ unstable` function at compile time (norma `56f8312`, radix `1fa1ad8e3`) | Free-function deferrals are known debt that fails at compile time; a remaining run-time `panic` stub is a defect to convert to the `@ unstable` form | Any runtime behavior of a deferred function |
 
 ## Promotion Triggers
 
@@ -62,9 +62,9 @@ matching evidence exists:
 | Local provider-coverage evidence | A repo-local provider packet, such as `faberlang/hosts` `e066ee0`, shows manifest/dispatch agreement and local tests for the route family. Norma's route audit must also pass against a clean sibling provider workspace at the expected revision, including its missing-dispatch, dirty-provider-evidence, and revision-mismatch negative self-tests. This permits private-preview evidence wording only. |
 | Public provider coverage claim | Provider manifest export exists for the route family, dispatch coverage is validated, and public contract output is regenerated from that export rather than hand-written. |
 | Runnable example claim | A public example imports the Norma module, runs through the released compiler/package path, and exercises the host route without private setup. |
-| Complete module claim | Every public function in that module is either native/generated and exercised, or has provider evidence; no `mori` deferral remains in the claimed surface. |
+| Complete module claim | Every public function in that module is either native/generated and exercised, or has provider evidence; no deferred stub (`@ unstable` declaration or run-time `panic` body) remains in the claimed surface. |
 | Cross-host or production claim | At least two host backends or an explicit target matrix pass the same example and negative cases; unsupported routes fail closed. |
-| Deferral cleanup claim | Radix free-function `@ nondum` SEM017 support exists and the module has been migrated away from runtime-only `mori` stubs. |
+| Deferral cleanup claim | The module has no run-time `panic` stub left: every deferral is a bodiless `@ unstable` declaration that SEM017 refuses at compile time, or has been given a real body. |
 
 ## Validation Commands
 
@@ -75,7 +75,6 @@ git diff --check
 ./scripta/check-source
 stage=$(mktemp -d) && cp scripta/check-promoted-helper-imports.fab "$stage/"
 FABER_LIBRARY_HOME="$(pwd)/.." faber run "$stage/check-promoted-helper-imports.fab"
-./scripta/audit-deferred-mori
 faber script scripta/audit-provider-route-claims.fab
 faber script scripta/audit-provider-route-claims.fab -- --self-test
 ```

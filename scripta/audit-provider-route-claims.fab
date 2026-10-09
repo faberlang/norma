@@ -102,7 +102,7 @@ fn lines_contain(list<string> lines, string needle) → bool {
 # SOURCE ROUTES (rglob('*.fab') + `\bcall\s+'([^']+)'`)
 # ===========================================================================
 
-fn collect_fab(string dir) → list<string> {
+fn collect_fab(string dir) → list<string> ⇥ string {
     var list<string> out ← empty
     const list<string> names ← solum.list_dir(dir) ↦ list<string>
     const list<string> sorted ← names.sorted() ↦ list<string>
@@ -196,7 +196,7 @@ fn call_routes(string text) → list<string> {
     return routes
 }
 
-fn source_routes(string src) → list<string> {
+fn source_routes(string src) → list<string> ⇥ string {
     var list<string> all ← empty
     const list<string> files ← collect_fab(src)
     const int n ← files.length()
@@ -237,7 +237,7 @@ fn routes_with_prefix(list<string> all, string family) → list<string> {
 # PROVIDER EVIDENCE (faberlang/hosts sibling checkout)
 # ===========================================================================
 
-fn manifest_routes(string host, string family) → list<string> {
+fn manifest_routes(string host, string family) → list<string> ⇥ string {
     const string manifest ← host + "/crates/" + family + "/src/manifest.json"
     if solum.is_regular(manifest) ↦ bool ≡ false {
         consolum.warn_line("audit-provider-route-claims: missing provider manifest: " + manifest)
@@ -261,7 +261,7 @@ fn manifest_routes(string host, string family) → list<string> {
 # Brace-matched body of the `match request.route.as_str() { ... }` dispatch,
 # then every `"family:route"` string inside it (same findings as the Python
 # body-extract + regex pass).
-fn dispatch_corpus(string host, string family) → list<string> {
+fn dispatch_corpus(string host, string family) → list<string> ⇥ string {
     const string lib ← host + "/crates/" + family + "/src/lib.rs"
     if solum.is_regular(lib) ↦ bool ≡ false {
         consolum.warn_line("audit-provider-route-claims: missing provider dispatch source: " + lib)
@@ -345,7 +345,7 @@ fn dispatch_corpus(string host, string family) → list<string> {
     return routes
 }
 
-fn git_short_head(string host) → string {
+fn git_short_head(string host) → string ⇥ string {
     const map<string, value> result ← processus.captura(["git", "-C", host, "rev-parse", "--short=7", "HEAD"]) ↦ map<string, value>
     const int status ← result["status"] ↦ int
     if status ≠ 0 {
@@ -357,7 +357,7 @@ fn git_short_head(string host) → string {
     return stdout.trim()
 }
 
-fn dirty_provider_paths(string host) → list<string> {
+fn dirty_provider_paths(string host) → list<string> ⇥ string {
     const map<string, value> refresh ← processus.captura(["git", "-C", host, "update-index", "-q", "--refresh"]) ↦ map<string, value>
     const int refresh_status ← refresh["status"] ↦ int
     if refresh_status ≠ 0 {
@@ -406,7 +406,7 @@ fn repo_name(string host) → string {
 # AUDIT
 # ===========================================================================
 
-fn check_clean_provider_checkout(string host, list<string> stderr_lines) → bool {
+fn check_clean_provider_checkout(string host, mut list<string> stderr_lines) → bool ⇥ string {
     const list<string> dirty ← dirty_provider_paths(host)
     if dirty.length() ≡ 0 {
         return true
@@ -422,14 +422,14 @@ fn check_clean_provider_checkout(string host, list<string> stderr_lines) → boo
     return false
 }
 
-fn run_audit(string root, string host, string expected_rev, list<string> stdout_lines, list<string> stderr_lines) → int {
+fn run_audit(string root, string host, string expected_rev, mut list<string> stdout_lines, mut list<string> stderr_lines) → int ⇥ string {
     const string actual_rev ← git_short_head(host)
     const bool revision_ok ← actual_rev ≡ expected_rev
     if revision_ok ≡ false {
         const string name ← repo_name(host)
         stderr_lines.append("audit-provider-route-claims: " + name + " revision mismatch: expected " + expected_rev + ", got " + actual_rev)
     }
-    const bool clean_ok ← check_clean_provider_checkout(host, stderr_lines)
+    const bool clean_ok ← check_clean_provider_checkout(host, mut stderr_lines)
     var int status ← 0
     if revision_ok ≡ false or clean_ok ≡ false {
         status ← 1
@@ -568,7 +568,7 @@ fn run_audit(string root, string host, string expected_rev, list<string> stdout_
 # manifest-only exception is asserted reported on stdout)
 # ===========================================================================
 
-fn self_test_run() → int {
+fn self_test_run() → int ⇥ string {
     const int pid ← processus.pid() ↦ int
     const string pid_s ← pid ↦ string
     const string tmp_base ← solum.temp_dir() ↦ string
@@ -670,7 +670,7 @@ fn self_test_run() → int {
     # Fixture 1: missing dispatch route must be rejected (aleator:missing)
     var list<string> stdout_lines ← empty
     var list<string> stderr_lines ← empty
-    const int status_one ← run_audit(norma_root, host, actual_rev, stdout_lines, stderr_lines)
+    const int status_one ← run_audit(norma_root, host, actual_rev, mut stdout_lines, mut stderr_lines)
     if status_one ≡ 0 {
         consolum.warn_line("audit-provider-route-claims: self-test failed to reject a missing dispatch route")
         solum.remove_tree(base)
@@ -694,7 +694,7 @@ fn self_test_run() → int {
     solum.write_file(aleator_src + "/manifest.json", dirty_manifest)
     var list<string> stdout_two ← empty
     var list<string> stderr_two ← empty
-    const int status_two ← run_audit(norma_root, host, actual_rev, stdout_two, stderr_two)
+    const int status_two ← run_audit(norma_root, host, actual_rev, mut stdout_two, mut stderr_two)
     if status_two ≡ 0 {
         consolum.warn_line("audit-provider-route-claims: self-test failed to reject dirty provider evidence")
         solum.remove_tree(base)
@@ -711,7 +711,7 @@ fn self_test_run() → int {
     solum.write_file(aleator_src + "/manifest.json", clean_manifest)
     var list<string> stdout_three ← empty
     var list<string> stderr_three ← empty
-    const int status_three ← run_audit(norma_root, host, "0000000", stdout_three, stderr_three)
+    const int status_three ← run_audit(norma_root, host, "0000000", mut stdout_three, mut stderr_three)
     if status_three ≡ 0 {
         consolum.warn_line("audit-provider-route-claims: self-test failed to reject a revision mismatch")
         solum.remove_tree(base)
@@ -731,7 +731,7 @@ fn self_test_run() → int {
     solum.write_file(aleator_src + "/lib.rs", unclaimed_lib)
     var list<string> stdout_four ← empty
     var list<string> stderr_four ← empty
-    const int status_four ← run_audit(norma_root, host, actual_rev, stdout_four, stderr_four)
+    const int status_four ← run_audit(norma_root, host, actual_rev, mut stdout_four, mut stderr_four)
     if status_four ≡ 0 {
         consolum.warn_line("audit-provider-route-claims: self-test failed to reject a manifested route with no Norma claim")
         solum.remove_tree(base)
@@ -750,7 +750,7 @@ fn self_test_run() → int {
     solum.write_file(solum_src + "/manifest.json", no_digestio_manifest)
     var list<string> stdout_five ← empty
     var list<string> stderr_five ← empty
-    const int status_five ← run_audit(norma_root, host, actual_rev, stdout_five, stderr_five)
+    const int status_five ← run_audit(norma_root, host, actual_rev, mut stdout_five, mut stderr_five)
     if status_five ≡ 0 {
         consolum.warn_line("audit-provider-route-claims: self-test failed to reject a stale manifest-only exception")
         solum.remove_tree(base)
@@ -820,7 +820,7 @@ main {
 
     var list<string> stdout_lines ← empty
     var list<string> stderr_lines ← empty
-    const int status ← run_audit(root, host, expected_rev, stdout_lines, stderr_lines)
+    const int status ← run_audit(root, host, expected_rev, mut stdout_lines, mut stderr_lines)
 
     const int so ← stdout_lines.length()
     var int oi ← 0

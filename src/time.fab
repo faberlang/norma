@@ -177,7 +177,7 @@ fn sleep(int ms) → void {
 # Verb: interval from "vigilare" (to watch, stay awake)
 # Why: Recurring timer; host pushes one frame per interval; Faber drains
 # the cursor. Stop by dropping the cursor or breaking the iteration.
-# Deferred as a panic stub: the runtime cannot yet return live inbound
+# Deferred as a bodiless `@ unstable` declaration: the runtime cannot yet return live inbound
 # cursor values from functions ("live tuus cursor values cannot be returned
 # from functions yet"). Matches thesaurus.messages. A native Faber `ad`
 # body becomes possible once cursor-return-from-function ships.
