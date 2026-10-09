@@ -111,7 +111,7 @@ interface Subscription {
     # Iterate over incoming messages (async generator)
     @ future
     @ cursor
-    fn messages() → cursor<Message>
+    fn messages() → iterator<Message>
 
     # Unsubscribe and cleanup
     fn close() → void

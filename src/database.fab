@@ -33,7 +33,7 @@ locale = "en"
 #               async-only open (no connecte pair; DB is futurum-first)
 #   quaer-    (quaerere)
 #               query       — async finite package → list<series>
-#               query_stream — async stream        → cursor<series>
+#               query_stream — async stream        → iterator<series>
 #   capi-     (capere)
 #               first_row   — async first row      → series ∪ null
 #               (distinct operation from quaer-; not a wrapper spelling)
@@ -86,7 +86,7 @@ interface Connection {
     # Stem quaer- · cell: future plural (async stream)
     @ future
     @ cursor
-    fn query_stream(string sql, list<value> params) → cursor<series>
+    fn query_stream(string sql, list<value> params) → iterator<series>
 
     # -----------------------------------------------------------------
     # MUTATIONS — stems exsequ- / inser-
@@ -133,7 +133,7 @@ interface Transaction {
     # Stem quaer- · future plural
     @ future
     @ cursor
-    fn query_stream(string sql, list<value> params) → cursor<series>
+    fn query_stream(string sql, list<value> params) → iterator<series>
 
     # Stem exsequ- · future singular
     @ future

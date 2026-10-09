@@ -184,7 +184,7 @@ fn sleep(int ms) → void {
 @ cursor
 @ public
 @ unstable "deferred pending Stage 2 dispatch"
-fn interval(int ms) → cursor<instant>
+fn interval(int ms) → iterator<instant>
 
 # =========================================================================
 # DURATION CONSTANTS (milliseconds — pure numeric literals)
