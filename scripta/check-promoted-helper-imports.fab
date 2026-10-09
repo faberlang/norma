@@ -29,7 +29,7 @@ import from "faber:solum" solum
 import from "faber:consolum" consolum
 
 # First row of the document starting with the promoted-helper matrix header.
-fn find_promoted_row(string via) → string {
+fn find_promoted_row(string via) → string ⇥ string {
     const list<value> rows ← solum.read_lines(via) ↦ list<value>
     const int n ← rows.length()
     var int idx ← 0
