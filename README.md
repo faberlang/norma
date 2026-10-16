@@ -1,3 +1,9 @@
+> **Archived — superseded.** Norma, the standard library, now lives in
+> [faberlang/faber](https://github.com/faberlang/faber) under `lib/norma`, and
+> ships inside the `faber` release. This repository is kept for history only.
+> The text below describes the retired layout, where Norma resolved through a
+> library-home environment variable, and no longer matches how Faber works.
+
 # Norma
 
 Norma is the default public Faber source library. Radix resolves imports such as
